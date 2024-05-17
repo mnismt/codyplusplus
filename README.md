@@ -1,8 +1,16 @@
+<div align=center>
+
+# <img src="https://i.imgur.com/jGfMIyy.png" width="26"> Cody++
+
+</div>
+
 # Cody++ README
 
 Cody++ is a VSCode extension that adds some missing features for developers who love Cody.
 
 This extension provides additional commands to enhance your development workflow with Cody.
+
+*Psst... This extension was developed with a little help from Cody too! :P*
 
 ## Requirements
 
@@ -18,6 +26,7 @@ This extension provides additional commands to enhance your development workflow
     - Right-click on a folder in the Explorer view.
     - Select `Add folder to Cody` from the context menu.
     - If the folder contains a large number of files, you will be prompted to confirm before proceeding.
+    - **Note**: The chat panel must be opened for this feature to work.
 
 ## Extension Settings
 

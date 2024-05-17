@@ -24,7 +24,7 @@
       "explorer/context": [
         {
           "command": "cody-plus-plus.addFolder",
-          "when": "explorerResourceIsFolder",
+          "when": "explorerResourceIsFolder && cody.activated",
           "group": "0_cody"
         }
       ]
