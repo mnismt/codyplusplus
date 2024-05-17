@@ -1,0 +1,38 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module"
+    },
+    "extends": [
+        "plugin:prettier/recommended"
+    ],
+    "plugins": [
+        "@typescript-eslint",
+        "prettier"
+    ],
+    "rules": {
+        "@typescript-eslint/naming-convention": [
+            "warn",
+            {
+                "selector": "import",
+                "format": [
+                    "camelCase",
+                    "PascalCase"
+                ]
+            }
+        ],
+        "prettier/prettier": [
+            "error",
+            {
+                "semi": false
+            }
+        ]
+    },
+    "ignorePatterns": [
+        "out",
+        "dist",
+        "**/*.d.ts"
+    ]
+}
