@@ -1,7 +1,7 @@
 {
   "name": "cody-plus-plus",
-  "displayName": "cody-plus-plus",
-  "description": "",
+  "displayName": "Cody++",
+  "description": "Cody++ is a VS Code extension that allows you to add folders to Cody Chat.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.89.0"
@@ -14,10 +14,20 @@
   "contributes": {
     "commands": [
       {
-        "command": "cody-plus-plus.helloWorld",
-        "title": "Hello World"
+        "command": "cody-plus-plus.addFolder",
+        "title": "Add Folder to Cody Chat",
+        "category": "Cody++"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "cody-plus-plus.addFolder",
+          "when": "explorerResourceIsFolder",
+          "group": "0_cody"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run package",
