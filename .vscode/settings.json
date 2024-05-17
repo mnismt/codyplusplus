@@ -13,5 +13,8 @@
     "editor.codeActionsOnSave": {
         "source.fixAll": "always",
         "source.organizeImports": "always"
-    }
+    },
+    "editor.formatOnSave": false,
+    "cody.chat.preInstruction": "You will assist me to develop a Vscode extension",
+    "cody.experimental.commitMessage": true
 }
