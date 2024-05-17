@@ -1,6 +1,6 @@
 <div align=center>
 
-# <img src="https://i.imgur.com/jGfMIyy.png" width="26"> Cody++
+# <img src="https://i.imgur.com/jGfMIyy.png" width="52">  Cody++
 
 </div>
 

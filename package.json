@@ -1,9 +1,16 @@
 {
   "name": "cody-plus-plus",
   "displayName": "Cody++",
-  "description": "Cody++ is a VS Code extension that allows you to add folders to Cody Chat.",
+  "description": "Adds some missing features for developers who love Cody",
   "publisher": "mnismt",
   "version": "0.0.1",
+  "license": "MIT",
+  "icon": "resources/cody-plus-plus.png",
+  "homepage": "https://github.com/mnismt/codyplusplus",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mnismt/codyplusplus"
+  },
   "engines": {
     "vscode": "^1.89.0"
   },
@@ -32,6 +39,7 @@
   },
   "scripts": {
     "vscode:prepublish": "pnpm run package",
+    "vscode:package": "pnpm run vscode:prepublish && pnpm vsce package --no-dependencies",
     "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
