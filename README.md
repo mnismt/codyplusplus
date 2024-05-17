@@ -1,6 +1,6 @@
 # cody-plus-plus README
 
-This is the README for your extension "cody-plus-plus". After writing up a brief description, we recommend including the following sections.
+Cody++ is a VSCode extension that adds some missing features for developers who loves Cody.
 
 ## Features
 
