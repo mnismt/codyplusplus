@@ -2,6 +2,7 @@
   "name": "cody-plus-plus",
   "displayName": "Cody++",
   "description": "Cody++ is a VS Code extension that allows you to add folders to Cody Chat.",
+  "publisher": "mnismt",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.89.0"
