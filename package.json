@@ -44,6 +44,17 @@
           "type": "number",
           "default": 15,
           "description": "The maximum number of files allowed before showing a warning message."
+        },
+        "codyPlusPlus.excludedFileTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            ".exe",
+            ".bin"
+          ],
+          "description": "List of file extensions to exclude from being added to Cody."
         }
       }
     }

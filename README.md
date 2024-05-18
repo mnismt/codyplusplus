@@ -33,6 +33,7 @@ This extension provides additional commands to enhance your development workflow
 This extension contributes the following settings:
 
 - `codyPlusPlus.fileThreshold`: The maximum number of files allowed before showing a warning message. Default is 15.
+- `codyPlusPlus.excludedFileTypes`: List of file extensions to exclude from being added to Cody. Default is [".exe", ".bin"].
 
 To configure this setting in two ways:
 
@@ -43,10 +44,11 @@ To configure this setting in two ways:
     - Adjust the `File Threshold` setting to your desired value.
 
 2. Using the `settings.json` file:
-    - Add this line to your `settings.json` file:
+    - Add these lines to your `settings.json` file:
 
         ```json
-        "codyPlusPlus.fileThreshold": 15
+        "codyPlusPlus.fileThreshold": 15,
+        "codyPlusPlus.excludedFileTypes": [".exe", ".bin"]
         ```
 
 ## Known Issues
