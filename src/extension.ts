@@ -1,6 +1,5 @@
 import * as path from 'path'
 import * as vscode from 'vscode'
-import { FILE_THRESHOLD } from './constants'
 import { CODY_COMMAND } from './constants/cody'
 
 export function activate(context: vscode.ExtensionContext) {
@@ -10,7 +9,11 @@ export function activate(context: vscode.ExtensionContext) {
     'cody-plus-plus.addFolder',
     async (uri: vscode.Uri) => {
       const fileCount = await countFilesInDirectory(uri)
-      if (fileCount > FILE_THRESHOLD) {
+      const fileThreshold = vscode.workspace
+        .getConfiguration('codyPlusPlus')
+        .get<number>('fileThreshold', 15)
+
+      if (fileCount > fileThreshold) {
         const userResponse = await vscode.window.showWarningMessage(
           `The folder contains ${fileCount} files. Do you want to proceed?`,
           { modal: true },

@@ -35,6 +35,17 @@
           "group": "0_cody"
         }
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Cody++ Configuration",
+      "properties": {
+        "codyPlusPlus.fileThreshold": {
+          "type": "number",
+          "default": 15,
+          "description": "The maximum number of files allowed before showing a warning message."
+        }
+      }
     }
   },
   "scripts": {

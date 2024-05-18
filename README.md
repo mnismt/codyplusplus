@@ -30,7 +30,24 @@ This extension provides additional commands to enhance your development workflow
 
 ## Extension Settings
 
-This extension does not contribute any settings.
+This extension contributes the following settings:
+
+- `codyPlusPlus.fileThreshold`: The maximum number of files allowed before showing a warning message. Default is 15.
+
+To configure this setting in two ways:
+
+1. Using the Settings UI:
+    - Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P` on Mac).
+    - Type `Preferences: Open Settings (UI)` and press Enter.
+    - In the search bar, type `Cody Plus Plus`.
+    - Adjust the `File Threshold` setting to your desired value.
+
+2. Using the `settings.json` file:
+    - Add this line to your `settings.json` file:
+
+        ```json
+        "codyPlusPlus.fileThreshold": 15
+        ```
 
 ## Known Issues
 
