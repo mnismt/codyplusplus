@@ -6,11 +6,7 @@
 
 # Cody++ README
 
-Cody++ is a VSCode extension that adds some missing features for developers who love Cody.
-
-This extension provides additional commands to enhance your development workflow with Cody.
-
-*Psst... This extension was developed with a little help from Cody too! :P*
+Cody++ is a VSCode extension that adds some missing features for developers who enjoy Cody.
 
 ## Requirements
 
