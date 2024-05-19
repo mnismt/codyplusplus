@@ -1,16 +1,26 @@
 <div align=center>
 
-# <img src="https://i.imgur.com/vgcnIwy.png" width="52">  Cody++
+# <img src="https://i.imgur.com/vgcnIwy.png" width="64">  Cody++
 
 </div>
 
 # Cody++ README
 
-Cody++ is a VSCode extension that adds some missing features for developers who enjoy Cody.
+Cody++ is a VSCode extension that adds some missing features for developers who enjoy [Cody](https://sourcegraph.com/cody).
 
 ## Requirements
 
 - You must have the [Cody](https://marketplace.visualstudio.com/items?itemName=sourcegraph.cody-ai) extension installed in VS Code.
+
+## Installation
+
+You can install the Cody++ extension from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mnismt.cody-plus-plus)
+
+You can also install the extension from the command line:
+
+```sh
+code --install-extension mnismt.cody-plus-plus
+```
 
 ## Features
 
@@ -29,7 +39,9 @@ Cody++ is a VSCode extension that adds some missing features for developers who 
 
 ## Demo
 
-<https://github.com/mnismt/codyplusplus/assets/27861064/b2b664bb-4f74-48eb-b18f-f0a24b87bf82>
+<video controls>
+  <source src="https://i.imgur.com/9WexYNl.mp4" type="video/mp4">
+</video>
 
 ## Extension Settings
 
