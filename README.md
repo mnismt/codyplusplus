@@ -1,6 +1,6 @@
 <div align=center>
 
-# <img src="https://i.imgur.com/jGfMIyy.png" width="52">  Cody++
+# <img src="https://i.imgur.com/vgcnIwy.png" width="52">  Cody++
 
 </div>
 
@@ -26,14 +26,14 @@ This extension provides additional commands to enhance your development workflow
 ## Usage
 
 - **Add Folder to Cody**:
-    - Right-click on a folder in the Explorer view.
-    - Select `Add folder to Cody` from the context menu.
-    - If the folder contains a large number of files, you will be prompted to confirm before proceeding.
-    - **Note**: The Cody chat panel must be opened for this feature to work.
+  - Right-click on a folder in the Explorer view.
+  - Select `Add folder to Cody` from the context menu.
+  - If the folder contains a large number of files, you will be prompted to confirm before proceeding.
+  - **Note**: The Cody chat panel must be opened for this feature to work.
 
 ## Demo
 
-https://github.com/mnismt/codyplusplus/assets/27861064/b2b664bb-4f74-48eb-b18f-f0a24b87bf82
+<https://github.com/mnismt/codyplusplus/assets/27861064/b2b664bb-4f74-48eb-b18f-f0a24b87bf82>
 
 ## Extension Settings
 
