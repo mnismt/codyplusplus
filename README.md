@@ -39,9 +39,7 @@ code --install-extension mnismt.cody-plus-plus
 
 ## Demo
 
-<video controls>
-  <source src="https://i.imgur.com/9WexYNl.mp4" type="video/mp4">
-</video>
+![Demo](https://i.imgur.com/GwLAWj4.gif)
 
 ## Extension Settings
 
