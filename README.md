@@ -25,11 +25,15 @@ This extension provides additional commands to enhance your development workflow
 
 ## Usage
 
-1. **Add Folder to Cody**:
+- **Add Folder to Cody**:
     - Right-click on a folder in the Explorer view.
     - Select `Add folder to Cody` from the context menu.
     - If the folder contains a large number of files, you will be prompted to confirm before proceeding.
     - **Note**: The Cody chat panel must be opened for this feature to work.
+
+## Demo
+
+https://github.com/mnismt/codyplusplus/assets/27861064/b2b664bb-4f74-48eb-b18f-f0a24b87bf82
 
 ## Extension Settings
 
@@ -53,13 +57,3 @@ To configure this setting in two ways:
         "codyPlusPlus.fileThreshold": 15,
         "codyPlusPlus.excludedFileTypes": [".exe", ".bin"]
         ```
-
-## Known Issues
-
-- None at the moment. Please report any issues you encounter.
-
-## Release Notes
-
-### 0.0.1
-
-- Initial release of Cody++.
