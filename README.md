@@ -18,7 +18,10 @@ This extension provides additional commands to enhance your development workflow
 
 ## Features
 
-- **Add Folder to Cody**: Recursively adds all files in a folder to Cody, with a confirmation prompt if the folder contains a large number of files.
+- **Add Folder to Cody**:
+  - Recursively adds all files in a folder to Cody.
+  - You can configure the maximum number of files allowed before showing a warning message.
+  - You can configure the file extensions to exclude from being added to Cody.
 
 ## Usage
 
@@ -26,7 +29,7 @@ This extension provides additional commands to enhance your development workflow
     - Right-click on a folder in the Explorer view.
     - Select `Add folder to Cody` from the context menu.
     - If the folder contains a large number of files, you will be prompted to confirm before proceeding.
-    - **Note**: The chat panel must be opened for this feature to work.
+    - **Note**: The Cody chat panel must be opened for this feature to work.
 
 ## Extension Settings
 
