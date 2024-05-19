@@ -39,7 +39,7 @@ code --install-extension mnismt.cody-plus-plus
 
 ## Demo
 
-![Demo](https://i.imgur.com/GwLAWj4.gif)
+![Add Folder](https://github.com/mnismt/codyplusplus/assets/27861064/726ec181-b33e-484f-bbe3-ceab9d6cdda5)
 
 ## Extension Settings
 
