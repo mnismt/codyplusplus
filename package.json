@@ -57,6 +57,23 @@
           "description": "List of file extensions to exclude from being added to Cody."
         }
       }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codyPlusPlus",
+          "title": "Cody++",
+          "icon": "resources/cody-plus-plus.png"
+        }
+      ]
+    },
+    "views": {
+      "codyPlusPlus": [
+        {
+          "id": "customCommands",
+          "name": "Custom Commands"
+        }
+      ]
     }
   },
   "scripts": {
@@ -98,5 +115,8 @@
       "eslint --fix",
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
   }
 }
