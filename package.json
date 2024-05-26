@@ -25,6 +25,12 @@
         "command": "cody-plus-plus.addFolder",
         "title": "Add Folder to Cody Chat",
         "category": "Cody++"
+      },
+      {
+        "command": "cody-plus-plus.addCustomCommand",
+        "title": "Add New",
+        "category": "Cody++",
+        "icon": "$(add)"
       }
     ],
     "menus": {
@@ -33,6 +39,13 @@
           "command": "cody-plus-plus.addFolder",
           "when": "explorerResourceIsFolder && cody.activated",
           "group": "0_cody"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "cody-plus-plus.addCustomCommand",
+          "when": "view == customCommands",
+          "group": "navigation"
         }
       ]
     },
