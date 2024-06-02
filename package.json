@@ -31,6 +31,18 @@
         "title": "Add New",
         "category": "Cody++",
         "icon": "$(add)"
+      },
+      {
+        "command": "codyPlusPlus.editCommand",
+        "title": "Edit",
+        "category": "Cody++",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "codyPlusPlus.deleteCommand",
+        "title": "Delete",
+        "category": "Cody++",
+        "icon": "$(trash)"
       }
     ],
     "menus": {
@@ -46,6 +58,18 @@
           "command": "cody-plus-plus.addCustomCommand",
           "when": "view == customCommands",
           "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "codyPlusPlus.editCommand",
+          "when": "viewItem == customCommand",
+          "group": "inline"
+        },
+        {
+          "command": "codyPlusPlus.deleteCommand",
+          "when": "viewItem == customCommand",
+          "group": "inline"
         }
       ]
     },

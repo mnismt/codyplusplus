@@ -35,13 +35,13 @@ export class CustomCommandsTreeView implements vscode.TreeDataProvider<CommandTr
             tooltip: this.commands[commandId].description,
             commandId: commandId,
             collapsibleState: vscode.TreeItemCollapsibleState.None,
-            iconPath: new vscode.ThemeIcon('terminal-bash')
+            iconPath: new vscode.ThemeIcon('terminal-bash'),
+            contextValue: 'customCommand'
           }) as CommandTreeItem
       )
     }
     return []
   }
-
   refresh(): void {
     this._onDidChangeTreeData.fire()
   }
