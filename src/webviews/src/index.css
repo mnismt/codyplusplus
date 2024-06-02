@@ -1,11 +1,116 @@
 body.vscode-light {
   color: black;
+  background-color: white;
 }
 
 body.vscode-dark {
   color: white;
+  background-color: #1e1e1e;
 }
 
 body.vscode-high-contrast {
   color: red;
+  background-color: black;
+}
+
+body {
+  font-family: var(--vscode-font-family, sans-serif);
+  font-size: var(--vscode-font-size, 14px);
+  line-height: var(--vscode-line-height, 1.5);
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: var(--vscode-textLink-foreground, #006ab1);
+}
+
+button {
+  background-color: var(--vscode-button-background, #0e639c);
+  color: var(--vscode-button-foreground, white);
+  border: none;
+  padding: 0.5em 1em;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--vscode-button-hoverBackground, #1177bb);
+}
+
+input,
+textarea {
+  background-color: var(--vscode-input-background, #3c3c3c);
+  color: var(--vscode-input-foreground, white);
+  border: 1px solid var(--vscode-input-border, #3c3c3c);
+  padding: 0.5em;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--vscode-focusBorder, #007fd4);
+  outline: none;
+}
+
+header {
+  background-color: var(--vscode-sideBar-background, #252526);
+  color: var(--vscode-sideBar-foreground, white);
+  padding: 1em;
+}
+
+footer {
+  background-color: var(--vscode-statusBar-background, #007acc);
+  color: var(--vscode-statusBar-foreground, white);
+  padding: 1em;
+  text-align: center;
+}
+
+.container {
+  padding: 1em;
+}
+
+.card {
+  background-color: var(--vscode-editor-background, #1e1e1e);
+  color: var(--vscode-editor-foreground, white);
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.card p {
+  margin-bottom: 0;
+}
+
+.container {
+  padding: 1em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.form-label {
+  font-weight: bold;
+}
+
+.form-control {
+  border: 1px solid var(--vscode-input-border, #3c3c3c);
+  padding: 0.5em;
+  width: 100%;
+  box-sizing: border-box;
 }
