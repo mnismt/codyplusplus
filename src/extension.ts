@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import { addCustomCommand } from './commands/addCustomCommand'
 import { addFolderCommand } from './commands/addFolder'
 import { CustomCommandsTreeView } from './views/CustomCommandsTreeView'
 
@@ -12,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   const addCustomCommandDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addCustomCommand',
-    () => {}
+    () => addCustomCommand(context)
   )
 
   const customCommandsTreeView = new CustomCommandsTreeView()
