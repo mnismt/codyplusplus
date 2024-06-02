@@ -5,7 +5,9 @@ import * as vscode from 'vscode'
 import { z } from 'zod'
 import { CODY_CUSTOM_COMMANDS_FILE } from '../constants/cody'
 
-const CommandContextSchema = z.object({
+export const CustomCommandId = z.string()
+
+export const CommandContextSchema = z.object({
   codebase: z.boolean().optional(),
   command: z.string().optional(),
   currentDir: z.boolean().optional(),
@@ -17,14 +19,19 @@ const CommandContextSchema = z.object({
   selection: z.boolean().optional()
 })
 
-const CustomCommandSchema = z.object({
-  description: z.string(),
+export const CustomCommandSchema = z.object({
+  description: z.string().optional(),
   prompt: z.string(),
   mode: z.enum(['ask', 'edit', 'insert']).optional(),
-  context: CommandContextSchema
+  context: CommandContextSchema.optional()
 })
 
-const CustomCommandsSchema = z.record(z.string(), CustomCommandSchema)
+export const CreateCommandSchema = z.object({
+  id: CustomCommandId,
+  data: CustomCommandSchema
+})
+
+export const CustomCommandsSchema = z.record(CustomCommandId, CustomCommandSchema)
 
 type CommandContext = z.infer<typeof CommandContextSchema>
 type CustomCommand = z.infer<typeof CustomCommandSchema>

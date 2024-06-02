@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
-import { CustomCommandService } from '../services/customCommand.service'
+import z from 'zod'
+import { CustomCommandService, CustomCommandsSchema } from '../services/customCommand.service'
 
 interface CommandTreeItem extends vscode.TreeItem {
   commandId: string
@@ -12,7 +13,7 @@ export class CustomCommandsTreeView implements vscode.TreeDataProvider<CommandTr
     this._onDidChangeTreeData.event
 
   private customCommandService: CustomCommandService
-  private commands: { [id: string]: { description: string } } = {}
+  private commands: z.infer<typeof CustomCommandsSchema> = {}
 
   constructor() {
     this.customCommandService = CustomCommandService.getInstance()
