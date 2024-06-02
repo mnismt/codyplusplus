@@ -32,21 +32,32 @@ function App() {
           <label htmlFor="name" className="form-label">
             Name
           </label>
-          <input type="text" name="name" className="form-control" required />
+          <input
+            type="text"
+            name="name"
+            className="form-control"
+            placeholder="Command name"
+            required
+          />
         </div>
 
         <div className="form-group">
           <label htmlFor="description" className="form-label">
             Description
           </label>
-          <input type="text" name="description" />
+          <input
+            type="text"
+            name="description"
+            className="form-control"
+            placeholder="Command description"
+          />
         </div>
 
         <div className="form-group">
           <label htmlFor="mode" className="form-label">
             Mode
           </label>
-          <select name="mode">
+          <select name="mode" className="form-control">
             <option value="ask">Ask</option>
             <option value="edit">Edit</option>
             <option value="insert">Insert</option>
@@ -57,10 +68,17 @@ function App() {
           <label htmlFor="prompt" className="form-label">
             Prompt
           </label>
-          <textarea name="prompt" className="form-control" required />
+          <textarea
+            name="prompt"
+            className="form-control"
+            cols={30}
+            rows={10}
+            required
+            placeholder="Command prompt"
+          />
         </div>
 
-        <div className="flex justify-end">
+        <div>
           <button type="submit">Create</button>
         </div>
       </form>
