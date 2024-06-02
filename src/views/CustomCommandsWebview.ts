@@ -1,5 +1,7 @@
 import * as vscode from 'vscode'
-import { DEV_WEBVIEW_URL } from '../constants/webview'
+import z from 'zod'
+import { COMMANDS, DEV_WEBVIEW_URL } from '../constants/webview'
+import { CreateCommandSchema, CustomCommandService } from '../services/customCommand.service'
 import { getNonce } from '../utils'
 
 export class CustomCommandsWebview {
@@ -7,6 +9,8 @@ export class CustomCommandsWebview {
   private readonly _panel: vscode.WebviewPanel
   private readonly _extensionUri: vscode.Uri
   private readonly _extensionMode: vscode.ExtensionMode
+  private readonly _nonce: string
+  private customCommandService: CustomCommandService
 
   private constructor(
     panel: vscode.WebviewPanel,
@@ -16,6 +20,8 @@ export class CustomCommandsWebview {
     this._panel = panel
     this._extensionUri = extensionUri
     this._extensionMode = extensionMode
+    this._nonce = getNonce()
+    this.customCommandService = CustomCommandService.getInstance()
 
     // Set the webview's initial HTML content
     this._panel.webview.html = this._getHtmlForWebview(this._panel.webview)
@@ -23,11 +29,7 @@ export class CustomCommandsWebview {
     // Handle messages from the webview
     this._panel.webview.onDidReceiveMessage(
       message => {
-        switch (message.command) {
-          case 'alert':
-            vscode.window.showErrorMessage(message.text)
-            return
-        }
+        this._handleMessage(message)
       },
       undefined,
       []
@@ -39,13 +41,6 @@ export class CustomCommandsWebview {
       ? vscode.window.activeTextEditor.viewColumn
       : undefined
 
-    // If we already have a panel, show it.
-    if (CustomCommandsWebview.currentPanel) {
-      CustomCommandsWebview.currentPanel._panel.reveal(column)
-      return
-    }
-
-    // Otherwise, create a new panel.
     const panel = vscode.window.createWebviewPanel(
       'customCommandsWebview',
       'Add Custom Command',
@@ -70,6 +65,29 @@ export class CustomCommandsWebview {
     return this._getProdHtml(webview)
   }
 
+  private _handleMessage(message: any) {
+    switch (message.command) {
+      case COMMANDS.CREATE_COMMAND:
+        this._createCommand(message)
+        break
+      // Add more cases here to handle other commands
+      default:
+        console.log('Received unknown message:', message)
+    }
+  }
+
+  private async _createCommand(message: z.infer<typeof CreateCommandSchema>) {
+    try {
+      const parsedCommandData = CreateCommandSchema.parse(message)
+      console.log(parsedCommandData)
+      const { id, data } = parsedCommandData
+      await this.customCommandService.addCommand(id, data)
+      vscode.window.showInformationMessage(`Command ${id} created successfully.`)
+    } catch (error: any) {
+      vscode.window.showErrorMessage(`Failed to create command (${error.message})`)
+    }
+  }
+
   private _getDevHtml(): string {
     return `
 <!doctype html>
@@ -91,6 +109,11 @@ export class CustomCommandsWebview {
   <body>
     <div id="root"></div>
     <script type="module" src="${DEV_WEBVIEW_URL}/src/main.tsx"></script>
+    
+    <script nonce="${this._nonce}">
+      window.nonce = "${this._nonce}";
+      window.vscode = acquireVsCodeApi();
+    </script>
   </body>
 </html>
 `
@@ -117,7 +140,11 @@ export class CustomCommandsWebview {
     </head>
     <body>
       <div id="root"></div>
-      <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
+      <script type="module" nonce="${nonce}" src="${scriptUri}"></>
+      <script nonce="${nonce}">
+        window.nonce = "${nonce}";
+        window.vscode = acquireVsCodeApi();
+      </script>
     </body>
     </html>`
   }
