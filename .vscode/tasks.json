@@ -67,7 +67,7 @@
             "label": "tasks: watch-webviews",
             "group": "build",
             "type": "shell",
-            "command": "pnpm run watch:webviews",
+            "command": "pnpm run watch:webviews"
         }
 	]
 }
