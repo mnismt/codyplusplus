@@ -31,10 +31,18 @@ export const CreateCommandSchema = z.object({
   data: CustomCommandSchema
 })
 
+export const UpdateCommandSchema = z.object({
+  id: CustomCommandId,
+  oldId: CustomCommandId.optional(),
+  data: CustomCommandSchema
+})
+
 export const CustomCommandsSchema = z.record(CustomCommandId, CustomCommandSchema)
 
 type CommandContext = z.infer<typeof CommandContextSchema>
-type CustomCommand = z.infer<typeof CustomCommandSchema>
+export type CustomCommand = z.infer<typeof CustomCommandSchema>
+export type CreateCustomCommand = z.infer<typeof CreateCommandSchema>
+export type UpdateCustomCommand = z.infer<typeof UpdateCommandSchema>
 type CustomCommands = z.infer<typeof CustomCommandsSchema>
 
 export class CustomCommandService {
@@ -92,14 +100,22 @@ export class CustomCommandService {
     this._onDidChangeCommands.fire()
   }
 
-  public async modifyCommand(id: string, command: CustomCommand): Promise<void> {
-    if (this.commands[id]) {
-      this.commands[id] = command
-      await this.saveCommands()
-      this._onDidChangeCommands.fire()
-    } else {
-      console.error(`CODY++: Command with id ${id} does not exist.`)
+  public async getCommand(id: string): Promise<CustomCommand> {
+    return this.commands[id]
+  }
+
+  public async updateCommand({ id, oldId, data }: UpdateCustomCommand): Promise<void> {
+    // If id !== oldId, we need to delete the old command and add the new one
+    console.log(id, oldId)
+    if (oldId && id !== oldId) {
+      await this.removeCommand(oldId)
+      await this.addCommand(id, data)
+      return
     }
+
+    this.commands[id] = data
+    await this.saveCommands()
+    this._onDidChangeCommands.fire()
   }
 
   public async removeCommand(id: string): Promise<void> {

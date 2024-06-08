@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import { addCustomCommand } from './commands/addCustomCommand'
+import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
 import { addFolderCommand } from './commands/addFolder'
 import { CustomCommandService } from './services/customCommand.service'
 import { CustomCommandsTreeView } from './views/CustomCommandsTreeView'
@@ -20,10 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   const editCommandDisposable = vscode.commands.registerCommand(
     'codyPlusPlus.editCommand',
-    (item: any) => {
-      // Implement the edit functionality here
-      vscode.window.showInformationMessage(`Edit command: ${item.commandId}`)
-    }
+    async (item: any) => editCustomCommand(context, item.commandId)
   )
 
   const deleteCommandDisposable = vscode.commands.registerCommand(

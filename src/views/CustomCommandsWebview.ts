@@ -1,7 +1,12 @@
 import * as vscode from 'vscode'
-import z from 'zod'
 import { COMMANDS, DEV_WEBVIEW_URL } from '../constants/webview'
-import { CreateCommandSchema, CustomCommandService } from '../services/customCommand.service'
+import {
+  CreateCommandSchema,
+  CreateCustomCommand,
+  CustomCommandService,
+  UpdateCommandSchema,
+  UpdateCustomCommand
+} from '../services/customCommand.service'
 import { getNonce } from '../utils'
 
 export class CustomCommandsWebview {
@@ -15,7 +20,8 @@ export class CustomCommandsWebview {
   private constructor(
     panel: vscode.WebviewPanel,
     extensionUri: vscode.Uri,
-    extensionMode: vscode.ExtensionMode
+    extensionMode: vscode.ExtensionMode,
+    initialState?: CreateCustomCommand
   ) {
     this._panel = panel
     this._extensionUri = extensionUri
@@ -24,7 +30,7 @@ export class CustomCommandsWebview {
     this.customCommandService = CustomCommandService.getInstance()
 
     // Set the webview's initial HTML content
-    this._panel.webview.html = this._getHtmlForWebview(this._panel.webview)
+    this._panel.webview.html = this._getHtmlForWebview(this._panel.webview, initialState)
 
     // Handle messages from the webview
     this._panel.webview.onDidReceiveMessage(
@@ -36,14 +42,18 @@ export class CustomCommandsWebview {
     )
   }
 
-  public static createOrShow(extensionUri: vscode.Uri, extensionMode: vscode.ExtensionMode) {
+  public static createOrShow(
+    extensionUri: vscode.Uri,
+    extensionMode: vscode.ExtensionMode,
+    initialState?: CreateCustomCommand
+  ) {
     const column = vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
       : undefined
 
     const panel = vscode.window.createWebviewPanel(
       'customCommandsWebview',
-      'Add Custom Command',
+      initialState ? `Edit Command "${initialState.id}"` : 'Add Custom Command',
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -54,15 +64,16 @@ export class CustomCommandsWebview {
     CustomCommandsWebview.currentPanel = new CustomCommandsWebview(
       panel,
       extensionUri,
-      extensionMode
+      extensionMode,
+      initialState
     )
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview): string {
+  private _getHtmlForWebview(webview: vscode.Webview, initialState?: CreateCustomCommand): string {
     if (this._extensionMode === vscode.ExtensionMode.Development) {
-      return this._getDevHtml()
+      return this._getDevHtml(initialState)
     }
-    return this._getProdHtml(webview)
+    return this._getProdHtml(webview, initialState)
   }
 
   private _handleMessage(message: any) {
@@ -70,13 +81,17 @@ export class CustomCommandsWebview {
       case COMMANDS.CREATE_COMMAND:
         this._createCommand(message)
         break
+      case COMMANDS.UPDATE_COMMAND:
+        console.log(message)
+        this._updateCommand(message)
+        break
       // Add more cases here to handle other commands
       default:
         console.log('Received unknown message:', message)
     }
   }
 
-  private async _createCommand(message: z.infer<typeof CreateCommandSchema>) {
+  private async _createCommand(message: CreateCustomCommand) {
     try {
       const parsedCommandData = CreateCommandSchema.parse(message)
       const { id, data } = parsedCommandData
@@ -87,7 +102,18 @@ export class CustomCommandsWebview {
     }
   }
 
-  private _getDevHtml(): string {
+  private async _updateCommand(message: UpdateCustomCommand) {
+    try {
+      const parsedCommandData = UpdateCommandSchema.parse(message)
+      const { id, oldId, data } = parsedCommandData
+      await this.customCommandService.updateCommand({ id, oldId, data })
+      vscode.window.showInformationMessage(`Command ${id} updated successfully.`)
+    } catch (error: any) {
+      vscode.window.showErrorMessage(`Failed to update command (${error.message})`)
+    }
+  }
+
+  private _getDevHtml(initialState?: CreateCustomCommand): string {
     return `
 <!doctype html>
 <html lang="en">
@@ -111,6 +137,7 @@ export class CustomCommandsWebview {
     
     <script nonce="${this._nonce}">
       window.nonce = "${this._nonce}";
+      ${initialState ? `window.initialState = ${JSON.stringify(initialState)};` : undefined}
       window.vscode = acquireVsCodeApi();
     </script>
   </body>
@@ -118,7 +145,7 @@ export class CustomCommandsWebview {
 `
   }
 
-  private _getProdHtml(webview: vscode.Webview): string {
+  private _getProdHtml(webview: vscode.Webview, initialState?: CreateCustomCommand): string {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, 'dist', 'webviews', 'assets', 'index.js')
     )
@@ -142,6 +169,7 @@ export class CustomCommandsWebview {
       <script type="module" nonce="${nonce}" src="${scriptUri}"></>
       <script nonce="${nonce}">
         window.nonce = "${nonce}";
+        ${initialState ? `window.initialState = ${JSON.stringify(initialState)};` : undefined}
         window.vscode = acquireVsCodeApi();
       </script>
     </body>

@@ -1,43 +1,70 @@
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { COMMANDS, postMessage } from './lib/vscodeApi'
 
+interface FormData {
+  name: string
+  description: string
+  mode: string
+  prompt: string
+}
+
 function App() {
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+  const { register, handleSubmit, setValue, getValues } = useForm<FormData>()
 
-    const formData = new FormData(event.currentTarget)
-    const name = formData.get('name') as string
-    const description = formData.get('description') as string
-    const mode = formData.get('mode') as string
-    const prompt = formData.get('prompt') as string
+  const [oldId, setOldId] = useState<string | undefined>(undefined)
+  const [isEditing, setIsEditing] = useState<boolean>(false)
 
+  useEffect(() => {
+    const initialState = (window as any).initialState
+    // Get initial data from the global window object
+    if (initialState) {
+      const { id, data } = initialState
+
+      setOldId(id)
+
+      setValue('name', id)
+      setValue('description', data.description || '')
+      setValue('mode', data.mode || 'ask')
+      setValue('prompt', data.prompt || '')
+
+      setIsEditing(true)
+    }
+  }, [setValue])
+
+  const onSubmit = (data: FormData) => {
     postMessage({
-      command: COMMANDS.CREATE_COMMAND,
-      id: name,
+      command: isEditing ? COMMANDS.UPDATE_COMMAND : COMMANDS.CREATE_COMMAND,
+      id: data.name,
+      oldId: isEditing ? oldId : undefined,
       data: {
-        description,
-        mode,
-        prompt
+        description: data.description,
+        mode: data.mode,
+        prompt: data.prompt
       }
     })
+
+    setOldId(data.name)
   }
 
   return (
     <main className="container">
-      <h1 className="font-bold">Create a new Cody custom command</h1>
+      <h1 className="font-bold">
+        {isEditing ? `Edit command "${getValues('name')}"` : `Create a new Cody custom command`}
+      </h1>
 
       <hr />
 
-      <form className="form" onSubmit={handleSubmit}>
+      <form className="form" onSubmit={handleSubmit(onSubmit)}>
         <div className="form-group">
           <label htmlFor="name" className="form-label">
             Name
           </label>
           <input
+            {...register('name', { required: true })}
             type="text"
-            name="name"
             className="form-control"
             placeholder="Command name"
-            required
           />
         </div>
 
@@ -46,8 +73,8 @@ function App() {
             Description
           </label>
           <input
+            {...register('description')}
             type="text"
-            name="description"
             className="form-control"
             placeholder="Command description"
           />
@@ -57,7 +84,7 @@ function App() {
           <label htmlFor="mode" className="form-label">
             Mode
           </label>
-          <select name="mode" className="form-control">
+          <select {...register('mode', { required: true })} className="form-control">
             <option value="ask">Ask</option>
             <option value="edit">Edit</option>
             <option value="insert">Insert</option>
@@ -69,7 +96,7 @@ function App() {
             Prompt
           </label>
           <textarea
-            name="prompt"
+            {...register('prompt', { required: true })}
             className="form-control"
             cols={30}
             rows={10}
@@ -79,7 +106,7 @@ function App() {
         </div>
 
         <div>
-          <button type="submit">Create</button>
+          <button type="submit">{isEditing ? 'Update' : 'Create'}</button>
         </div>
       </form>
     </main>
