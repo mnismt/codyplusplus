@@ -21,94 +21,6 @@ body {
   padding: 0;
 }
 
-a {
-  color: var(--vscode-textLink-foreground, #006ab1);
-}
-
-button {
-  background-color: var(--vscode-button-background, #0e639c);
-  color: var(--vscode-button-foreground, white);
-  border: none;
-  padding: 0.5em 1em;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: var(--vscode-button-hoverBackground, #1177bb);
-}
-
-input,
-textarea {
-  background-color: var(--vscode-input-background, #3c3c3c);
-  color: var(--vscode-input-foreground, white);
-  border: 1px solid var(--vscode-input-border, #3c3c3c);
-  padding: 0.5em;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-input:focus,
-textarea:focus {
-  border-color: var(--vscode-focusBorder, #007fd4);
-  outline: none;
-}
-
-select {
-  background-color: var(--vscode-input-background, #3c3c3c);
-  color: var(--vscode-input-foreground, white);
-  border: 1px solid var(--vscode-input-border, #3c3c3c);
-  padding: 0.5em;
-  width: 100%;
-  box-sizing: border-box;
-  appearance: none; /* Remove default styling */
-  -webkit-appearance: none; /* Remove default styling for Safari */
-  -moz-appearance: none; /* Remove default styling for Firefox */
-  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white"><path d="M4 6l4 4 4-4z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 0.5em center;
-  background-size: 1em;
-}
-
-select:focus {
-  border-color: var(--vscode-focusBorder, #007fd4);
-  outline: none;
-}
-
-
-header {
-  background-color: var(--vscode-sideBar-background, #252526);
-  color: var(--vscode-sideBar-foreground, white);
-  padding: 1em;
-}
-
-footer {
-  background-color: var(--vscode-statusBar-background, #007acc);
-  color: var(--vscode-statusBar-foreground, white);
-  padding: 1em;
-  text-align: center;
-}
-
-.container {
-  padding: 1em;
-}
-
-.card {
-  background-color: var(--vscode-editor-background, #1e1e1e);
-  color: var(--vscode-editor-foreground, white);
-  padding: 1em;
-  margin: 1em 0;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.card h2 {
-  margin-top: 0;
-}
-
-.card p {
-  margin-bottom: 0;
-}
-
 .container {
   padding: 1em;
 }
@@ -129,11 +41,3 @@ footer {
 .form-label {
   font-weight: bold;
 }
-
-.form-control {
-  border: 1px solid var(--vscode-input-border, #3c3c3c);
-  padding: 0.5em;
-  width: 100%;
-  box-sizing: border-box;
-}
-
