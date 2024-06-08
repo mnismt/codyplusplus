@@ -57,9 +57,13 @@ export class CustomCommandsWebview {
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,
-        localResourceRoots: [vscode.Uri.joinPath(extensionUri)]
+        retainContextWhenHidden: true,
+        enableFindWidget: true,
+        localResourceRoots: [vscode.Uri.joinPath(extensionUri)],
+        enableCommandUris: true
       }
     )
+    panel.iconPath = vscode.Uri.joinPath(extensionUri, 'resources', 'cody-plus-plus.png')
 
     CustomCommandsWebview.currentPanel = new CustomCommandsWebview(
       panel,
@@ -127,9 +131,7 @@ export class CustomCommandsWebview {
     </script>
     <script type="module" src="${DEV_WEBVIEW_URL}/@vite/client"></script>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cody++</title>
   </head>
   <body>
     <div id="root"></div>
@@ -155,14 +157,11 @@ export class CustomCommandsWebview {
     const cspSource = webview.cspSource
     const nonce = getNonce()
 
-    console.log({ initialState })
-
     return `<!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Add Custom Command</title>
       <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${cspSource} https:; script-src 'nonce-${nonce}' ${cspSource}; style-src 'unsafe-inline' ${cspSource};">
       <link rel="stylesheet" type="text/css" href="${styleUri}">
     </head>

@@ -86,8 +86,6 @@ function App() {
   const onSubmit = (data: FormData) => {
     data.name = slugify(data.name)
 
-    console.log({ data, isEditing, oldId })
-
     postMessage({
       command: isEditing ? COMMANDS.UPDATE_COMMAND : COMMANDS.CREATE_COMMAND,
       id: data.name,
@@ -155,18 +153,10 @@ function App() {
         </div>
 
         <div style={{ marginTop: '0.25rem' }}>
-          <h2>Context</h2>
+          <h2>Context (optional)</h2>
           <VSCodeDivider />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="context.codebase" className="form-label">
-            Codebase
-          </label>
-          <VSCodeCheckbox {...register('context.codebase')}>
-            Include contextual information from code search based on the prompt of the command.
-          </VSCodeCheckbox>
-        </div>
         <div className="form-group">
           <label htmlFor="context.command" className="form-label">
             Command
@@ -248,6 +238,17 @@ function App() {
             Include currently selected code. When not specified, Cody will try to use visible
             content from the current file instead
           </VSCodeCheckbox>
+        </div>
+        <div className="form-group">
+          <label htmlFor="context.codebase" className="form-label">
+            Codebase
+          </label>
+          <VSCodeCheckbox {...register('context.codebase')}>
+            Include contextual information from code search based on the prompt of the command.
+          </VSCodeCheckbox>
+          <small>
+            Warning: This option is experimental and might change or be removed in the future.
+          </small>
         </div>
 
         <VSCodeDivider />
