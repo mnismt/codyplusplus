@@ -155,6 +155,8 @@ export class CustomCommandsWebview {
     const cspSource = webview.cspSource
     const nonce = getNonce()
 
+    console.log({ initialState })
+
     return `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -166,7 +168,7 @@ export class CustomCommandsWebview {
     </head>
     <body>
       <div id="root"></div>
-      <script type="module" nonce="${nonce}" src="${scriptUri}"></>
+      <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
       <script nonce="${nonce}">
         window.nonce = "${nonce}";
         ${initialState ? `window.initialState = ${JSON.stringify(initialState)};` : undefined}
