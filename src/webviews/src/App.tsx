@@ -23,7 +23,7 @@ function App() {
 
   return (
     <main className="container">
-      <h1 className="font-bold">Create a new command</h1>
+      <h1 className="font-bold">Create a new Cody custom command</h1>
 
       <hr />
 

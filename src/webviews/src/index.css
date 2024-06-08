@@ -53,6 +53,28 @@ textarea:focus {
   outline: none;
 }
 
+select {
+  background-color: var(--vscode-input-background, #3c3c3c);
+  color: var(--vscode-input-foreground, white);
+  border: 1px solid var(--vscode-input-border, #3c3c3c);
+  padding: 0.5em;
+  width: 100%;
+  box-sizing: border-box;
+  appearance: none; /* Remove default styling */
+  -webkit-appearance: none; /* Remove default styling for Safari */
+  -moz-appearance: none; /* Remove default styling for Firefox */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white"><path d="M4 6l4 4 4-4z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 0.5em center;
+  background-size: 1em;
+}
+
+select:focus {
+  border-color: var(--vscode-focusBorder, #007fd4);
+  outline: none;
+}
+
+
 header {
   background-color: var(--vscode-sideBar-background, #252526);
   color: var(--vscode-sideBar-foreground, white);
@@ -114,3 +136,4 @@ footer {
   width: 100%;
   box-sizing: border-box;
 }
+
