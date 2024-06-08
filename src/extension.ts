@@ -28,9 +28,18 @@ export function activate(context: vscode.ExtensionContext) {
 
   const deleteCommandDisposable = vscode.commands.registerCommand(
     'codyPlusPlus.deleteCommand',
-    (item: any) => {
-      customCommandService.removeCommand(item.commandId)
-      vscode.window.showInformationMessage(`Delete command: ${item.commandId}`)
+    async (item: any) => {
+      const confirmation = await vscode.window.showWarningMessage(
+        `Are you sure you want to delete the "${item.commandId}" command?`,
+        { modal: true },
+        'Yes',
+        'No'
+      )
+
+      if (confirmation === 'Yes') {
+        customCommandService.removeCommand(item.commandId)
+        vscode.window.showInformationMessage(`Command "${item.commandId}" deleted successfully.`)
+      }
     }
   )
 

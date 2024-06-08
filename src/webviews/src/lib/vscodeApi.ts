@@ -15,7 +15,6 @@ declare global {
 }
 
 const vscode = window.vscode
-
 export const postMessage = (message: VscodeMessage) => {
   vscode.postMessage(message)
 }

@@ -125,7 +125,6 @@ export class CustomCommandService {
     try {
       const fileContent = JSON.stringify(this.commands, null, 2)
       await fs.promises.writeFile(codyJsonPath, fileContent, 'utf-8')
-      vscode.window.showInformationMessage('Custom commands saved successfully.')
     } catch (error: any) {
       console.error(`CODY++: Failed to save ${CODY_CUSTOM_COMMANDS_FILE}: ${error.message}`)
     }

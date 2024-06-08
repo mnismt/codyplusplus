@@ -47,7 +47,7 @@ export class CustomCommandsWebview {
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,
-        localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'src', 'webviews', 'dist')]
+        localResourceRoots: [vscode.Uri.joinPath(extensionUri)]
       }
     )
 
@@ -79,7 +79,6 @@ export class CustomCommandsWebview {
   private async _createCommand(message: z.infer<typeof CreateCommandSchema>) {
     try {
       const parsedCommandData = CreateCommandSchema.parse(message)
-      console.log(parsedCommandData)
       const { id, data } = parsedCommandData
       await this.customCommandService.addCommand(id, data)
       vscode.window.showInformationMessage(`Command ${id} created successfully.`)
@@ -121,10 +120,10 @@ export class CustomCommandsWebview {
 
   private _getProdHtml(webview: vscode.Webview): string {
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'src', 'webviews', 'dist', 'assets', 'index.js')
+      vscode.Uri.joinPath(this._extensionUri, 'dist', 'webviews', 'assets', 'index.js')
     )
     const styleUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'src', 'webviews', 'dist', 'assets', 'index.css')
+      vscode.Uri.joinPath(this._extensionUri, 'dist', 'webviews', 'assets', 'index.css')
     )
     const cspSource = webview.cspSource
     const nonce = getNonce()
