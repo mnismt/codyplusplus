@@ -28,17 +28,34 @@ export class CustomCommandsTreeView implements vscode.TreeDataProvider<CommandTr
     if (!element) {
       this.commands = this.customCommandService.getCommands()
 
-      return Object.keys(this.commands).map(
-        commandId =>
-          ({
-            label: commandId,
-            tooltip: this.commands[commandId].description,
-            commandId: commandId,
-            collapsibleState: vscode.TreeItemCollapsibleState.None,
-            iconPath: new vscode.ThemeIcon('terminal-bash'),
-            contextValue: 'customCommand'
-          }) as CommandTreeItem
-      )
+      return Object.keys(this.commands).map(commandId => {
+        const command = this.commands[commandId]
+        let iconPath: vscode.ThemeIcon
+
+        switch (command.mode) {
+          case 'ask':
+            iconPath = new vscode.ThemeIcon('comment-discussion')
+            break
+          case 'insert':
+            iconPath = new vscode.ThemeIcon('add')
+            break
+          case 'edit':
+            iconPath = new vscode.ThemeIcon('edit')
+            break
+          default:
+            iconPath = new vscode.ThemeIcon('comment-discussion')
+            break
+        }
+
+        return {
+          label: commandId,
+          tooltip: command.description,
+          commandId: commandId,
+          collapsibleState: vscode.TreeItemCollapsibleState.None,
+          iconPath: iconPath,
+          contextValue: 'customCommand'
+        } as CommandTreeItem
+      })
     }
     return []
   }

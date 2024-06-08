@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { slugify } from '../../utils'
 import { COMMANDS, postMessage } from './lib/vscodeApi'
-
 interface FormData {
   name: string
   description: string
@@ -33,6 +33,8 @@ function App() {
   }, [setValue])
 
   const onSubmit = (data: FormData) => {
+    data.name = slugify(data.name)
+
     postMessage({
       command: isEditing ? COMMANDS.UPDATE_COMMAND : COMMANDS.CREATE_COMMAND,
       id: data.name,
@@ -44,6 +46,7 @@ function App() {
       }
     })
 
+    setValue('name', data.name)
     setOldId(data.name)
   }
 
