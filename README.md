@@ -28,6 +28,8 @@ code --install-extension mnismt.cody-plus-plus
   - Recursively adds all files in a folder to Cody.
   - You can configure the maximum number of files allowed before showing a warning message.
   - You can configure the file extensions to exclude from being added to Cody.
+- **Add Custom Command**:
+  - Add, edit, and remove custom commands from the workspace settings.
 
 ## Usage
 
@@ -36,10 +38,21 @@ code --install-extension mnismt.cody-plus-plus
   - Select `Add folder to Cody` from the context menu.
   - If the folder contains a large number of files, you will be prompted to confirm before proceeding.
   - **Note**: The Cody chat panel must be opened for this feature to work.
+- **Add Custom Command**:
+  - Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P` on Mac).
+  - Type `Add New` and select `Add New`.
+  - Use the UI to create or edit a custom command.
+  - Click `Save` or `Update` to save the changes.
 
 ## Demo
 
+### Add a folder
+
 ![Add Folder](https://github.com/mnismt/codyplusplus/assets/27861064/726ec181-b33e-484f-bbe3-ceab9d6cdda5)
+
+### Create a custom command
+
+![Create a custom command](https://github.com/mnismt/codyplusplus/assets/27861064/4724c351-70ce-4926-9ead-a3115b581420)
 
 ## Extension Settings
 
