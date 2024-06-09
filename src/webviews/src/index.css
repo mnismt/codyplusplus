@@ -1,0 +1,43 @@
+body.vscode-light {
+  color: black;
+  background-color: white;
+}
+
+body.vscode-dark {
+  color: white;
+  background-color: #1e1e1e;
+}
+
+body.vscode-high-contrast {
+  color: red;
+  background-color: black;
+}
+
+body {
+  font-family: var(--vscode-font-family, sans-serif);
+  font-size: var(--vscode-font-size, 14px);
+  line-height: var(--vscode-line-height, 1.5);
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  padding: 1em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.form-label {
+  font-weight: bold;
+}

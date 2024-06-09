@@ -62,6 +62,12 @@
 				"npm: watch-tests"
 			],
 			"problemMatcher": []
-		}
+		},
+        {
+            "label": "tasks: watch-webviews",
+            "group": "build",
+            "type": "shell",
+            "command": "pnpm run watch:webviews"
+        }
 	]
 }
