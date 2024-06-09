@@ -114,13 +114,12 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "pnpm run package",
-    "vscode:package": "pnpm run vscode:prepublish && pnpm vsce package --no-dependencies",
+    "vscode:package": "pnpm run package && pnpm vsce package --no-dependencies",
     "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:webviews": "cd src/webviews && pnpm run dev",
-    "build:webviews": "cd src/webviews && pnpm run build && cpx \"./dist/assets/**\" \"../../dist/webviews/assets\"",
+    "build:webviews": "rm -rf dist/webviews && cd src/webviews && pnpm run build && cpx \"./dist/assets/**\" \"../../dist/webviews/assets\"",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "pnpm run check-types && pnpm run build:webviews && pnpm run lint && node esbuild.js --production",
     "compile-tests": "tsc -p . --outDir out",
