@@ -52,7 +52,7 @@ code --install-extension mnismt.cody-plus-plus
 
 ### Create a custom command
 
-![Create a custom command](https://github.com/mnismt/codyplusplus/assets/27861064/4724c351-70ce-4926-9ead-a3115b581420)
+![add-a-command-edited - 01](https://github.com/mnismt/codyplusplus/assets/27861064/d915d3ca-1eea-4dea-b69d-654b0f75d14f)
 
 ## Extension Settings
 
