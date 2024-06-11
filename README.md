@@ -9,6 +9,7 @@
 Cody++ is a VSCode extension that adds some missing features for developers who enjoy [Cody](https://sourcegraph.com/cody).
 
 [![](https://img.shields.io/badge/Chat_with_Cody++-Ask_Cody-%238A16D7?labelColor=%23383838)](https://sourcegraph.com/github.com/mnismt/CodyPlusPlus)
+![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/CodyPlusPlus)
 
 ## Requirements
 
