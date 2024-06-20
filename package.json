@@ -3,7 +3,7 @@
   "displayName": "Cody++",
   "description": "Adds some missing features for developers who love Cody",
   "publisher": "mnismt",
-  "version": "0.2.0",
+  "version": "0.1.1",
   "license": "MIT",
   "icon": "resources/cody-plus-plus.png",
   "homepage": "https://github.com/mnismt/codyplusplus",
