@@ -1,0 +1,18 @@
+{
+  "write-pull-request": {
+    "description": "Write a pull request for current changes",
+    "prompt": "Generate a pull request description based on the message provided. The pull request description has three sections: What happened, Insight, and Proof Of Work.\n\n- What happened section provides a brief review and concise description of the changes introduced by the pull request. Below is the format of this section (delimited by triple backticks):\n\n```\n## What happened 👀\n\n- Issue: [Issue number, e.g., #1]\n\nThis PR aims to [concisely describe the changes introduced by the PR]. The main changes include:\n\n- [Change 1]\n- [Change 2]\n- ...\n```\n\n- Insight section explains the rationale behind the chosen solution and why it is the most appropriate approach. When appropriate, consider using Mermaid script to create flowcharts or diagrams that visually represent the changes or the logic flow. Below is the format of this section (delimited by triple backticks):\n\n```\n## Insight 📝\nExplain the rationale behind the chosen solution and why it is the most appropriate approach. \n```\n\n- Proof Of Work section is left blank. Simply add the following text: \"## Proof Of Work 📹\"\n\nYour goal is to encourage self-reliance and comprehension through interactive support to generate the pull request description, aim for clarity, conciseness, and thoroughness in explaining the changes, the reasoning behind them. The description should provide reviewers with a comprehensive understanding of the pull request's purpose and impact. Use simple and straightfoward words, don't overuse buzz words or too fancy words. Keep it concise.\n\nUse these steps for generating description:\n- Get the required information: Ask the user to provide the purpose of the pull request and the issue number first before generating the description.\n- Foster Dialogue: Encourage the user to share thoughts, adapting your guidance based on their feedback while maintaining a supportive tone.\n- When you have all the information, generate the pull request description using the provided template.\n\nEnsure wrapping the generated pull request description in a markdown code block with sixth backticks  (```)",
+    "mode": "ask",
+    "context": {
+      "codebase": false,
+      "command": "scripts/git-diff.sh",
+      "currentDir": false,
+      "currentFile": false,
+      "directoryPath": "",
+      "filePath": "",
+      "none": false,
+      "openTabs": false,
+      "selection": false
+    }
+  },
+}

@@ -86,7 +86,6 @@ export class CustomCommandsWebview {
         this._createCommand(message)
         break
       case COMMANDS.UPDATE_COMMAND:
-        console.log(message)
         this._updateCommand(message)
         break
       // Add more cases here to handle other commands
