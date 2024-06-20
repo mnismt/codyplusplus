@@ -4,6 +4,9 @@ import * as vscode from 'vscode'
 export const CODY_COMMAND = {
   MENTION: {
     FILE: 'cody.mention.file'
+  },
+  COMMAND: {
+    CUSTOM: 'cody.command.custom'
   }
 }
 

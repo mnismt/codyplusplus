@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
 import z from 'zod'
+import { CODY_COMMAND } from '../constants/cody'
 import { CustomCommandService, CustomCommandsSchema } from '../services/customCommand.service'
 
 interface CommandTreeItem extends vscode.TreeItem {
@@ -53,7 +54,12 @@ export class CustomCommandsTreeView implements vscode.TreeDataProvider<CommandTr
           commandId: commandId,
           collapsibleState: vscode.TreeItemCollapsibleState.None,
           iconPath: iconPath,
-          contextValue: 'customCommand'
+          contextValue: 'customCommand',
+          command: {
+            title: `Execute ${commandId}`,
+            command: `${CODY_COMMAND.COMMAND.CUSTOM}.${commandId}`,
+            arguments: [commandId]
+          }
         } as CommandTreeItem
       })
     }
