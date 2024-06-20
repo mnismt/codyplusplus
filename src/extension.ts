@@ -51,4 +51,8 @@ export function activate(context: vscode.ExtensionContext) {
   )
 }
 
-export function deactivate() {}
+export function deactivate() {
+  if (CustomCommandService && CustomCommandService.getInstance()) {
+    CustomCommandService.getInstance().disposeFileWatcher()
+  }
+}

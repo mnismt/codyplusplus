@@ -1,9 +1,8 @@
 import * as fs from 'fs'
-import * as path from 'path'
 import * as vscode from 'vscode'
 
 import { z } from 'zod'
-import { CODY_CUSTOM_COMMANDS_FILE } from '../constants/cody'
+import { CODY_CUSTOM_COMMANDS_FILE, getCodyJsonPath } from '../constants/cody'
 
 export const CustomCommandId = z.string()
 
@@ -48,11 +47,13 @@ type CustomCommands = z.infer<typeof CustomCommandsSchema>
 export class CustomCommandService {
   private static instance: CustomCommandService
   private commands: CustomCommands = {}
+  private fileWatcher: vscode.FileSystemWatcher | undefined
   private _onDidChangeCommands: vscode.EventEmitter<void> = new vscode.EventEmitter<void>()
   public readonly onDidChangeCommands: vscode.Event<void> = this._onDidChangeCommands.event
 
   private constructor() {
     this.loadCommands()
+    this.setupFileWatcher()
   }
 
   public static getInstance(): CustomCommandService {
@@ -63,14 +64,11 @@ export class CustomCommandService {
   }
 
   private async loadCommands() {
-    const workspaceFolders = vscode.workspace.workspaceFolders
-    if (!workspaceFolders) {
-      console.error('CODY++: No workspace folder is open.')
+    const codyJsonPath = getCodyJsonPath()
+
+    if (!codyJsonPath) {
       return
     }
-
-    const vscodeFolderPath = path.join(workspaceFolders[0].uri.fsPath, '.vscode')
-    const codyJsonPath = path.join(vscodeFolderPath, CODY_CUSTOM_COMMANDS_FILE)
 
     try {
       const fileContent = await fs.promises.readFile(codyJsonPath, 'utf-8')
@@ -84,9 +82,30 @@ export class CustomCommandService {
       }
 
       this.commands = validationResult.data
-      this._onDidChangeCommands.fire()
+      this._onDidChangeCommands?.fire()
     } catch (error: any) {
       console.error(`CODY++: Failed to load ${CODY_CUSTOM_COMMANDS_FILE}: ${error.message}`)
+    }
+  }
+
+  private setupFileWatcher() {
+    const codyJsonPath = getCodyJsonPath()
+
+    if (!codyJsonPath) {
+      return
+    }
+
+    this.fileWatcher = vscode.workspace.createFileSystemWatcher(codyJsonPath)
+
+    this.fileWatcher.onDidChange(() => this.loadCommands())
+    this.fileWatcher.onDidCreate(() => this.loadCommands())
+    this.fileWatcher.onDidDelete(() => this.loadCommands())
+  }
+
+  public disposeFileWatcher() {
+    if (this.fileWatcher) {
+      this.fileWatcher.dispose()
+      this.fileWatcher = undefined
     }
   }
 
@@ -106,7 +125,6 @@ export class CustomCommandService {
 
   public async updateCommand({ id, oldId, data }: UpdateCustomCommand): Promise<void> {
     // If id !== oldId, we need to delete the old command and add the new one
-    console.log(id, oldId)
     if (oldId && id !== oldId) {
       await this.removeCommand(oldId)
       await this.addCommand(id, data)
@@ -129,14 +147,11 @@ export class CustomCommandService {
   }
 
   private async saveCommands(): Promise<void> {
-    const workspaceFolders = vscode.workspace.workspaceFolders
-    if (!workspaceFolders) {
-      console.error('CODY++: No workspace folder is open.')
+    const codyJsonPath = getCodyJsonPath()
+
+    if (!codyJsonPath) {
       return
     }
-
-    const vscodeFolderPath = path.join(workspaceFolders[0].uri.fsPath, '.vscode')
-    const codyJsonPath = path.join(vscodeFolderPath, `${CODY_CUSTOM_COMMANDS_FILE}`)
 
     try {
       const fileContent = JSON.stringify(this.commands, null, 2)
