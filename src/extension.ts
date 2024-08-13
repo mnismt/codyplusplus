@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
 import { addFolderCommand } from './commands/addFolder'
+import { addFile, addSelection } from './commands/addToCody'
 import { CustomCommandService } from './services/customCommand.service'
 import { CustomCommandsTreeView } from './views/CustomCommandsTreeView'
 
@@ -40,6 +41,16 @@ export function activate(context: vscode.ExtensionContext) {
     }
   )
 
+  const addFileToCodyDisposable = vscode.commands.registerCommand('cody-plus-plus.addFile', addFile)
+
+  const addSelectionToCodyDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.addSelection',
+    async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
+      const urisToAdd = allSelections || [contextSelection]
+      await addSelection(urisToAdd)
+    }
+  )
+
   const customCommandsTreeView = new CustomCommandsTreeView()
   vscode.window.registerTreeDataProvider('customCommands', customCommandsTreeView)
 
@@ -47,7 +58,9 @@ export function activate(context: vscode.ExtensionContext) {
     addFolderDisposable,
     addCustomCommandDisposable,
     editCommandDisposable,
-    deleteCommandDisposable
+    deleteCommandDisposable,
+    addFileToCodyDisposable,
+    addSelectionToCodyDisposable
   )
 }
 

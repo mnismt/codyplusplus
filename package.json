@@ -22,6 +22,16 @@
   "contributes": {
     "commands": [
       {
+        "command": "cody-plus-plus.addFile",
+        "title": "Add File to Cody",
+        "category": "Cody++"
+      },
+      {
+        "command": "cody-plus-plus.addSelection",
+        "title": "Add Selection to Cody",
+        "category": "Cody++"
+      },
+      {
         "command": "cody-plus-plus.addFolder",
         "title": "Add Folder to Cody Chat",
         "category": "Cody++"
@@ -47,6 +57,16 @@
     ],
     "menus": {
       "explorer/context": [
+        {
+          "command": "cody-plus-plus.addFile",
+          "when": "resourceScheme == file && !explorerResourceIsFolder",
+          "group": "0_cody"
+        },
+        {
+          "command": "cody-plus-plus.addSelection",
+          "when": "explorerViewletFocus && resourceScheme == file",
+          "group": "0_cody"
+        },
         {
           "command": "cody-plus-plus.addFolder",
           "when": "explorerResourceIsFolder && cody.activated",
