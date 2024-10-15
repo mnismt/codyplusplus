@@ -157,5 +157,6 @@
   },
   "dependencies": {
     "zod": "^3.23.8"
-  }
+  },
+  "packageManager": "pnpm@9.11.0"
 }
