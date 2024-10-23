@@ -3,7 +3,7 @@
   "displayName": "Cody++",
   "description": "Adds some missing features for developers who love Sourcegraph Cody",
   "publisher": "mnismt",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "MIT",
   "icon": "resources/cody-plus-plus.png",
   "homepage": "https://github.com/mnismt/codyplusplus",

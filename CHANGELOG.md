@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.1.3] - 2024-10-23
+
 - Add support for excluding folders from being added to Cody (#8)
 
 ## [0.1.2] - 2024-10-15
