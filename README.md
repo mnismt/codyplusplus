@@ -29,8 +29,9 @@ code --install-extension mnismt.cody-plus-plus
 
 - **Add Folder to Cody**:
   - Recursively adds all files in a folder to Cody.
-  - You can configure the maximum number of files allowed before showing a warning message.
   - You can configure the file extensions to exclude from being added to Cody.
+  - You can configure the folders to exclude from being added to Cody.
+  - You can configure the maximum number of files allowed before showing a warning message.
 - **Add Custom Command**:
   - Add, edit, and remove custom commands from the workspace settings.
 
