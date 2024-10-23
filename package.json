@@ -92,6 +92,17 @@
             ".bin"
           ],
           "description": "List of file extensions to exclude from being added to Cody."
+        },
+        "codyPlusPlus.excludedFolders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "node_modules",
+            ".git"
+          ],
+          "description": "List of folders to exclude from being added to Cody."
         }
       }
     },
@@ -147,7 +158,11 @@
     "lint-staged": "^15.2.2",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.2.5",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "conventional-changelog-cli": "^5.0.0",
+    "@release-it/conventional-changelog": "^8.0.1",
+    "@release-it/keep-a-changelog": "^5.0.0",
+    "release-it": "^17.5.0"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -157,5 +172,6 @@
   },
   "dependencies": {
     "zod": "^3.23.8"
-  }
+  },
+  "packageManager": "pnpm@9.11.0"
 }

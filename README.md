@@ -29,8 +29,9 @@ code --install-extension mnismt.cody-plus-plus
 
 - **Add Folder to Cody**:
   - Recursively adds all files in a folder to Cody.
-  - You can configure the maximum number of files allowed before showing a warning message.
   - You can configure the file extensions to exclude from being added to Cody.
+  - You can configure the folders to exclude from being added to Cody.
+  - You can configure the maximum number of files allowed before showing a warning message.
 - **Add Custom Command**:
   - Add, edit, and remove custom commands from the workspace settings.
 
@@ -63,6 +64,7 @@ This extension contributes the following settings:
 
 - `codyPlusPlus.fileThreshold`: The maximum number of files allowed before showing a warning message. Default is 15.
 - `codyPlusPlus.excludedFileTypes`: List of file extensions to exclude from being added to Cody. Default is [".exe", ".bin"].
+- `codyPlusPlus.excludedFolders`: List of folders to exclude from being added to Cody.
 
 To configure this setting in two ways:
 
@@ -70,7 +72,10 @@ To configure this setting in two ways:
     - Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P` on Mac).
     - Type `Preferences: Open Settings (UI)` and press Enter.
     - In the search bar, type `Cody Plus Plus`.
-    - Adjust the `File Threshold` setting to your desired value.
+    - Adjust the:
+      - `File Threshold` setting to your desired value.
+      - `Excluded File Types` setting to your desired value.
+      - `Excluded Folders` setting to your desired value.
 
 2. Using the `settings.json` file:
     - Add these lines to your `settings.json` file:
@@ -78,4 +83,5 @@ To configure this setting in two ways:
         ```json
         "codyPlusPlus.fileThreshold": 15,
         "codyPlusPlus.excludedFileTypes": [".exe", ".bin"]
+        "codyPlusPlus.excludedFolders": [".git", "node_modules"]
         ```
