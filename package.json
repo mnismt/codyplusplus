@@ -92,6 +92,17 @@
             ".bin"
           ],
           "description": "List of file extensions to exclude from being added to Cody."
+        },
+        "codyPlusPlus.excludedFolders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "node_modules",
+            ".git"
+          ],
+          "description": "List of folders to exclude from being added to Cody."
         }
       }
     },
