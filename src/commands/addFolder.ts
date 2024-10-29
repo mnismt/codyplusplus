@@ -3,8 +3,18 @@ import * as vscode from 'vscode'
 import { CODY_COMMAND } from '../constants/cody'
 import { countFilesInDirectory, walkDirectory } from '../utils/file'
 
-// Command function to add all files in a folder to Cody
+// Command function to add all files in a folder to Cody (recursive)
 export async function addFolderCommand(uri: vscode.Uri) {
+  await addFolderInternal(uri, true)
+}
+
+// Command function to add only files in the current folder to Cody (non-recursive)
+export async function addShallowFolderCommand(uri: vscode.Uri) {
+  await addFolderInternal(uri, false)
+}
+
+// Internal helper function to handle both recursive and non-recursive folder scanning
+async function addFolderInternal(uri: vscode.Uri, recursive: boolean) {
   // Retrieve extension configurations
   const config = vscode.workspace.getConfiguration('codyPlusPlus')
   // Maximum number of files before prompting the user
@@ -17,8 +27,13 @@ export async function addFolderCommand(uri: vscode.Uri) {
   console.log('CODY++', 'EXCLUDED FOLDERS', { excludedFolders })
 
   try {
-    // Pass excludedFolders to countFilesInDirectory
-    const fileCount = await countFilesInDirectory(uri, excludedFileTypes, excludedFolders)
+    // Count files
+    const fileCount = await countFilesInDirectory(
+      uri,
+      excludedFileTypes,
+      excludedFolders,
+      recursive
+    )
 
     // Prompt the user if file count exceeds threshold
     if (fileCount > fileThreshold) {
@@ -33,10 +48,14 @@ export async function addFolderCommand(uri: vscode.Uri) {
       }
     }
 
-    // Traverse the directory
-    await walkDirectory(uri, excludedFileTypes, excludedFolders, async fileUri => {
-      await executeMentionFileCommand(fileUri)
-    })
+    // Process files using walkDirectory with shallow flag based on recursive parameter
+    await walkDirectory(
+      uri,
+      excludedFileTypes,
+      excludedFolders,
+      executeMentionFileCommand,
+      !recursive
+    )
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to add folder to Cody: ${error.message}`)
   }

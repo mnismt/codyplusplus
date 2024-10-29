@@ -2,7 +2,7 @@
 import * as vscode from 'vscode'
 // Import custom command handlers
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
-import { addFolderCommand } from './commands/addFolder'
+import { addFolderCommand, addShallowFolderCommand } from './commands/addFolder'
 import { addFile, addSelection } from './commands/addToCody'
 // Import services and views
 import { CustomCommandService } from './services/customCommand.service'
@@ -19,6 +19,12 @@ export function activate(context: vscode.ExtensionContext) {
   const addFolderDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addFolder',
     addFolderCommand
+  )
+
+  // Register the "Add Shallow Folder" command, which adds only files in the current folder to Cody
+  const addShallowFolderDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.addShallowFolder',
+    addShallowFolderCommand
   )
 
   // Register the "Add Custom Command" command, which opens a UI to create a custom command
@@ -71,6 +77,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Add all disposables to the extension context for proper cleanup on deactivation
   context.subscriptions.push(
     addFolderDisposable,
+    addShallowFolderDisposable,
     addCustomCommandDisposable,
     editCommandDisposable,
     deleteCommandDisposable,

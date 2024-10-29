@@ -33,7 +33,12 @@
       },
       {
         "command": "cody-plus-plus.addFolder",
-        "title": "Add Folder to Cody Chat",
+        "title": "Add Folder and Subfolders to Cody Chat",
+        "category": "Cody++"
+      },
+      {
+        "command": "cody-plus-plus.addShallowFolder",
+        "title": "Add Files in Folder to Cody Chat",
         "category": "Cody++"
       },
       {
@@ -71,8 +76,14 @@
           "command": "cody-plus-plus.addFolder",
           "when": "explorerResourceIsFolder && cody.activated",
           "group": "0_cody"
+        },
+        {
+          "command": "cody-plus-plus.addShallowFolder",
+          "when": "explorerResourceIsFolder && cody.activated",
+          "group": "0_cody"
         }
-      ],      "view/title": [
+      ],
+      "view/title": [
         {
           "command": "cody-plus-plus.addCustomCommand",
           "when": "view == customCommands",
