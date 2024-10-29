@@ -1,9 +1,24 @@
 # Change Log
 
-All notable changes to the "cody-plus-plus" extension will be documented in this file.
-
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
 ## [Unreleased]
+
+## [0.1.3] - 2024-10-23
+
+- Add support for excluding folders from being added to Cody (#8)
+
+## [0.1.2] - 2024-10-15
+
+- Introduce a new logo that is distinct from the original Cody
+- Create FUNDING.yml
+
+## [0.1.1] - 2024-06-11
+
+- Implement file watcher for hot-reloading and command execution (#4)
+
+## [0.1.0] - 2024-06-09
+
+- Implement Cody Custom Management (#3)
+
+## [0.0.1] - 2024-05-19
 
 - Initial release
