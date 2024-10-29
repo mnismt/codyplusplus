@@ -23,12 +23,12 @@
     "commands": [
       {
         "command": "cody-plus-plus.addFile",
-        "title": "Add File to Cody",
+        "title": "Add File to Cody Chat",
         "category": "Cody++"
       },
       {
         "command": "cody-plus-plus.addSelection",
-        "title": "Add Selection to Cody",
+        "title": "Add Selection to Cody Chat",
         "category": "Cody++"
       },
       {
