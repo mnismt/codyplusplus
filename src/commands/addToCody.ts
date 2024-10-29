@@ -19,13 +19,14 @@ export async function addSelection(uris: vscode.Uri[]) {
   const config = vscode.workspace.getConfiguration('codyPlusPlus')
   const fileThreshold: number = config.get<number>('fileThreshold', 15)
   const excludedFileTypes: string[] = config.get<string[]>('excludedFileTypes', [])
+  const excludedFolders: string[] = config.get<string[]>('excludedFolders', [])
 
   try {
     let totalFileCount = 0
     for (const uri of uris) {
       const stat = await vscode.workspace.fs.stat(uri)
       if (stat.type === vscode.FileType.Directory) {
-        totalFileCount += await countFilesInDirectory(uri, excludedFileTypes)
+        totalFileCount += await countFilesInDirectory(uri, excludedFileTypes, excludedFolders)
       } else {
         totalFileCount++
       }
@@ -48,7 +49,7 @@ export async function addSelection(uris: vscode.Uri[]) {
       if (stat.type === vscode.FileType.File) {
         await executeMentionFileCommand(uri)
       } else if (stat.type === vscode.FileType.Directory) {
-        await walkDirectory(uri, excludedFileTypes, async fileUri => {
+        await walkDirectory(uri, excludedFileTypes, excludedFolders, async fileUri => {
           await executeMentionFileCommand(fileUri)
         })
       }
