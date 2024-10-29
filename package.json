@@ -59,12 +59,12 @@
       "explorer/context": [
         {
           "command": "cody-plus-plus.addFile",
-          "when": "resourceScheme == file && !explorerResourceIsFolder",
+          "when": "resourceScheme == file && !explorerResourceIsFolder && cody.activated",
           "group": "0_cody"
         },
         {
           "command": "cody-plus-plus.addSelection",
-          "when": "explorerViewletFocus && resourceScheme == file",
+          "when": "listMultiSelection && explorerViewletFocus && listHasSelectionOrFocus && cody.activated",
           "group": "0_cody"
         },
         {
@@ -72,8 +72,7 @@
           "when": "explorerResourceIsFolder && cody.activated",
           "group": "0_cody"
         }
-      ],
-      "view/title": [
+      ],      "view/title": [
         {
           "command": "cody-plus-plus.addCustomCommand",
           "when": "view == customCommands",
