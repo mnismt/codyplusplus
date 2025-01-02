@@ -28,7 +28,7 @@
       },
       {
         "command": "cody-plus-plus.addSelection",
-        "title": "Add Selection to Cody Chat",
+        "title": "Add Selected Files to Cody Chat",
         "category": "Cody++"
       },
       {
