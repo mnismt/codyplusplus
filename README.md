@@ -6,7 +6,7 @@
 
 # Cody++ README
 
-Cody++ is a VSCode extension that adds some missing features for developers who enjoy [Cody](https://sourcegraph.com/cody).
+Enhances [Cody AI](https://sourcegraph.com/cody) with additional file management and custom command features.
 
 [![](https://img.shields.io/badge/Chat_with_Cody++-Ask_Cody-%238A16D7?labelColor=%23383838)](https://sourcegraph.com/github.com/mnismt/CodyPlusPlus)
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/CodyPlusPlus)](https://twitter.com/CodyPlusPlus)
@@ -27,27 +27,33 @@ code --install-extension mnismt.cody-plus-plus
 
 ## Features
 
+### File Management
+
+- **Add File to Cody**:
+  - Adds a single file to Cody's context.
+- **Add Selected Files to Cody**:
+  - Adds multiple selected files to Cody's context.
+- **Add Selected Files to Cody (Recursive)**:
+  - Recursively adds multiple selected files, including those in subdirectories, to Cody's context.
 - **Add Folder to Cody**:
+  - Adds only the files in the selected folder (non-recursive) to Cody's context.
+- **Add Folder to Cody (Recursive)**:
   - Recursively adds all files in a folder to Cody.
   - You can configure the file extensions to exclude from being added to Cody.
   - You can configure the folders to exclude from being added to Cody.
   - You can configure the maximum number of files allowed before showing a warning message.
+
+### Custom Commands
+
 - **Add Custom Command**:
   - Add, edit, and remove custom commands from the workspace settings.
-
-## Usage
-
-- **Add Folder to Cody**:
-  - Right-click on a folder in the Explorer view.
-  - Select `Add folder to Cody` from the context menu.
-  - If the folder contains a large number of files, you will be prompted to confirm before proceeding.
-  - **Note**: The Cody chat panel must be opened for this feature to work.
-- **Add Custom Command**:
-  - Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P` on Mac).
-  - Type `Add New` and select `Add New`.
-  - Use the UI to create or edit a custom command.
-  - Click `Save` or `Update` to save the changes.
-
+  - Custom commands are managed in a `cody.json` file within your workspace's `.vscode` directory.
+  - Provides a user-friendly UI for creating and editing custom commands.
+- **Edit Custom Command**:
+  - Edit an existing custom command.
+- **Delete Custom Command**:
+  - Delete a custom command.
+  
 ## Demo
 
 ### Add a folder
@@ -82,6 +88,6 @@ To configure this setting in two ways:
 
         ```json
         "codyPlusPlus.fileThreshold": 15,
-        "codyPlusPlus.excludedFileTypes": [".exe", ".bin"]
+        "codyPlusPlus.excludedFileTypes": [".exe", ".bin"],
         "codyPlusPlus.excludedFolders": [".git", "node_modules"]
         ```

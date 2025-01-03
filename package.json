@@ -33,7 +33,7 @@
       },
       {
         "command": "cody-plus-plus.addSelectionRecursive",
-        "title": "Add Selected Files to Cody (Recursive)",
+        "title": "Add Selected Files (Recursive) to Cody ",
         "category": "Cody++"
       },
       {
