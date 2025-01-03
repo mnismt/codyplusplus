@@ -2,8 +2,12 @@
 import * as vscode from 'vscode'
 // Import custom command handlers
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
-import { addFolderCommand, addShallowFolderCommand } from './commands/addFolder'
-import { addFile, addSelection } from './commands/addToCody'
+import {
+  addFile,
+  addFolderCommand,
+  addSelection,
+  addShallowFolderCommand
+} from './commands/addToCody'
 // Import services and views
 import { CustomCommandService } from './services/customCommand.service'
 import { CustomCommandsTreeView } from './views/CustomCommandsTreeView'
@@ -60,13 +64,21 @@ export function activate(context: vscode.ExtensionContext) {
     }
   )
 
-  const addFileToCodyDisposable = vscode.commands.registerCommand('cody-plus-plus.addFile', addFile)
+  const addFileDisposable = vscode.commands.registerCommand('cody-plus-plus.addFile', addFile)
 
-  const addSelectionToCodyDisposable = vscode.commands.registerCommand(
+  const addSelectionDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addSelection',
     async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
       const urisToAdd = allSelections || [contextSelection]
-      await addSelection(urisToAdd)
+      await addSelection(urisToAdd, false)
+    }
+  )
+
+  const addSelectionRecursiveDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.addSelectionRecursive',
+    async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
+      const urisToAdd = allSelections || [contextSelection]
+      await addSelection(urisToAdd, true)
     }
   )
 
@@ -81,8 +93,9 @@ export function activate(context: vscode.ExtensionContext) {
     addCustomCommandDisposable,
     editCommandDisposable,
     deleteCommandDisposable,
-    addFileToCodyDisposable,
-    addSelectionToCodyDisposable
+    addFileDisposable,
+    addSelectionDisposable,
+    addSelectionRecursiveDisposable
   )
 }
 
