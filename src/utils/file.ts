@@ -5,7 +5,8 @@ import * as vscode from 'vscode'
 export async function countFilesInDirectory(
   uri: vscode.Uri,
   excludedFileTypes: string[] = [],
-  excludedFolders: string[] = []
+  excludedFolders: string[] = [],
+  shallow: boolean = false
 ): Promise<number> {
   let fileCount = 0
   // Read the contents of the directory
@@ -28,20 +29,20 @@ export async function countFilesInDirectory(
     if (fileType === vscode.FileType.File && !isFileExcluded) {
       // Increment count for non-excluded files
       fileCount++
-    } else if (fileType === vscode.FileType.Directory) {
+    } else if (fileType === vscode.FileType.Directory && !shallow) {
       // Recursively count files in subdirectories
-      fileCount += await countFilesInDirectory(fileUri, excludedFileTypes, excludedFolders)
+      fileCount += await countFilesInDirectory(fileUri, excludedFileTypes, excludedFolders, shallow)
     }
   }
   return fileCount
 }
-
 // Walk through a directory and execute a callback for each file, excluding specified folders
 export async function walkDirectory(
   uri: vscode.Uri,
   excludedFileTypes: string[] = [],
   excludedFolders: string[] = [],
-  callback: (fileUri: vscode.Uri) => Promise<void>
+  callback: (fileUri: vscode.Uri) => Promise<void>,
+  shallow: boolean = false
 ) {
   // Read the contents of the directory
   const files = await vscode.workspace.fs.readDirectory(uri)
@@ -54,14 +55,14 @@ export async function walkDirectory(
       console.log('CODY++', `File ${fileName} is being processed`)
       // Execute callback for non-excluded files
       await callback(fileUri)
-    } else if (fileType === vscode.FileType.Directory) {
+    } else if (fileType === vscode.FileType.Directory && !shallow) {
       const isFolderExcluded = isFolderNameExcluded(fileName, excludedFolders)
       if (isFolderExcluded) {
         console.log('CODY++', `Folder ${fileName} is excluded`)
         continue
       }
-      // Recursively walk through subdirectories
-      await walkDirectory(fileUri, excludedFileTypes, excludedFolders, callback)
+      // Recursively walk through subdirectories unless shallow mode is enabled
+      await walkDirectory(fileUri, excludedFileTypes, excludedFolders, callback, shallow)
     }
   }
 }

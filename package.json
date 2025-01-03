@@ -22,8 +22,23 @@
   "contributes": {
     "commands": [
       {
+        "command": "cody-plus-plus.addFile",
+        "title": "Add File to Cody",
+        "category": "Cody++"
+      },
+      {
+        "command": "cody-plus-plus.addSelection",
+        "title": "Add Selected Files to Cody",
+        "category": "Cody++"
+      },
+      {
         "command": "cody-plus-plus.addFolder",
-        "title": "Add Folder to Cody Chat",
+        "title": "Add Folder (Recursive) to Cody",
+        "category": "Cody++"
+      },
+      {
+        "command": "cody-plus-plus.addShallowFolder",
+        "title": "Add Folder to Cody",
         "category": "Cody++"
       },
       {
@@ -48,9 +63,24 @@
     "menus": {
       "explorer/context": [
         {
-          "command": "cody-plus-plus.addFolder",
-          "when": "explorerResourceIsFolder && cody.activated",
+          "command": "cody-plus-plus.addFile",
+          "when": "!explorerResourceIsFolder && !listMultiSelection && explorerViewletFocus && resourceLangId && cody.activated",
           "group": "0_cody"
+        },
+        {
+          "command": "cody-plus-plus.addSelection",
+          "when": "listMultiSelection && explorerViewletFocus && listHasSelectionOrFocus && cody.activated",
+          "group": "0_cody"
+        },
+        {
+          "command": "cody-plus-plus.addFolder",
+          "when": "explorerResourceIsFolder && explorerViewletFocus && cody.activated",
+          "group": "1_cody"
+        },
+        {
+          "command": "cody-plus-plus.addShallowFolder",
+          "when": "explorerResourceIsFolder && explorerViewletFocus && cody.activated",
+          "group": "1_cody"
         }
       ],
       "view/title": [
