@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-01-04
+
 - Add commands "Add File to Cody", "Add Folder to Cody" and "Add Selection to Cody" (#10 - thanks @Yandrik)
 - Rename "Add Folder to Cody" to "Add Folder (Recursive) to Cody"
 - Add "Add Selected Files (Recursive) to Cody" to recursively add selected multiple files & folders
