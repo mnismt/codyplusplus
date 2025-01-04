@@ -43,6 +43,8 @@ code --install-extension mnismt.cody-plus-plus
   - You can configure the folders to exclude from being added to Cody.
   - You can configure the maximum number of files allowed before showing a warning message.
 
+![main-post](https://github.com/user-attachments/assets/9f2bc225-77da-4d54-a814-946606b43972)
+
 ### Custom Commands
 
 - **Add Custom Command**:
@@ -53,18 +55,11 @@ code --install-extension mnismt.cody-plus-plus
   - Edit an existing custom command.
 - **Delete Custom Command**:
   - Delete a custom command.
-  
-## Demo
-
-### Add a folder
-
-![Add Folder](https://github.com/mnismt/codyplusplus/assets/27861064/726ec181-b33e-484f-bbe3-ceab9d6cdda5)
-
-### Create a custom command
-
-![add-a-command-edited - 01](https://github.com/mnismt/codyplusplus/assets/27861064/d915d3ca-1eea-4dea-b69d-654b0f75d14f)
+    
+![Cody++](https://github.com/user-attachments/assets/8426387a-62ee-49c7-9627-c438e28f079e)
 
 ## Extension Settings
+
 
 This extension contributes the following settings:
 
