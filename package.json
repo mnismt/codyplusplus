@@ -1,7 +1,7 @@
 {
   "name": "cody-plus-plus",
   "displayName": "Cody++",
-  "description": "Enhances Cody AI with additional file management and custom command features",
+  "description": "Enhances Cody AI with additional files control and custom command features",
   "publisher": "mnismt",
   "version": "0.2.0",
   "license": "MIT",

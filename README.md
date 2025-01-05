@@ -6,7 +6,7 @@
 
 # Cody++ README
 
-Enhances [Cody AI](https://sourcegraph.com/cody) with additional file management and custom command features.
+Enhances [Cody AI](https://sourcegraph.com/cody) with additional files control and custom command features.
 
 [![](https://img.shields.io/badge/Chat_with_Cody++-Ask_Cody-%238A16D7?labelColor=%23383838)](https://sourcegraph.com/github.com/mnismt/CodyPlusPlus)
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/CodyPlusPlus)](https://twitter.com/CodyPlusPlus)
@@ -27,7 +27,7 @@ code --install-extension mnismt.cody-plus-plus
 
 ## Features
 
-### File Management
+### files control
 
 - **Add File to Cody**:
   - Adds a single file to Cody's context.
