@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-01-08
+
 - Add welcome message to the custom commands tree view when no commands are added
 
 ## [0.2.0] - 2025-01-04

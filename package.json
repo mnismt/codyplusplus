@@ -3,7 +3,7 @@
   "displayName": "Cody++",
   "description": "Enhances Cody AI with additional files control and custom command features",
   "publisher": "mnismt",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "MIT",
   "icon": "resources/cody-plus-plus.png",
   "homepage": "https://github.com/mnismt/codyplusplus",
