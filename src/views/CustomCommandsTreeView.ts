@@ -28,8 +28,9 @@ export class CustomCommandsTreeView implements vscode.TreeDataProvider<CommandTr
   async getChildren(element?: CommandTreeItem): Promise<CommandTreeItem[]> {
     if (!element) {
       this.commands = this.customCommandService.getCommands()
+      const commandKeys = Object.keys(this.commands)
 
-      return Object.keys(this.commands).map(commandId => {
+      return commandKeys.map(commandId => {
         const command = this.commands[commandId]
         let iconPath: vscode.ThemeIcon
 
@@ -65,6 +66,7 @@ export class CustomCommandsTreeView implements vscode.TreeDataProvider<CommandTr
     }
     return []
   }
+
   refresh(): void {
     this._onDidChangeTreeData.fire()
   }

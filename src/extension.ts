@@ -39,13 +39,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Register the "Edit Command" command, allowing users to edit existing custom commands
   const editCommandDisposable = vscode.commands.registerCommand(
-    'codyPlusPlus.editCommand',
+    'cody-plus-plus.editCommand',
     async (item: any) => editCustomCommand(context, item.commandId)
   )
 
   // Register the "Delete Command" command, enabling users to delete custom commands
   const deleteCommandDisposable = vscode.commands.registerCommand(
-    'codyPlusPlus.deleteCommand',
+    'cody-plus-plus.deleteCommand',
     async (item: any) => {
       // Prompt the user for confirmation before deleting the command
       const confirmation = await vscode.window.showWarningMessage(
