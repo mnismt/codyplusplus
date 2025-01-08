@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add welcome message to the custom commands tree view when no commands are added
+
 ## [0.2.0] - 2025-01-04
 
 - Add commands "Add File to Cody", "Add Folder to Cody" and "Add Selection to Cody" (#10 - thanks @Yandrik)
