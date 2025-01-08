@@ -102,12 +102,12 @@
       ],
       "view/item/context": [
         {
-          "command": "codyPlusPlus.editCommand",
+          "command": "cody-plus-plus.editCommand",
           "when": "viewItem == customCommand",
           "group": "inline"
         },
         {
-          "command": "codyPlusPlus.deleteCommand",
+          "command": "cody-plus-plus.deleteCommand",
           "when": "viewItem == customCommand",
           "group": "inline"
         }
@@ -162,7 +162,13 @@
           "name": "Custom Commands"
         }
       ]
-    }
+    },
+    "viewsWelcome": [
+      {
+        "view": "customCommands",
+        "contents": "Welcome to Cody++ Custom Commands!\n\nNo custom commands found yet. Get started by adding your first command.\n\n[Add Custom Command](command:cody-plus-plus.addCustomCommand)\n\n[Watch Tutorial Video](https://youtu.be/ruVgjt0zIzk)"
+      }
+    ]
   },
   "scripts": {
     "vscode:package": "pnpm run package && pnpm vsce package --no-dependencies",
@@ -170,8 +176,8 @@
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:webviews": "cd src/webviews && pnpm run dev",
-    "build:webviews": "rm -rf dist/webviews && cd src/webviews && pnpm run build && cpx \"./dist/assets/**\" \"../../dist/webviews/assets\"",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "build:webviews": "rm -rf dist/webviews && cd src/webviews && pnpm run build && cpx \"./dist/assets/**\" \"../../dist/webviews/assets\"",
     "package": "pnpm run check-types && pnpm run build:webviews && pnpm run lint && node esbuild.js --production",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
