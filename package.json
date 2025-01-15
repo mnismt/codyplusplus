@@ -96,19 +96,19 @@
       "view/title": [
         {
           "command": "cody-plus-plus.addCustomCommand",
-          "when": "view == customCommands",
+          "when": "view == mainView",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "cody-plus-plus.editCommand",
-          "when": "viewItem == customCommand",
+          "when": "view == mainView",
           "group": "inline"
         },
         {
           "command": "cody-plus-plus.deleteCommand",
-          "when": "viewItem == customCommand",
+          "when": "view == mainView",
           "group": "inline"
         }
       ]
@@ -158,14 +158,15 @@
     "views": {
       "codyPlusPlus": [
         {
-          "id": "customCommands",
-          "name": "Custom Commands"
+          "id": "mainView",
+          "name": "Cody++",
+          "type": "webview"
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "customCommands",
+        "view": "mainView",
         "contents": "Welcome to Cody++ Custom Commands!\n\nNo custom commands found yet. Get started by adding your first command.\n\n[Add Custom Command](command:cody-plus-plus.addCustomCommand)\n\n[Watch Tutorial Video](https://youtu.be/ruVgjt0zIzk)"
       }
     ]

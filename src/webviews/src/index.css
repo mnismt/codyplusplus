@@ -41,3 +41,61 @@ body {
 .form-label {
   font-weight: bold;
 }
+
+.command-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.command-item {
+  background: var(--vscode-sideBar-background);
+  border: 1px solid var(--vscode-sideBar-border);
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+.command-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.command-name {
+  font-weight: bold;
+}
+
+.command-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.command-description {
+  color: var(--vscode-descriptionForeground);
+  font-size: 0.9em;
+  margin-bottom: 0.25rem;
+}
+
+.command-mode {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--vscode-descriptionForeground);
+  font-size: 0.9em;
+}
+
+.mode-text {
+  text-transform: capitalize;
+}
+
+.no-commands {
+  text-align: center;
+  color: var(--vscode-descriptionForeground);
+  padding: 1rem;
+}
+
+.no-commands p {
+  margin: 0.25rem 0;
+}
