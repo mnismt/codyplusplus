@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Add Telemetry option and update dependencies
+- Refactors the extension to use webviews instead of a tree view for displaying custom commands
+
 ## [0.2.1] - 2025-01-08
 
 - Add welcome message to the custom commands tree view when no commands are added
