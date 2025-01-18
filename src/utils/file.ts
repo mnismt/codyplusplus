@@ -52,7 +52,6 @@ export async function walkDirectory(
     const isFileExcluded = isFileTypeExcluded(fileName, excludedFileTypes)
 
     if (fileType === vscode.FileType.File && !isFileExcluded) {
-      console.log('CODY++', `File ${fileName} is being processed`)
       // Execute callback for non-excluded files
       await callback(fileUri)
     } else if (fileType === vscode.FileType.Directory && !shallow) {
