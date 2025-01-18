@@ -27,7 +27,7 @@ code --install-extension mnismt.cody-plus-plus
 
 ## Features
 
-### files control
+### Files control
 
 - **Add File to Cody**:
   - Adds a single file to Cody's context.
