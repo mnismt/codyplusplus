@@ -1,4 +1,4 @@
-import { VSCodeButton } from '@vscode/webview-ui-toolkit/react'
+import { VscodeButton } from '@vscode-elements/react-elements'
 import { Edit, MessageSquare, Play, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
@@ -55,15 +55,15 @@ export function CommandList() {
           <div className="command-header">
             <span className="command-name">{id}</span>
             <div className="command-actions">
-              <VSCodeButton appearance="icon" onClick={() => handleExecute(id)}>
-                <Play className="icon" /> {/* Use lucide-react Play icon */}
-              </VSCodeButton>
-              <VSCodeButton appearance="icon" onClick={() => handleEdit(id)}>
-                <Edit className="icon" /> {/* Use lucide-react Edit icon */}
-              </VSCodeButton>
-              <VSCodeButton appearance="icon" onClick={() => handleDelete(id)}>
-                <Trash className="icon" /> {/* Use lucide-react Trash icon */}
-              </VSCodeButton>
+              <VscodeButton onClick={() => handleExecute(id)}>
+                <Play size={14} className="icon" /> {/* Use lucide-react Play icon */}
+              </VscodeButton>
+              <VscodeButton onClick={() => handleEdit(id)}>
+                <Edit size={14} className="icon" /> {/* Use lucide-react Edit icon */}
+              </VscodeButton>
+              <VscodeButton onClick={() => handleDelete(id)}>
+                <Trash size={14} className="icon" /> {/* Use lucide-react Trash icon */}
+              </VscodeButton>
             </div>
           </div>
           {command.description && <div className="command-description">{command.description}</div>}
@@ -78,24 +78,19 @@ export function CommandList() {
           <p>Welcome to Cody++ Custom Commands.</p>
           <p>No custom commands found. Get started by adding your first command.</p>
           <p style={{ marginTop: '1rem' }}>
-            <VSCodeButton
-              appearance="primary"
-              onClick={() => handleAdd()}
-              style={{ width: '100%' }}
-            >
+            <VscodeButton onClick={() => handleAdd()} style={{ width: '100%' }}>
               Add Custom Command
-            </VSCodeButton>
+            </VscodeButton>
           </p>
           <p>
-            <VSCodeButton
-              appearance="primary"
+            <VscodeButton
               onClick={() => {
                 handleOpenVideo()
               }}
               style={{ width: '100%' }}
             >
               Watch Tutorial Video
-            </VSCodeButton>
+            </VscodeButton>
           </p>
         </div>
       )}

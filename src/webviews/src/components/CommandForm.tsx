@@ -1,12 +1,14 @@
 import {
-  VSCodeButton,
-  VSCodeCheckbox,
-  VSCodeDivider,
-  VSCodeDropdown,
-  VSCodeOption,
-  VSCodeTextArea,
-  VSCodeTextField
-} from '@vscode/webview-ui-toolkit/react'
+  VscodeButton,
+  VscodeCheckbox,
+  VscodeDivider,
+  VscodeFormGroup,
+  VscodeLabel,
+  VscodeOption,
+  VscodeSingleSelect,
+  VscodeTextarea,
+  VscodeTextfield
+} from '@vscode-elements/react-elements'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { slugify } from '../../../utils'
@@ -109,85 +111,89 @@ export function CommandForm() {
 
   return (
     <main className="container">
-      <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        <div className="form-group">
-          <label htmlFor="name" className="form-label">
-            Name
-          </label>
-          <VSCodeTextField {...register('name', { required: true })} placeholder="Command name" />
-        </div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="name">Name</VscodeLabel>
+          <VscodeTextfield
+            className="form-input"
+            {...(register('name', { required: true }), { max: undefined })}
+            placeholder="Command name"
+          />
+        </VscodeFormGroup>
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="description">Description</VscodeLabel>
+          <VscodeTextfield
+            className="form-input"
+            {...(register('description', { required: true }), { max: undefined })}
+            placeholder="Command description"
+          />
+        </VscodeFormGroup>
 
-        <div className="form-group">
-          <label htmlFor="description" className="form-label">
-            Description
-          </label>
-          <VSCodeTextField {...register('description')} placeholder="Command description" />
-        </div>
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="mode">Mode</VscodeLabel>
+          <VscodeSingleSelect
+            className="form-input form-select"
+            {...register('mode', { required: true })}
+          >
+            <VscodeOption className="form-select-option" value="ask">
+              Ask
+            </VscodeOption>
+            <VscodeOption className="form-select-option" value="edit">
+              Edit
+            </VscodeOption>
+            <VscodeOption className="form-select-option" value="insert">
+              Insert
+            </VscodeOption>
+          </VscodeSingleSelect>
+        </VscodeFormGroup>
 
-        <div className="form-group">
-          <label htmlFor="mode" className="form-label">
-            Mode
-          </label>
-          <VSCodeDropdown {...register('mode', { required: true })}>
-            <VSCodeOption value="ask">Ask</VSCodeOption>
-            <VSCodeOption value="edit">Edit</VSCodeOption>
-            <VSCodeOption value="insert">Insert</VSCodeOption>
-          </VSCodeDropdown>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="prompt" className="form-label">
-            Prompt
-          </label>
-          <VSCodeTextArea
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="prompt">Prompt</VscodeLabel>
+          <VscodeTextarea
+            className="form-input"
             {...register('prompt', { required: true })}
             placeholder="Command prompt"
-            rows={10}
+            rows={20}
+            style={{ minHeight: '150px' }}
           />
-        </div>
+        </VscodeFormGroup>
 
         <div style={{ marginTop: '0.25rem' }}>
           <h2>Context (optional)</h2>
-          <VSCodeDivider />
+          <VscodeDivider />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="context.command" className="form-label">
-            Command
-          </label>
-          <VSCodeTextField
-            {...register('context.command')}
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="context.command">Command</VscodeLabel>
+          <VscodeTextfield
+            className="form-input"
+            {...(register('context.command'), { max: undefined })}
             placeholder="Terminal command"
             type="text"
           />
           <small>Terminal command to run and include the output of.</small>
-        </div>
+        </VscodeFormGroup>
 
-        <div className="form-group">
-          <label htmlFor="context.currentDir" className="form-label">
-            Current Directory
-          </label>
-          <VSCodeCheckbox {...register('context.currentDir')}>
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="context.currentDir">Current Directory</VscodeLabel>
+          <VscodeCheckbox {...register('context.currentDir')}>
             Include snippets from the first 10 files in the current directory.
-          </VSCodeCheckbox>
-        </div>
+          </VscodeCheckbox>
+        </VscodeFormGroup>
 
-        <div className="form-group">
-          <label htmlFor="context.currentFile" className="form-label">
-            Current File
-          </label>
-          <VSCodeCheckbox {...register('context.currentFile')}>
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="context.currentFile">Current File</VscodeLabel>
+          <VscodeCheckbox {...register('context.currentFile')}>
             Include snippets from the current file. If the file is too long, only the content
             surrounding the current selection will be included
-          </VSCodeCheckbox>
-        </div>
+          </VscodeCheckbox>
+        </VscodeFormGroup>
 
-        <div className="form-group">
-          <label htmlFor="context.directoryPath" className="form-label">
-            Directory Path
-          </label>
-          <VSCodeTextField
-            {...register('context.directoryPath')}
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="context.directoryPath">Directory Path</VscodeLabel>
+          <VscodeTextfield
+            className="form-input"
+            {...(register('context.directoryPath'), { max: undefined })}
             placeholder="Relative directory path"
             type="text"
           />
@@ -195,65 +201,54 @@ export function CommandForm() {
             Include snippets from the first five files within the given relative path of the
             directory. Content will be limited and truncated according to the token limit
           </small>
-        </div>
+        </VscodeFormGroup>
 
-        <div className="form-group">
-          <label htmlFor="context.filePath" className="form-label">
-            File Path
-          </label>
-          <VSCodeTextField
-            {...register('context.filePath')}
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="context.filePath">File Path</VscodeLabel>
+          <VscodeTextfield
+            className="form-input"
+            {...(register('context.filePath'), { max: undefined })}
             placeholder="Relative file path"
             type="text"
           />
           <small>Include snippets from the specified file.</small>
-        </div>
+        </VscodeFormGroup>
 
-        <div className="form-group">
-          <label htmlFor="context.none" className="form-label">
-            None
-          </label>
-          <VSCodeCheckbox {...register('context.none')}>
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="context.none">None</VscodeLabel>
+          <VscodeCheckbox {...register('context.none')}>
             Do not include any additional context.
-          </VSCodeCheckbox>
-        </div>
+          </VscodeCheckbox>
+        </VscodeFormGroup>
 
-        <div className="form-group">
-          <label htmlFor="context.openTabs" className="form-label">
-            Open Tabs
-          </label>
-          <VSCodeCheckbox {...register('context.openTabs')}>
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="context.openTabs">Open Tabs</VscodeLabel>
+          <VscodeCheckbox {...register('context.openTabs')}>
             Include snippets from all open editor tabs.
-          </VSCodeCheckbox>
-        </div>
+          </VscodeCheckbox>
+        </VscodeFormGroup>
 
-        <div className="form-group">
-          <label htmlFor="context.selection" className="form-label">
-            Selection
-          </label>
-          <VSCodeCheckbox {...register('context.selection')}>
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="context.selection">Selection</VscodeLabel>
+          <VscodeCheckbox {...register('context.selection')}>
             Include the current selection.
-          </VSCodeCheckbox>
-        </div>
+          </VscodeCheckbox>
+        </VscodeFormGroup>
 
-        <div className="form-group">
-          <label htmlFor="context.codebase" className="form-label">
-            Codebase
-          </label>
-          <VSCodeCheckbox {...register('context.codebase')}>
+        <VscodeFormGroup variant="vertical">
+          <VscodeLabel htmlFor="context.codebase">Codebase</VscodeLabel>
+          <VscodeCheckbox {...register('context.codebase')}>
             Include contextual information from code search based on the prompt of the command.
-          </VSCodeCheckbox>
+          </VscodeCheckbox>
           <small>
             Warning: This option is experimental and might change or be removed in the future.
           </small>
-        </div>
+        </VscodeFormGroup>
 
-        <VSCodeDivider />
+        <VscodeDivider />
 
         <div>
-          <VSCodeButton appearance="primary" type="submit">
-            {isEditing ? 'Update' : 'Create'}
-          </VSCodeButton>
+          <VscodeButton type="submit">{isEditing ? 'Update' : 'Create'}</VscodeButton>
         </div>
       </form>
     </main>

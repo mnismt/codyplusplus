@@ -42,6 +42,47 @@ body {
   font-weight: bold;
 }
 
+.form-input {
+  width: 100%;
+  padding: 4px;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: var(--vscode-editor-font-family);
+  font-size: var(--vscode-editor-font-size);
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+}
+
+.form-input:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  border-color: var(--vscode-focusBorder);
+}
+
+/* VSCode Select specific styling */
+.form-select {
+  background-color: var(--vscode-dropdown-background) !important;
+  color: var(--vscode-dropdown-foreground) !important;
+  border: 1px solid var(--vscode-dropdown-border) !important;
+  padding: 4px 8px !important;
+}
+
+.form-select-option {
+  padding: 4px 8px !important;
+  cursor: pointer !important;
+  background-color: var(--vscode-dropdown-background) !important;
+  color: var(--vscode-dropdown-foreground) !important;
+}
+
+.form-select-option:hover {
+  background-color: var(--vscode-list-hoverBackground) !important;
+}
+
+.form-select-option[selected] {
+  background-color: var(--vscode-list-activeSelectionBackground) !important;
+  color: var(--vscode-list-activeSelectionForeground) !important;
+}
+
 .command-list {
   display: flex;
   flex-direction: column;
