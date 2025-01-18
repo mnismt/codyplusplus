@@ -1,5 +1,5 @@
 import { VSCodeButton } from '@vscode/webview-ui-toolkit/react'
-import { Edit, MessageSquare, Play, Plus, Trash } from 'lucide-react' // Import lucide-react icons
+import { Edit, MessageSquare, Play, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
 import { CustomCommandsSchema } from '../../../services/customCommand.service'
@@ -22,8 +22,6 @@ export function CommandList() {
 
     window.addEventListener('message', messageHandler)
     postMessage({ type: 'getCommands' })
-
-    console.log(commands)
 
     return () => {
       window.removeEventListener('message', messageHandler)
@@ -108,12 +106,12 @@ export function CommandList() {
 function getIconForMode(mode: string): JSX.Element {
   switch (mode) {
     case 'ask':
-      return <MessageSquare className="icon" size={14} /> // Use lucide-react Comment icon
+      return <MessageSquare className="icon" size={14} />
     case 'insert':
-      return <Plus className="icon" size={14} /> // Use lucide-react Plus icon
+      return <Plus className="icon" size={14} />
     case 'edit':
-      return <Edit className="icon" size={14} /> // Use lucide-react Edit icon
+      return <Edit className="icon" size={14} />
     default:
-      return <MessageSquare className="icon" size={14} /> // Default to Comment icon
+      return <MessageSquare className="icon" size={14} />
   }
 }

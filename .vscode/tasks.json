@@ -6,68 +6,36 @@
 		{
             "label": "watch",
             "dependsOn": [
-                "npm: watch:tsc",
-                "npm: watch:esbuild"
+                "watch:extension",
+                "watch:webviews"
             ],
-            "presentation": {
-                "reveal": "never"
-            },
             "group": {
                 "kind": "build",
                 "isDefault": true
-            },
-            "runOptions": {
-                "runOn": "folderOpen"
             }
         },
         {
+            "label": "watch:extension",
             "type": "npm",
             "script": "watch:esbuild",
-            "group": "build",
-            "problemMatcher": "$esbuild-watch",
-            "isBackground": true,
-            "label": "npm: watch:esbuild",
-            "presentation": {
-                "group": "watch",
-                "reveal": "never"
-            }
-        },
-		{
-            "type": "npm",
-            "script": "watch:tsc",
-            "group": "build",
             "problemMatcher": "$tsc-watch",
-            "isBackground": true,
-            "label": "npm: watch:tsc",
-            "presentation": {
-                "group": "watch",
-                "reveal": "never"
-            }
+            "isBackground": true
         },
-		{
-			"type": "npm",
-			"script": "watch-tests",
-			"problemMatcher": "$tsc-watch",
-			"isBackground": true,
-			"presentation": {
-				"reveal": "never",
-				"group": "watchers"
-			},
-			"group": "build"
-		},
-		{
-			"label": "tasks: watch-tests",
-			"dependsOn": [
-				"npm: watch",
-				"npm: watch-tests"
-			],
-			"problemMatcher": []
-		},
         {
-            "label": "tasks: watch-webviews",
-            "group": "build",
-            "type": "shell",
-            "command": "pnpm run watch:webviews"
+            "label": "watch:webviews",
+            "type": "npm",
+            "script": "watch:webviews",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^.*$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".*",
+                    "endsPattern": ".*"
+                }
+            },
+            "isBackground": true
         }
 	]
 }
