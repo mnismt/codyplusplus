@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
 import { CODY_COMMAND } from '../constants/cody'
+import { VIEW } from '../constants/webview'
 import { CustomCommandService } from '../services/customCommand.service'
 import { BaseWebview } from './BaseWebview'
 
@@ -35,7 +36,7 @@ export class MainWebviewView extends BaseWebview implements vscode.WebviewViewPr
 
     webviewView.webview.html = this._getHtmlForWebview(
       webviewView.webview,
-      'window.isCommandList = true;'
+      `window.VIEW = '${VIEW.COMMAND_LIST}';`
     )
 
     webviewView.webview.onDidReceiveMessage(async message => {

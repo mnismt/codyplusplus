@@ -1,8 +1,9 @@
+import { VIEW } from '../../../constants/webview'
 import { CreateCustomCommand } from '../../../services/customCommand.service'
 
 declare global {
   interface Window {
-    isCommandList?: boolean
+    VIEW?: keyof typeof VIEW
     initialState?: CreateCustomCommand
   }
 }
