@@ -56,19 +56,19 @@ export function CommandList() {
             <span className="command-name">{id}</span>
             <div className="command-actions">
               <VscodeButton onClick={() => handleExecute(id)}>
-                <Play size={14} className="icon" /> {/* Use lucide-react Play icon */}
+                <Play size={14} className="icon" />
               </VscodeButton>
               <VscodeButton onClick={() => handleEdit(id)}>
-                <Edit size={14} className="icon" /> {/* Use lucide-react Edit icon */}
+                <Edit size={14} className="icon" />
               </VscodeButton>
               <VscodeButton onClick={() => handleDelete(id)}>
-                <Trash size={14} className="icon" /> {/* Use lucide-react Trash icon */}
+                <Trash size={14} className="icon" />
               </VscodeButton>
             </div>
           </div>
           {command.description && <div className="command-description">{command.description}</div>}
           <div className="command-mode">
-            {getIconForMode(command.mode || 'ask')} {/* Render the icon for the command mode */}
+            {getIconForMode(command.mode || 'ask')}
             <span className="mode-text">{command.mode || 'ask'}</span>
           </div>
         </div>
