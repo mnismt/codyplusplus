@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Migrate from pnpm to Bun
 - Add Telemetry option and update dependencies
 - Refactors the extension to use webviews instead of a tree view for displaying custom commands
 

@@ -40,7 +40,6 @@ export const UpdateCommandSchema = z.object({
 
 export const CustomCommandsSchema = z.record(CustomCommandId, CustomCommandSchema)
 
-type CommandContext = z.infer<typeof CommandContextSchema>
 export type CustomCommand = z.infer<typeof CustomCommandSchema>
 export type CreateCustomCommand = z.infer<typeof CreateCommandSchema>
 export type UpdateCustomCommand = z.infer<typeof UpdateCommandSchema>
