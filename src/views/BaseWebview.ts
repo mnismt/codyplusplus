@@ -1,0 +1,76 @@
+import * as vscode from 'vscode'
+import { DEV_WEBVIEW_URL } from '../constants/webview'
+import { getNonce } from '../utils'
+
+export abstract class BaseWebview {
+  protected constructor(
+    protected readonly _extensionUri: vscode.Uri,
+    protected readonly _extensionMode: vscode.ExtensionMode
+  ) {}
+
+  protected _getHtmlForWebview(webview: vscode.Webview, additionalScriptVars?: string): string {
+    if (this._extensionMode === vscode.ExtensionMode.Development) {
+      return this._getDevHtml(additionalScriptVars)
+    }
+    return this._getProdHtml(webview, additionalScriptVars)
+  }
+
+  protected _getDevHtml(additionalScriptVars?: string): string {
+    const nonce = getNonce()
+    return `
+<!doctype html>
+<html lang="en">
+  <head>
+    <script type="module">
+      import { injectIntoGlobalHook } from '${DEV_WEBVIEW_URL}/@react-refresh'
+      injectIntoGlobalHook(window)
+      window.$RefreshReg$ = () => {}
+      window.$RefreshSig$ = () => (type) => type
+      window.__vite_plugin_react_preamble_installed__ = true
+    </script>
+    <script type="module" src="${DEV_WEBVIEW_URL}/@vite/client"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="${DEV_WEBVIEW_URL}/src/main.tsx"></script>
+    <script nonce="${nonce}">
+      window.nonce = "${nonce}"
+      window.vscode = acquireVsCodeApi()
+      ${additionalScriptVars || ''}
+    </script>
+  </body>
+</html>`
+  }
+
+  protected _getProdHtml(webview: vscode.Webview, additionalScriptVars?: string): string {
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'dist', 'webviews', 'assets', 'index.js')
+    )
+    const styleUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'dist', 'webviews', 'assets', 'index.css')
+    )
+    const nonce = getNonce()
+    const cspSource = webview.cspSource
+
+    return `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${cspSource} https:; script-src 'nonce-${nonce}' ${cspSource}; style-src 'unsafe-inline' ${cspSource};">
+      <link rel="stylesheet" type="text/css" href="${styleUri}">
+    </head>
+    <body>
+      <div id="root"></div>
+      <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
+      <script nonce="${nonce}">
+        window.nonce = "${nonce}"
+        window.vscode = acquireVsCodeApi()
+        ${additionalScriptVars || ''}
+      </script>
+    </body>
+    </html>`
+  }
+}

@@ -10,11 +10,15 @@ import {
 } from './commands/addToCody'
 // Import services and views
 import { CustomCommandService } from './services/customCommand.service'
-import { CustomCommandsTreeView } from './views/CustomCommandsTreeView'
+import { TelemetryService } from './services/telemetry.service'
+import { MainWebviewView } from './views/MainWebviewView'
 
 // Function called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
   console.log('Cody++ is now active!')
+
+  // Initialize telemetry
+  TelemetryService.getInstance()
 
   // Initialize the singleton service for managing custom commands
   const customCommandService = CustomCommandService.getInstance()
@@ -82,9 +86,17 @@ export function activate(context: vscode.ExtensionContext) {
     }
   )
 
-  // Create and register the tree view for displaying custom commands in the sidebar
-  const customCommandsTreeView = new CustomCommandsTreeView()
-  vscode.window.registerTreeDataProvider('customCommands', customCommandsTreeView)
+  // Create and register the webview view for displaying custom commands in the sidebar
+  const customCommandsWebviewProvider = new MainWebviewView(
+    context.extensionUri,
+    context.extensionMode
+  )
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      MainWebviewView.viewType,
+      customCommandsWebviewProvider
+    )
+  )
 
   // Add all disposables to the extension context for proper cleanup on deactivation
   context.subscriptions.push(
