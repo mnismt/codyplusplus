@@ -36,7 +36,7 @@ export function CommandForm() {
   const [oldId, setOldId] = useState<string | undefined>(undefined)
   const [isEditing, setIsEditing] = useState<boolean>(false)
 
-  const initialState = (window as any).initialState
+  const initialState = window.initialState
   const defaultValues: FormData = initialState
     ? {
         name: initialState.id,
