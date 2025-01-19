@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import { COMMANDS } from '../constants/webview'
+import { COMMANDS, VIEW } from '../constants/webview'
 import {
   CreateCommandSchema,
   CreateCustomCommand,
@@ -26,7 +26,9 @@ export class CustomCommandsWebview extends BaseWebview {
     // Set the webview's initial HTML content
     this._panel.webview.html = this._getHtmlForWebview(
       this._panel.webview,
-      initialState ? `window.initialState = ${JSON.stringify(initialState)};` : undefined
+      `window.VIEW = '${VIEW.CUSTOM_COMMAND_FORM_VIEW}';${
+        initialState ? ` window.initialState = ${JSON.stringify(initialState)};` : ''
+      }`
     )
     this.customCommandService = CustomCommandService.getInstance()
 

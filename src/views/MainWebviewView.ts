@@ -36,7 +36,7 @@ export class MainWebviewView extends BaseWebview implements vscode.WebviewViewPr
 
     webviewView.webview.html = this._getHtmlForWebview(
       webviewView.webview,
-      `window.VIEW = '${VIEW.COMMAND_LIST}';`
+      `window.VIEW = '${VIEW.MAIN_VIEW}';`
     )
 
     webviewView.webview.onDidReceiveMessage(async message => {

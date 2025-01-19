@@ -7,7 +7,7 @@ import { postMessage } from '../lib/vscodeApi'
 
 type Commands = z.infer<typeof CustomCommandsSchema>
 
-export function CommandList() {
+export function MainView() {
   const [commands, setCommands] = useState<Commands>({})
 
   useEffect(() => {

@@ -37,7 +37,7 @@ interface FormErrors {
   prompt: string
 }
 
-export function CommandForm() {
+export function CustomCommandFormView() {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     description: '',
