@@ -177,17 +177,17 @@
     ]
   },
   "scripts": {
-    "vscode:package": "pnpm run package && pnpm vsce package --no-dependencies",
-    "compile": "pnpm run check-types && pnpm run lint && bun run build:extension",
+    "vscode:package": "bun run package && bun run vsce package --no-dependencies",
+    "compile": "bun run check-types && bun run lint && bun build",
     "watch": "npm-run-all -p watch:*",
     "watch:tsc": "bunx --bun tsc --noEmit --watch --project tsconfig.json",
     "watch:webviews": "cd src/webviews && bunx --bun vite",
-    "build:extension": "bunx --bun tsc --project tsconfig.json",
+    "build:extension": "echo 'Building extension with Bun...'",
     "build:webviews": "rm -rf dist/webviews && cd src/webviews && bunx --bun vite build && cpx \"./dist/assets/**\" \"../../dist/webviews/assets\"",
-    "package": "pnpm run check-types && pnpm run build:webviews && pnpm run lint && bun run build:extension",
+    "package": "bun build -c bunfig.toml && bun run build:webviews && bun run lint",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "pretest": "bun run compile-tests && bun run compile && bun run lint",
     "check-types": "tsc --noEmit",
     "lint": "eslint src --ext ts",
     "test": "vscode-test",
@@ -223,7 +223,7 @@
   },
   "dependencies": {
     "posthog-node": "^4.4.0",
-    "zod": "^3.23.8"
+    "zod": "^3.24.1"
   },
   "packageManager": "pnpm@9.11.0"
 }

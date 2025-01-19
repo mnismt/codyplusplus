@@ -10,7 +10,6 @@ import {
   VscodeTextfield
 } from '@vscode-elements/react-elements'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { slugify } from '../../../utils'
 import { COMMANDS, postMessage } from '../lib/vscodeApi'
 
@@ -20,77 +19,150 @@ interface FormData {
   mode: string
   prompt: string
   context: {
-    codebase?: boolean
-    command?: string
-    currentDir?: boolean
-    currentFile?: boolean
-    directoryPath?: string
-    filePath?: string
-    none?: boolean
-    openTabs?: boolean
-    selection?: boolean
+    codebase: boolean
+    command: string
+    currentDir: boolean
+    currentFile: boolean
+    directoryPath: string
+    filePath: string
+    none: boolean
+    openTabs: boolean
+    selection: boolean
   }
 }
 
+interface FormErrors {
+  name: string
+  description: string
+  prompt: string
+}
+
 export function CommandForm() {
-  const [oldId, setOldId] = useState<string | undefined>(undefined)
-  const [isEditing, setIsEditing] = useState<boolean>(false)
-
-  const initialState = window.initialState
-  const defaultValues: FormData = initialState
-    ? {
-        name: initialState.id,
-        description: initialState.data.description || '',
-        mode: initialState.data.mode || 'ask',
-        prompt: initialState.data.prompt || '',
-        context: {
-          codebase: initialState.data.context?.codebase || false,
-          command: initialState.data.context?.command || '',
-          currentDir: initialState.data.context?.currentDir || false,
-          currentFile: initialState.data.context?.currentFile || false,
-          directoryPath: initialState.data.context?.directoryPath || '',
-          filePath: initialState.data.context?.filePath || '',
-          none: initialState.data.context?.none || false,
-          openTabs: initialState.data.context?.openTabs || false,
-          selection: initialState.data.context?.selection || false
-        }
-      }
-    : {
-        name: '',
-        description: '',
-        mode: 'ask',
-        prompt: '',
-        context: {
-          codebase: false,
-          command: '',
-          currentDir: false,
-          currentFile: false,
-          directoryPath: '',
-          filePath: '',
-          none: false,
-          openTabs: false,
-          selection: false
-        }
-      }
-
-  const { register, handleSubmit } = useForm<FormData>({
-    defaultValues
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    description: '',
+    mode: 'ask',
+    prompt: '',
+    context: {
+      codebase: false,
+      command: '',
+      currentDir: false,
+      currentFile: false,
+      directoryPath: '',
+      filePath: '',
+      none: false,
+      openTabs: false,
+      selection: false
+    }
+  })
+  const [oldId, setOldId] = useState<string>('')
+  const [isEditing, setIsEditing] = useState(false)
+  const [errors, setErrors] = useState<FormErrors>({
+    name: '',
+    description: '',
+    prompt: ''
   })
 
   useEffect(() => {
-    if (initialState) {
-      setOldId(initialState.id)
+    if (window.initialState) {
+      setFormData({
+        name: window.initialState.id,
+        description: window.initialState.data.description || '',
+        mode: window.initialState.data.mode || 'ask',
+        prompt: window.initialState.data.prompt || '',
+        context: {
+          codebase: window.initialState.data.context?.codebase || false,
+          command: window.initialState.data.context?.command || '',
+          currentDir: window.initialState.data.context?.currentDir || false,
+          currentFile: window.initialState.data.context?.currentFile || false,
+          directoryPath: window.initialState.data.context?.directoryPath || '',
+          filePath: window.initialState.data.context?.filePath || '',
+          none: window.initialState.data.context?.none || false,
+          openTabs: window.initialState.data.context?.openTabs || false,
+          selection: window.initialState.data.context?.selection || false
+        }
+      })
+      setOldId(window.initialState.id)
       setIsEditing(true)
     }
-  }, [initialState])
+  }, [])
 
-  const onSubmit = (data: FormData) => {
-    const id = slugify(data.name)
+  const validateField = (name: string, value: string) => {
+    switch (name) {
+      case 'name':
+        return value.trim() ? '' : 'Command name is required'
+      case 'description':
+        return value.trim() ? '' : 'Description is required'
+      case 'prompt':
+        return value.trim() ? '' : 'Prompt is required'
+      default:
+        return ''
+    }
+  }
+
+  const handleInputChange = (e: Event) => {
+    const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    const { name, value } = target
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+
+    // Update error state for the field
+    setErrors(prev => ({
+      ...prev,
+      [name]: validateField(name, value)
+    }))
+  }
+
+  const handleCheckboxChange = (e: Event) => {
+    const target = e.target as HTMLInputElement
+    const { name, checked } = target
+    setFormData(prev => ({
+      ...prev,
+      context: {
+        ...prev.context,
+        [name]: checked
+      }
+    }))
+  }
+
+  const handleContextInputChange = (e: Event) => {
+    const target = e.target as HTMLInputElement
+    const { name, value } = target
+    setFormData(prev => ({
+      ...prev,
+      context: {
+        ...prev.context,
+        [name]: value
+      }
+    }))
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Validate all fields
+    const newErrors = {
+      name: validateField('name', formData.name),
+      description: validateField('description', formData.description),
+      prompt: validateField('prompt', formData.prompt)
+    }
+
+    setErrors(newErrors)
+
+    // Check if there are any errors
+    if (Object.values(newErrors).some(error => error !== '')) {
+      return
+    }
+
+    const id = slugify(formData.name)
     const commandData = {
-      description: data.description,
-      mode: data.mode,
-      prompt: data.prompt,
-      context: data.context
+      description: formData.description,
+      mode: formData.mode,
+      prompt: formData.prompt,
+      context: formData.context
     }
 
     if (isEditing) {
@@ -111,39 +183,46 @@ export function CommandForm() {
 
   return (
     <main className="container">
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit}>
         <VscodeFormGroup variant="vertical">
           <VscodeLabel htmlFor="name">Name</VscodeLabel>
           <VscodeTextfield
             className="form-input"
-            {...(register('name', { required: true }), { max: undefined })}
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
             placeholder="Command name"
           />
+          {errors.name && (
+            <small style={{ color: 'var(--vscode-errorForeground)' }}>{errors.name}</small>
+          )}
         </VscodeFormGroup>
+
         <VscodeFormGroup variant="vertical">
           <VscodeLabel htmlFor="description">Description</VscodeLabel>
           <VscodeTextfield
             className="form-input"
-            {...(register('description', { required: true }), { max: undefined })}
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
             placeholder="Command description"
           />
+          {errors.description && (
+            <small style={{ color: 'var(--vscode-errorForeground)' }}>{errors.description}</small>
+          )}
         </VscodeFormGroup>
 
         <VscodeFormGroup variant="vertical">
           <VscodeLabel htmlFor="mode">Mode</VscodeLabel>
           <VscodeSingleSelect
             className="form-input form-select"
-            {...register('mode', { required: true })}
+            name="mode"
+            value={formData.mode}
+            onChange={handleInputChange}
           >
-            <VscodeOption className="form-select-option" value="ask">
-              Ask
-            </VscodeOption>
-            <VscodeOption className="form-select-option" value="edit">
-              Edit
-            </VscodeOption>
-            <VscodeOption className="form-select-option" value="insert">
-              Insert
-            </VscodeOption>
+            <VscodeOption value="ask">Ask</VscodeOption>
+            <VscodeOption value="edit">Edit</VscodeOption>
+            <VscodeOption value="insert">Insert</VscodeOption>
           </VscodeSingleSelect>
         </VscodeFormGroup>
 
@@ -151,11 +230,16 @@ export function CommandForm() {
           <VscodeLabel htmlFor="prompt">Prompt</VscodeLabel>
           <VscodeTextarea
             className="form-input"
-            {...register('prompt', { required: true })}
+            name="prompt"
+            value={formData.prompt}
+            onChange={handleInputChange}
             placeholder="Command prompt"
             rows={20}
             style={{ minHeight: '150px' }}
           />
+          {errors.prompt && (
+            <small style={{ color: 'var(--vscode-errorForeground)' }}>{errors.prompt}</small>
+          )}
         </VscodeFormGroup>
 
         <div style={{ marginTop: '0.25rem' }}>
@@ -164,38 +248,48 @@ export function CommandForm() {
         </div>
 
         <VscodeFormGroup variant="vertical">
-          <VscodeLabel htmlFor="context.command">Command</VscodeLabel>
+          <VscodeLabel htmlFor="command">Command</VscodeLabel>
           <VscodeTextfield
             className="form-input"
-            {...(register('context.command'), { max: undefined })}
+            name="command"
+            value={formData.context.command}
+            onChange={handleContextInputChange}
             placeholder="Terminal command"
-            type="text"
           />
           <small>Terminal command to run and include the output of.</small>
         </VscodeFormGroup>
 
         <VscodeFormGroup variant="vertical">
-          <VscodeLabel htmlFor="context.currentDir">Current Directory</VscodeLabel>
-          <VscodeCheckbox {...register('context.currentDir')}>
+          <VscodeLabel htmlFor="currentDir">Current Directory</VscodeLabel>
+          <VscodeCheckbox
+            name="currentDir"
+            checked={formData.context.currentDir}
+            onChange={handleCheckboxChange}
+          >
             Include snippets from the first 10 files in the current directory.
           </VscodeCheckbox>
         </VscodeFormGroup>
 
         <VscodeFormGroup variant="vertical">
-          <VscodeLabel htmlFor="context.currentFile">Current File</VscodeLabel>
-          <VscodeCheckbox {...register('context.currentFile')}>
+          <VscodeLabel htmlFor="currentFile">Current File</VscodeLabel>
+          <VscodeCheckbox
+            name="currentFile"
+            checked={formData.context.currentFile}
+            onChange={handleCheckboxChange}
+          >
             Include snippets from the current file. If the file is too long, only the content
             surrounding the current selection will be included
           </VscodeCheckbox>
         </VscodeFormGroup>
 
         <VscodeFormGroup variant="vertical">
-          <VscodeLabel htmlFor="context.directoryPath">Directory Path</VscodeLabel>
+          <VscodeLabel htmlFor="directoryPath">Directory Path</VscodeLabel>
           <VscodeTextfield
             className="form-input"
-            {...(register('context.directoryPath'), { max: undefined })}
+            name="directoryPath"
+            value={formData.context.directoryPath}
+            onChange={handleContextInputChange}
             placeholder="Relative directory path"
-            type="text"
           />
           <small>
             Include snippets from the first five files within the given relative path of the
@@ -204,40 +298,57 @@ export function CommandForm() {
         </VscodeFormGroup>
 
         <VscodeFormGroup variant="vertical">
-          <VscodeLabel htmlFor="context.filePath">File Path</VscodeLabel>
+          <VscodeLabel htmlFor="filePath">File Path</VscodeLabel>
           <VscodeTextfield
             className="form-input"
-            {...(register('context.filePath'), { max: undefined })}
+            name="filePath"
+            value={formData.context.filePath}
+            onChange={handleContextInputChange}
             placeholder="Relative file path"
-            type="text"
           />
           <small>Include snippets from the specified file.</small>
         </VscodeFormGroup>
 
         <VscodeFormGroup variant="vertical">
-          <VscodeLabel htmlFor="context.none">None</VscodeLabel>
-          <VscodeCheckbox {...register('context.none')}>
+          <VscodeLabel htmlFor="none">None</VscodeLabel>
+          <VscodeCheckbox
+            name="none"
+            checked={formData.context.none}
+            onChange={handleCheckboxChange}
+          >
             Do not include any additional context.
           </VscodeCheckbox>
         </VscodeFormGroup>
 
         <VscodeFormGroup variant="vertical">
-          <VscodeLabel htmlFor="context.openTabs">Open Tabs</VscodeLabel>
-          <VscodeCheckbox {...register('context.openTabs')}>
+          <VscodeLabel htmlFor="openTabs">Open Tabs</VscodeLabel>
+          <VscodeCheckbox
+            name="openTabs"
+            checked={formData.context.openTabs}
+            onChange={handleCheckboxChange}
+          >
             Include snippets from all open editor tabs.
           </VscodeCheckbox>
         </VscodeFormGroup>
 
         <VscodeFormGroup variant="vertical">
-          <VscodeLabel htmlFor="context.selection">Selection</VscodeLabel>
-          <VscodeCheckbox {...register('context.selection')}>
+          <VscodeLabel htmlFor="selection">Selection</VscodeLabel>
+          <VscodeCheckbox
+            name="selection"
+            checked={formData.context.selection}
+            onChange={handleCheckboxChange}
+          >
             Include the current selection.
           </VscodeCheckbox>
         </VscodeFormGroup>
 
         <VscodeFormGroup variant="vertical">
-          <VscodeLabel htmlFor="context.codebase">Codebase</VscodeLabel>
-          <VscodeCheckbox {...register('context.codebase')}>
+          <VscodeLabel htmlFor="codebase">Codebase</VscodeLabel>
+          <VscodeCheckbox
+            name="codebase"
+            checked={formData.context.codebase}
+            onChange={handleCheckboxChange}
+          >
             Include contextual information from code search based on the prompt of the command.
           </VscodeCheckbox>
           <small>
@@ -247,9 +358,7 @@ export function CommandForm() {
 
         <VscodeDivider />
 
-        <div>
-          <VscodeButton type="submit">{isEditing ? 'Update' : 'Create'}</VscodeButton>
-        </div>
+        <VscodeButton type="submit">{isEditing ? 'Update' : 'Create'}</VscodeButton>
       </form>
     </main>
   )
