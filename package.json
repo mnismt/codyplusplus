@@ -168,29 +168,19 @@
           "type": "webview"
         }
       ]
-    },
-    "viewsWelcome": [
-      {
-        "view": "mainView",
-        "contents": "Welcome to Cody++ Custom Commands!\n\nNo custom commands found yet. Get started by adding your first command.\n\n[Add Custom Command](command:cody-plus-plus.addCustomCommand)\n\n[Watch Tutorial Video](https://youtu.be/ruVgjt0zIzk)"
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:package": "bun run package && bun run vsce package --no-dependencies",
     "compile": "bun run check-types && bun run lint && bun build",
-    "watch": "npm-run-all -p watch:*",
-    "watch:tsc": "bunx --bun tsc --noEmit --watch --project tsconfig.json",
+    "watch": "npm-run-all -p watch:tsc watch:webviews",
+    "watch:tsc": "bunx --bun tsc --noEmit --watch",
     "watch:webviews": "cd src/webviews && bunx --bun vite",
-    "build:extension": "echo 'Building extension with Bun...'",
+    "build": "bun build -c bunfig.toml && bun run build:webviews && bun run lint",
     "build:webviews": "rm -rf dist/webviews && cd src/webviews && bunx --bun vite build && cpx \"./dist/assets/**\" \"../../dist/webviews/assets\"",
-    "package": "bun build -c bunfig.toml && bun run build:webviews && bun run lint",
-    "compile-tests": "tsc -p . --outDir out",
-    "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "bun run compile-tests && bun run compile && bun run lint",
+    "test": "bun run check-types && bun run compile && bun run lint && vscode-test",
     "check-types": "tsc --noEmit",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test",
     "prepare": "husky"
   },
   "devDependencies": {

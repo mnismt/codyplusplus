@@ -77,21 +77,18 @@ export function CommandList() {
         <div className="no-commands">
           <p>Welcome to Cody++ Custom Commands.</p>
           <p>No custom commands found. Get started by adding your first command.</p>
-          <p style={{ marginTop: '1rem' }}>
-            <VscodeButton onClick={() => handleAdd()} style={{ width: '100%' }}>
-              Add Custom Command
-            </VscodeButton>
-          </p>
-          <p>
+          <div
+            style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
+          >
+            <VscodeButton onClick={() => handleAdd()}>Add Custom Command</VscodeButton>
             <VscodeButton
               onClick={() => {
                 handleOpenVideo()
               }}
-              style={{ width: '100%' }}
             >
               Watch Tutorial Video
             </VscodeButton>
-          </p>
+          </div>
         </div>
       )}
     </div>
