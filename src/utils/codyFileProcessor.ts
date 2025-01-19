@@ -14,10 +14,10 @@ export async function processCodyFiles(
   uris: vscode.Uri[],
   callback: (uri: vscode.Uri) => Promise<void>,
   options: CodyFileProcessorOptions = {}
-) {
+): Promise<number> {
   if (!uris || uris.length === 0) {
     vscode.window.showWarningMessage('No files or folders are selected to add to Cody.')
-    return
+    return 0
   }
 
   const config = vscode.workspace.getConfiguration('codyPlusPlus')
@@ -52,7 +52,7 @@ export async function processCodyFiles(
         'No'
       )
       if (userResponse !== 'Yes') {
-        return
+        return 0
       }
     }
 
@@ -75,8 +75,10 @@ export async function processCodyFiles(
         progress.report({ message: 'Done!' })
       }
     )
+    return totalFileCount
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to process files: ${error.message}`)
+    return 0
   }
 }
 

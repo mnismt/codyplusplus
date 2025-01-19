@@ -27,7 +27,7 @@ code --install-extension mnismt.cody-plus-plus
 
 ## Features
 
-### files control
+### Files control
 
 - **Add File to Cody**:
   - Adds a single file to Cody's context.
@@ -55,11 +55,10 @@ code --install-extension mnismt.cody-plus-plus
   - Edit an existing custom command.
 - **Delete Custom Command**:
   - Delete a custom command.
-    
+
 ![Cody++](https://github.com/user-attachments/assets/8426387a-62ee-49c7-9627-c438e28f079e)
 
 ## Extension Settings
-
 
 This extension contributes the following settings:
 
@@ -86,3 +85,25 @@ To configure this setting in two ways:
         "codyPlusPlus.excludedFileTypes": [".exe", ".bin"],
         "codyPlusPlus.excludedFolders": [".git", "node_modules"]
         ```
+
+## Telemetry
+
+Cody++ collects anonymous usage information to help improve the extension. We are committed to protecting your privacy:
+
+- **What We Track**: Basic usage events like file additions and custom command interactions
+- **What We Don't Track**:
+  - No file contents
+  - No personal identifiable information
+  - No code snippets
+
+You can easily opt out of telemetry:
+
+1. Open VS Code Settings
+2. Search for "Cody Plus Plus"
+3. Uncheck "Enable Telemetry"
+
+For full details, see our [TELEMETRY.md](TELEMETRY.md) document.
+
+## Contributing
+
+We welcome contributions! Please see our GitHub repository for guidelines.

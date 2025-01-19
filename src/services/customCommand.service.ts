@@ -3,6 +3,8 @@ import * as vscode from 'vscode'
 
 import { z } from 'zod'
 import { CODY_CUSTOM_COMMANDS_FILE, getCodyJsonPath } from '../constants/cody'
+import { TELEMETRY_EVENTS } from '../constants/telemetry'
+import { TelemetryService } from './telemetry.service'
 
 export const CustomCommandId = z.string()
 
@@ -38,7 +40,6 @@ export const UpdateCommandSchema = z.object({
 
 export const CustomCommandsSchema = z.record(CustomCommandId, CustomCommandSchema)
 
-type CommandContext = z.infer<typeof CommandContextSchema>
 export type CustomCommand = z.infer<typeof CustomCommandSchema>
 export type CreateCustomCommand = z.infer<typeof CreateCommandSchema>
 export type UpdateCustomCommand = z.infer<typeof UpdateCommandSchema>
@@ -50,6 +51,7 @@ export class CustomCommandService {
   private fileWatcher: vscode.FileSystemWatcher | undefined
   private _onDidChangeCommands: vscode.EventEmitter<void> = new vscode.EventEmitter<void>()
   public readonly onDidChangeCommands: vscode.Event<void> = this._onDidChangeCommands.event
+  private telemetry = TelemetryService.getInstance()
 
   private constructor() {
     this.loadCommands()
@@ -117,6 +119,10 @@ export class CustomCommandService {
     this.commands[id] = command
     await this.saveCommands()
     this._onDidChangeCommands.fire()
+    this.telemetry.trackEvent(TELEMETRY_EVENTS.CUSTOM_COMMANDS.CREATED, {
+      commandMode: command.mode,
+      hasContext: Object.values(command.context || {}).some(v => v)
+    })
   }
 
   public async getCommand(id: string): Promise<CustomCommand> {
@@ -141,6 +147,7 @@ export class CustomCommandService {
       delete this.commands[id]
       await this.saveCommands()
       this._onDidChangeCommands.fire()
+      this.telemetry.trackEvent(TELEMETRY_EVENTS.CUSTOM_COMMANDS.DELETED)
     } else {
       console.error(`CODY++: Command with id ${id} does not exist.`)
     }
@@ -163,5 +170,11 @@ export class CustomCommandService {
 
   public refreshCommands(): void {
     this.loadCommands()
+  }
+
+  public async executeCommand(id: string): Promise<void> {
+    this.telemetry.trackEvent(TELEMETRY_EVENTS.CUSTOM_COMMANDS.EXECUTED, {
+      commandId: id
+    })
   }
 }

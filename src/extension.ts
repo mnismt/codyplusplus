@@ -10,11 +10,15 @@ import {
 } from './commands/addToCody'
 // Import services and views
 import { CustomCommandService } from './services/customCommand.service'
+import { TelemetryService } from './services/telemetry.service'
 import { MainWebviewView } from './views/MainWebviewView'
 
 // Function called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
   console.log('Cody++ is now active!')
+
+  // Initialize telemetry
+  TelemetryService.getInstance()
 
   // Initialize the singleton service for managing custom commands
   const customCommandService = CustomCommandService.getInstance()
