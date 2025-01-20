@@ -12,5 +12,8 @@ export default defineConfig({
         assetFileNames: 'assets/index.[ext]'
       }
     }
+  },
+  server: {
+    cors: true
   }
 })

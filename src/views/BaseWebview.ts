@@ -21,16 +21,18 @@ export abstract class BaseWebview {
 <!doctype html>
 <html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src http://localhost:5173 ws://localhost:5173; img-src http://localhost:5173 https:; script-src 'unsafe-eval' 'unsafe-inline' http://localhost:5173; style-src 'unsafe-inline' http://localhost:5173;">
     <script type="module">
-      import { injectIntoGlobalHook } from '${DEV_WEBVIEW_URL}/@react-refresh'
+      import { injectIntoGlobalHook } from "${DEV_WEBVIEW_URL}/@react-refresh"
       injectIntoGlobalHook(window)
       window.$RefreshReg$ = () => {}
       window.$RefreshSig$ = () => (type) => type
       window.__vite_plugin_react_preamble_installed__ = true
     </script>
     <script type="module" src="${DEV_WEBVIEW_URL}/@vite/client"></script>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="${DEV_WEBVIEW_URL}/vite.svg" />
   </head>
   <body>
     <div id="root"></div>

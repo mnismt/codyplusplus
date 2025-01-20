@@ -171,16 +171,20 @@
     }
   },
   "scripts": {
-    "vscode:package": "bun run package && bun run vsce package --no-dependencies",
-    "compile": "bun run check-types && bun run lint && bun build",
-    "watch": "npm-run-all -p watch:tsc watch:webviews",
-    "watch:tsc": "bunx --bun tsc --noEmit --watch",
-    "watch:webviews": "cd src/webviews && bunx --bun vite",
-    "build": "bun build -c bunfig.toml && bun run build:webviews && bun run lint",
-    "build:webviews": "rm -rf dist/webviews && cd src/webviews && bunx --bun vite build && cpx \"./dist/assets/**\" \"../../dist/webviews/assets\"",
-    "test": "bun run check-types && bun run compile && bun run lint && vscode-test",
+    "vscode:package": "pnpm run package && pnpm vsce package --no-dependencies",
+    "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:webviews": "cd src/webviews && pnpm run dev",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "build:webviews": "rm -rf dist/webviews && cd src/webviews && pnpm run build && cpx \"./dist/assets/**\" \"../../dist/webviews/assets\"",
+    "package": "pnpm run check-types && pnpm run build:webviews && pnpm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
     "check-types": "tsc --noEmit",
     "lint": "eslint src --ext ts",
+    "test": "vscode-test",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -195,6 +199,7 @@
     "@vscode/test-electron": "^2.3.9",
     "conventional-changelog-cli": "^5.0.0",
     "cpx": "^1.5.0",
+    "esbuild": "^0.20.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
@@ -213,7 +218,7 @@
   },
   "dependencies": {
     "posthog-node": "^4.4.0",
-    "zod": "^3.24.1"
+    "zod": "^3.23.8"
   },
   "packageManager": "pnpm@9.11.0"
 }
