@@ -7,9 +7,13 @@ function App() {
 
   if (isCommandList) {
     return (
-      <div className="flex flex-col gap-4">
-        <SystemInstruction />
-        <CustomCommands />
+      <div id="main-view">
+        <div className="collapsible-section">
+          <SystemInstruction />
+        </div>
+        <div className="collapsible-section">
+          <CustomCommands />
+        </div>
       </div>
     )
   }

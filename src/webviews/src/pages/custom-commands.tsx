@@ -3,8 +3,8 @@ import { CommandList } from '../components/CommandList'
 
 export function CustomCommands() {
   return (
-    <VscodeCollapsible title="Custom Commands" open>
-      <div className="p-4">
+    <VscodeCollapsible title="Custom Commands" open id="custom-commands">
+      <div style={{ minHeight: 0, flex: 1, overflowY: 'auto' }}>
         <CommandList />
       </div>
     </VscodeCollapsible>

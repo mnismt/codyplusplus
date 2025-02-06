@@ -59,7 +59,6 @@ body {
   border-color: var(--vscode-focusBorder);
 }
 
-/* VSCode Select specific styling */
 .form-select {
   background-color: var(--vscode-dropdown-background) !important;
   color: var(--vscode-dropdown-foreground) !important;
@@ -83,11 +82,30 @@ body {
   color: var(--vscode-list-activeSelectionForeground) !important;
 }
 
+/* Main view layout */
+#main-view {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Collapsible container styles */
+.collapsible {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; /* Important for flex child overflow */
+}
+
+/* Command list styles */
 .command-list {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.5rem;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .command-item {
@@ -95,31 +113,39 @@ body {
   border: 1px solid var(--vscode-sideBar-border);
   border-radius: 4px;
   padding: 0.5rem;
+  flex-shrink: 0; /* Prevent items from shrinking */
 }
 
 .command-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: start; /* Align items to the top */
   margin-bottom: 0.25rem;
 }
 
 .command-name {
   font-weight: bold;
+  word-wrap: break-word; /* Allow long words to break */
+  overflow: hidden; /* Hide any remaining overflow */
+  text-overflow: ellipsis; /* Add ellipsis for overflow */
+  flex: 1; /* Take up available space */
+  margin-right: 0.5rem; /* Add space between name and buttons */
 }
 
 .command-actions {
   display: flex;
   gap: 0.75rem;
+  align-items: start; /* Align buttons to the top */
 }
 
 .command-actions vscode-button {
   padding: 4px 8px;
-  border-radius: 4px;  /* Add rounded corners */
+  border-radius: 4px;
 }
 
 .command-actions vscode-button::part(control) {
-  border-radius: 4px;  /* Apply rounded corners to the button's inner control part */
+  /* Removed flexbox properties, as top alignment is handled by parent */
+  border-radius: 4px;
 }
 
 .command-description {

@@ -7,7 +7,12 @@ import {
 
 export function SystemInstruction() {
   return (
-    <VscodeCollapsible title="System Instructions" className="collapsible" open>
+    <VscodeCollapsible
+      title="System Instruction"
+      className="collapsible"
+      open
+      id="system-instruction"
+    >
       <VscodeTabs selectedIndex={0}>
         <VscodeTabHeader slot="header">Chat</VscodeTabHeader>
         <VscodeTabPanel>

@@ -1,6 +1,6 @@
 import { VscodeButton } from '@vscode-elements/react-elements'
 import { Edit, MessageSquare, Play, Plus, Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 import { CustomCommandsSchema } from '../../../services/customCommand.service'
 import { postMessage } from '../lib/vscodeApi'
@@ -9,6 +9,7 @@ type Commands = z.infer<typeof CustomCommandsSchema>
 
 export function CommandList() {
   const [commands, setCommands] = useState<Commands>({})
+  const commandListRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const messageHandler = (event: MessageEvent) => {
@@ -23,8 +24,45 @@ export function CommandList() {
     window.addEventListener('message', messageHandler)
     postMessage({ type: 'getCommands' })
 
+    const calculateMaxHeight = () => {
+      requestAnimationFrame(() => {
+        // Defer calculation
+        if (commandListRef.current) {
+          const mainView = document.getElementById('main-view')
+          const systemInstruction = document.querySelector(
+            '#system-instruction' // Use the ID we added
+          ) as HTMLElement
+
+          if (mainView && systemInstruction) {
+            const mainViewHeight = mainView.clientHeight
+            const systemInstructionHeight = systemInstruction.offsetHeight
+            // Subtract a buffer for padding/margins
+            const buffer = 32 // Adjust as needed
+            const maxHeight = mainViewHeight - systemInstructionHeight - buffer
+            commandListRef.current.style.maxHeight = `${maxHeight}px`
+          }
+        }
+      })
+    }
+
+    calculateMaxHeight()
+
+    window.addEventListener('resize', calculateMaxHeight)
+
+    const systemInstructionCollapsible = document.getElementById('system-instruction')
+    if (systemInstructionCollapsible) {
+      systemInstructionCollapsible.addEventListener('vsc-collapsible-toggle', calculateMaxHeight)
+    }
+
     return () => {
       window.removeEventListener('message', messageHandler)
+      window.removeEventListener('resize', calculateMaxHeight)
+      if (systemInstructionCollapsible) {
+        systemInstructionCollapsible.removeEventListener(
+          'vsc-collapsible-toggle',
+          calculateMaxHeight
+        )
+      }
     }
   }, [])
 
@@ -49,7 +87,7 @@ export function CommandList() {
   }
 
   return (
-    <div className="command-list">
+    <div className="command-list" ref={commandListRef}>
       {Object.entries(commands).map(([id, command]) => (
         <div key={id} className="command-item">
           <div className="command-header">
