@@ -1,11 +1,17 @@
 import { CommandForm } from './components/CommandForm'
-import { CommandList } from './components/CommandList'
+import { CustomCommands } from './pages/custom-commands'
+import { SystemInstruction } from './pages/system-instruction'
 
 function App() {
   const isCommandList = window.isCommandList
 
   if (isCommandList) {
-    return <CommandList />
+    return (
+      <div className="flex flex-col gap-4">
+        <SystemInstruction />
+        <CustomCommands />
+      </div>
+    )
   }
 
   return <CommandForm />
