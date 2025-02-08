@@ -3,17 +3,27 @@
 ## Technology Stack
 
 ### Core Technologies
-- **Extension Framework**: VS Code Extension API
+- **Extension Framework**: VS Code Extension API (v1.93.0)
 - **Language**: TypeScript with strict mode
 - **UI Framework**: React 18
 - **Build Tools**:
   - esbuild (extension)
   - Vite (webviews)
 - **Package Manager**: pnpm
-- **UI Styling**: 
-  - Tailwind CSS
+- **UI Components**: 
   - @vscode-elements/react-elements
-- **Analytics**: PostHog for anonymous tracking
+  - @vscode/webview-ui-toolkit
+  - Tailwind CSS for styling
+  - @vscode/codicons and lucide-react for icons
+- **Type Safety**: 
+  - TypeScript with strict mode
+  - zod for runtime type checking
+- **Analytics**: PostHog for anonymous tracking (opt-out available)
+- **Code Quality**:
+  - ESLint
+  - Prettier
+  - Husky for git hooks
+  - Conventional commits
 
 ## Development Environment
 

@@ -12,7 +12,7 @@
     "url": "https://github.com/mnismt/codyplusplus"
   },
   "engines": {
-    "vscode": "^1.89.0"
+    "vscode": "^1.93.0"
   },
   "categories": [
     "Other"
@@ -192,7 +192,7 @@
     "@release-it/keep-a-changelog": "^5.0.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
-    "@types/vscode": "^1.89.0",
+    "@types/vscode": "^1.93.0",
     "@typescript-eslint/eslint-plugin": "^7.7.1",
     "@typescript-eslint/parser": "^7.7.1",
     "@vscode/test-cli": "^0.0.9",

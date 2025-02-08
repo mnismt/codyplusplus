@@ -1,18 +1,24 @@
 # Active Context: Cody++
 
 ## Current Development Focus
-The project is undergoing significant UI improvements and telemetry integration:
+The project has undergone a technical upgrade and continues UI improvements:
+- Upgraded VS Code API to v1.93.0
 - Migrating from tree view to webviews for custom commands
 - Implementing telemetry system with PostHog
 - Enhancing custom command interface
 - Refining user interactions
 
 ## Recent Changes
-1. Latest Release (v0.2.1):
+1. Latest Technical Update:
+   - Upgraded VS Code API from 1.89.0 to 1.93.0
+   - Updated @types/vscode dependency
+   - Ensured compatibility with latest VS Code features
+
+2. Latest Release (v0.2.1):
    - Added welcome message for empty command view
    - Improved UI/UX for custom commands
 
-2. Major Features (v0.2.0):
+3. Major Features (v0.2.0):
    - Implemented multiple file addition commands
    - Added recursive file/folder selection
    - Enhanced progress tracking

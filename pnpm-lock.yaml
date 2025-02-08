@@ -28,8 +28,8 @@ importers:
         specifier: 18.x
         version: 18.19.33
       '@types/vscode':
-        specifier: ^1.89.0
-        version: 1.89.0
+        specifier: ^1.93.0
+        version: 1.97.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.7.1
         version: 7.9.0(@typescript-eslint/parser@7.9.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5)
@@ -426,8 +426,8 @@ packages:
   '@types/semver@7.5.8':
     resolution: {integrity: sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==}
 
-  '@types/vscode@1.89.0':
-    resolution: {integrity: sha512-TMfGKLSVxfGfoO8JfIE/neZqv7QLwS4nwPwL/NwMvxtAY2230H2I4Z5xx6836pmJvMAzqooRQ4pmLm7RUicP3A==}
+  '@types/vscode@1.97.0':
+    resolution: {integrity: sha512-ueE73loeOTe7olaVyqP9mrRI54kVPJifUPjblZo9fYcv1CuVLPOEKEkqW0GkqPC454+nCEoigLWnC2Pp7prZ9w==}
 
   '@typescript-eslint/eslint-plugin@7.9.0':
     resolution: {integrity: sha512-6e+X0X3sFe/G/54aC3jt0txuMTURqLyekmEHViqyA2VnxhLMpvA6nqmcjIy+Cr9tLDHPssA74BP5Mx9HQIxBEA==}
@@ -3547,7 +3547,7 @@ snapshots:
 
   '@types/semver@7.5.8': {}
 
-  '@types/vscode@1.89.0': {}
+  '@types/vscode@1.97.0': {}
 
   '@typescript-eslint/eslint-plugin@7.9.0(@typescript-eslint/parser@7.9.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5)':
     dependencies:
