@@ -1,6 +1,5 @@
 import { CommandForm } from './components/CommandForm'
 import { CustomCommands } from './pages/custom-commands'
-import { SystemInstruction } from './pages/system-instruction'
 
 function App() {
   const isCommandList = window.isCommandList
@@ -8,9 +7,9 @@ function App() {
   if (isCommandList) {
     return (
       <div id="main-view">
-        <div className="collapsible-section">
+        {/* <div className="collapsible-section">
           <SystemInstruction />
-        </div>
+        </div> */}
         <div className="collapsible-section">
           <CustomCommands />
         </div>

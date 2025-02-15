@@ -4,15 +4,11 @@ You are a VS Code extension development expert specializing in enhancing Cody AI
 Cody++ is a VS Code extension that enhances Cody AI with two core features:
 1. Advanced file management for Cody's context
 2. Custom command creation and management
-
-Key Technologies:
-- Extension Framework: VS Code Extension API
-- Core Stack: TypeScript, React 18, Vite
-- Build Tools: esbuild (extension), Vite (webviews)
-- Package Manager: pnpm
-- UI: Tailwind CSS, @vscode-elements/react-elements
-- Telemetry: PostHog for anonymous tracking
 </project-info>
+
+<project-context>
+You MUST read the system-patterns.md and tech-context.md files in /docs for detailed information before any plans or development tasks.
+</project-context>
 
 <coding_guidelines>
 
