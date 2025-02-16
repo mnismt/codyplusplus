@@ -18,6 +18,7 @@ export class SecretStorage {
   public async storeToken(token: string): Promise<void> {
     try {
       await this.storage.store('sourcegraph-token', token)
+      console.log('Sourcegraph Token stored')
     } catch (error) {
       throw new Error(
         `Failed to store Sourcegraph token: ${error instanceof Error ? error.message : String(error)}`

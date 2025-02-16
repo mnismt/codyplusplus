@@ -73,6 +73,11 @@
         "command": "cody-plus-plus.removeSourcegraphToken",
         "title": "Logout Sourcegraph",
         "category": "Cody++"
+      },
+      {
+        "command": "cody-plus-plus.addFilesToCodySmart",
+        "title": "Add Files to Cody (Smart)",
+        "category": "Cody++"
       }
     ],
     "menus": {
@@ -100,6 +105,11 @@
         {
           "command": "cody-plus-plus.addShallowFolder",
           "when": "explorerResourceIsFolder && explorerViewletFocus && cody.activated",
+          "group": "1_cody"
+        },
+        {
+          "command": "cody-plus-plus.addFilesToCodySmart",
+          "when": "explorerViewletFocus && cody.activated",
           "group": "1_cody"
         }
       ],

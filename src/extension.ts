@@ -4,6 +4,7 @@ import * as vscode from 'vscode'
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
 import {
   addFile,
+  addFilesSmartCommand,
   addFolderCommand,
   addSelection,
   addShallowFolderCommand
@@ -34,6 +35,11 @@ export async function activate(context: vscode.ExtensionContext) {
   const addShallowFolderDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addShallowFolder',
     addShallowFolderCommand
+  )
+
+  const addFilesSmartDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.addFilesToCodySmart',
+    (uri?: vscode.Uri) => addFilesSmartCommand(uri, context)
   )
 
   // Register the "Add Custom Command" command, which opens a UI to create a custom command
@@ -157,7 +163,8 @@ export async function activate(context: vscode.ExtensionContext) {
     addSelectionDisposable,
     addSelectionRecursiveDisposable,
     requestSourcegraphTokenDisposable,
-    removeSourcegraphTokenDisposable
+    removeSourcegraphTokenDisposable,
+    addFilesSmartDisposable
   )
 }
 

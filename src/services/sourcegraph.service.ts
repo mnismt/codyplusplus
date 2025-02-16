@@ -98,7 +98,7 @@ export class SourcegraphService {
           continue
         } else {
           // If we get here, token is valid
-          await vscode.window.showInformationMessage(
+          vscode.window.showInformationMessage(
             `Successfully authenticated as ${validationResult.username} with Sourcegraph. You can now use Cody++ features.`
           )
         }

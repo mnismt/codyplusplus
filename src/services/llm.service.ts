@@ -5,6 +5,10 @@ interface CompletionConfig {
   model?: string
   maxTokens?: number
   temperature?: number
+  responseFormat?: {
+    type: 'json' | 'text'
+    schema?: object
+  }
 }
 
 interface CompletionRequest {
@@ -17,8 +21,8 @@ interface CompletionResponse {
 }
 
 const DEFAULT_CONFIG: CompletionConfig = {
-  model: 'gpt-4o-mini',
-  maxTokens: 2000,
+  model: 'gemini-2.0-flash',
+  maxTokens: 4000,
   temperature: 0.0
 }
 
@@ -59,8 +63,11 @@ export class LLMService {
       ],
       maxTokensToSample: config.maxTokens,
       temperature: config.temperature,
-      stream: false
+      stream: false,
+      ...(config.responseFormat && { responseFormat: config.responseFormat })
     })
+
+    console.log(`Request body: ${body}`)
 
     try {
       const response = await fetch('https://sourcegraph.com/.api/completions/stream', {
@@ -82,6 +89,8 @@ export class LLMService {
       if (!result?.completion) {
         throw new Error('No completions found')
       }
+
+      console.log(`Completion result: ${result.completion}`)
 
       return { text: result.completion }
     } catch (error) {
