@@ -10,11 +10,12 @@ import {
 } from './commands/addToCody'
 // Import services and views
 import { CustomCommandService } from './services/customCommand.service'
+import { SourcegraphService } from './services/sourcegraph.service'
 import { TelemetryService } from './services/telemetry.service'
 import { MainWebviewView } from './views/MainWebviewView'
 
 // Function called when the extension is activated
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   console.log('Cody++ is now active!')
 
   // Initialize telemetry
@@ -86,6 +87,53 @@ export function activate(context: vscode.ExtensionContext) {
     }
   )
 
+  const requestSourcegraphTokenDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.requestSourcegraphToken',
+    async () => {
+      try {
+        const sourcegraphService = SourcegraphService.getInstance(context)
+        const token = await sourcegraphService.loginAndObtainToken()
+
+        if (token) {
+          vscode.window.showInformationMessage(
+            'Successfully authenticated with Sourcegraph. You can now use Smart File Selection feature.'
+          )
+        } else {
+          // User cancelled the flow
+          vscode.window.showInformationMessage(
+            'Authentication cancelled. You can try again later by running the "Sign in to Sourcegraph" command.'
+          )
+        }
+      } catch (error) {
+        if (error instanceof Error && error.message === 'No token provided') {
+          vscode.window.showInformationMessage(
+            'No token was entered. You can try again later by running the "Sign in to Sourcegraph" command.'
+          )
+        } else {
+          vscode.window.showErrorMessage(
+            `Failed to authenticate with Sourcegraph: ${error instanceof Error ? error.message : String(error)}. ` +
+              'Please make sure you created a valid access token with the required permissions.'
+          )
+        }
+      }
+    }
+  )
+
+  const removeSourcegraphTokenDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.removeSourcegraphToken',
+    async () => {
+      try {
+        const sourcegraphService = SourcegraphService.getInstance(context)
+        await sourcegraphService.logout()
+        vscode.window.showInformationMessage('Successfully logged out from Sourcegraph.')
+      } catch (error) {
+        vscode.window.showErrorMessage(
+          `Failed to log out from Sourcegraph: ${error instanceof Error ? error.message : String(error)}.`
+        )
+      }
+    }
+  )
+
   // Create and register the webview view for displaying custom commands in the sidebar
   const customCommandsWebviewProvider = new MainWebviewView(
     context.extensionUri,
@@ -107,7 +155,9 @@ export function activate(context: vscode.ExtensionContext) {
     deleteCommandDisposable,
     addFileDisposable,
     addSelectionDisposable,
-    addSelectionRecursiveDisposable
+    addSelectionRecursiveDisposable,
+    requestSourcegraphTokenDisposable,
+    removeSourcegraphTokenDisposable
   )
 }
 

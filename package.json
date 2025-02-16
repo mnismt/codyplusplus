@@ -63,6 +63,16 @@
         "title": "Delete",
         "category": "Cody++",
         "icon": "$(trash)"
+      },
+      {
+        "command": "cody-plus-plus.requestSourcegraphToken",
+        "title": "Sign In and Request Sourcegraph's Token",
+        "category": "Cody++"
+      },
+      {
+        "command": "cody-plus-plus.removeSourcegraphToken",
+        "title": "Logout Sourcegraph",
+        "category": "Cody++"
       }
     ],
     "menus": {
