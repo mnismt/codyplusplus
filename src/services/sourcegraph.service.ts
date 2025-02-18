@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import { SecretStorage } from './secret-store.service'
+import { SecretStorage } from './secretStore.service'
 
 interface GraphQLResponse {
   data?: {

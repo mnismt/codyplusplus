@@ -109,8 +109,8 @@
         },
         {
           "command": "cody-plus-plus.addFilesToCodySmart",
-          "when": "explorerViewletFocus && cody.activated",
-          "group": "1_cody"
+          "when": "explorerResourceIsFolder && explorerViewletFocus",
+          "group": "0_cody"
         }
       ],
       "view/title": [
@@ -237,6 +237,7 @@
     ]
   },
   "dependencies": {
+    "ignore": "^7.0.3",
     "posthog-node": "^4.4.0",
     "zod": "^3.23.8"
   },
