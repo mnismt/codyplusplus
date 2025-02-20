@@ -22,7 +22,7 @@ export async function addFile(uri: vscode.Uri) {
 /**
  * Add multiple selected files to Cody
  */
-export async function addSelection(uris: vscode.Uri[]) {
+export async function addSelection(uris: vscode.Uri[], recursive = false) {
   const telemetry = TelemetryService.getInstance()
   try {
     const fileCount = await processFiles(
@@ -31,12 +31,14 @@ export async function addSelection(uris: vscode.Uri[]) {
         await executeMentionFileCommand(uri)
       },
       {
-        progressTitle: 'Adding selected items to Cody'
+        progressTitle: 'Adding selected items to Cody',
+        recursive
       }
     )
 
     telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_SELECTION, {
-      fileCount
+      fileCount,
+      recursive
     })
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to add selection to Cody: ${error.message}`)
@@ -46,7 +48,7 @@ export async function addSelection(uris: vscode.Uri[]) {
 /**
  * Add all files in a folder to Cody recursively
  */
-export async function addFolderCommand(uri: vscode.Uri) {
+export async function addFolderCommand(uri: vscode.Uri, recursive = true) {
   const telemetry = TelemetryService.getInstance()
   try {
     const fileCount = await processFiles(
@@ -55,40 +57,14 @@ export async function addFolderCommand(uri: vscode.Uri) {
         await executeMentionFileCommand(uri)
       },
       {
-        recursive: true,
+        recursive,
         progressTitle: 'Adding folder to Cody'
       }
     )
 
     telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_FOLDER, {
       fileCount,
-      recursive: true
-    })
-  } catch (error: any) {
-    vscode.window.showErrorMessage(`Failed to add folder to Cody: ${error.message}`)
-  }
-}
-
-/**
- * Add only top-level files in a folder to Cody
- */
-export async function addShallowFolderCommand(uri: vscode.Uri) {
-  const telemetry = TelemetryService.getInstance()
-  try {
-    const fileCount = await processFiles(
-      [uri],
-      async uri => {
-        await executeMentionFileCommand(uri)
-      },
-      {
-        recursive: false,
-        progressTitle: 'Adding current directory to Cody'
-      }
-    )
-
-    telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_FOLDER, {
-      fileCount,
-      recursive: false
+      recursive
     })
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to add folder to Cody: ${error.message}`)

@@ -2,12 +2,7 @@
 import * as vscode from 'vscode'
 // Import custom command handlers
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
-import {
-  addFile,
-  addFolderCommand,
-  addSelection,
-  addShallowFolderCommand
-} from './commands/addToCody'
+import { addFile, addFolderCommand, addSelection } from './commands/addToCody'
 // Import services and views
 import { CustomCommandService } from './services/customCommand.service'
 import { SourcegraphService } from './services/sourcegraph.service'
@@ -33,7 +28,28 @@ export async function activate(context: vscode.ExtensionContext) {
   // Register the "Add Shallow Folder" command, which adds only files in the current folder to Cody
   const addShallowFolderDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addShallowFolder',
-    addShallowFolderCommand
+    (uri: vscode.Uri) => addFolderCommand(uri, false)
+  )
+
+  // Register the "Add File" command, which adds a single file to Cody
+  const addFileDisposable = vscode.commands.registerCommand('cody-plus-plus.addFile', addFile)
+
+  // Register the "Add Selection" command, which adds multiple selected files to Cody
+  const addSelectionDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.addSelection',
+    async (uri: vscode.Uri[], urisFromContextMenu: vscode.Uri[]) => {
+      const urisToAdd = Array.isArray(uri) ? uri : urisFromContextMenu ? [uri] : []
+      await addSelection(urisToAdd)
+    }
+  )
+
+  // Register the "Add Selection (Recursive)" command, which adds all files in a folder to Cody recursively
+  const addSelectionRecursiveDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.addSelectionRecursive',
+    async (uri: vscode.Uri[], urisFromContextMenu: vscode.Uri[]) => {
+      const urisToAdd = Array.isArray(uri) ? uri : urisFromContextMenu ? [uri] : []
+      await addSelection(urisToAdd, true)
+    }
   )
 
   // Register the "Add Custom Command" command, which opens a UI to create a custom command
@@ -66,16 +82,6 @@ export async function activate(context: vscode.ExtensionContext) {
         // Notify the user that the command was deleted successfully
         vscode.window.showInformationMessage(`Command "${item.commandId}" deleted successfully.`)
       }
-    }
-  )
-
-  const addFileDisposable = vscode.commands.registerCommand('cody-plus-plus.addFile', addFile)
-
-  const addSelectionDisposable = vscode.commands.registerCommand(
-    'cody-plus-plus.addSelection',
-    async (uri: vscode.Uri[], urisFromContextMenu: vscode.Uri[]) => {
-      const urisToAdd = Array.isArray(uri) ? uri : urisFromContextMenu ? [uri] : []
-      await addSelection(urisToAdd)
     }
   )
 
@@ -142,6 +148,7 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     addFolderDisposable,
     addShallowFolderDisposable,
+    addSelectionRecursiveDisposable,
     addCustomCommandDisposable,
     editCommandDisposable,
     deleteCommandDisposable,
