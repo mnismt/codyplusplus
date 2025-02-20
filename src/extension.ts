@@ -4,7 +4,6 @@ import * as vscode from 'vscode'
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
 import {
   addFile,
-  addFilesSmartCommand,
   addFolderCommand,
   addSelection,
   addShallowFolderCommand
@@ -35,11 +34,6 @@ export async function activate(context: vscode.ExtensionContext) {
   const addShallowFolderDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addShallowFolder',
     addShallowFolderCommand
-  )
-
-  const addFilesSmartDisposable = vscode.commands.registerCommand(
-    'cody-plus-plus.addFilesToCodySmart',
-    (uri?: vscode.Uri) => addFilesSmartCommand(uri, context)
   )
 
   // Register the "Add Custom Command" command, which opens a UI to create a custom command
@@ -79,17 +73,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const addSelectionDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addSelection',
-    async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
-      const urisToAdd = allSelections || [contextSelection]
-      await addSelection(urisToAdd, false)
-    }
-  )
-
-  const addSelectionRecursiveDisposable = vscode.commands.registerCommand(
-    'cody-plus-plus.addSelectionRecursive',
-    async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
-      const urisToAdd = allSelections || [contextSelection]
-      await addSelection(urisToAdd, true)
+    async (uri: vscode.Uri[], urisFromContextMenu: vscode.Uri[]) => {
+      const urisToAdd = Array.isArray(uri) ? uri : urisFromContextMenu ? [uri] : []
+      await addSelection(urisToAdd)
     }
   )
 
@@ -161,10 +147,8 @@ export async function activate(context: vscode.ExtensionContext) {
     deleteCommandDisposable,
     addFileDisposable,
     addSelectionDisposable,
-    addSelectionRecursiveDisposable,
     requestSourcegraphTokenDisposable,
-    removeSourcegraphTokenDisposable,
-    addFilesSmartDisposable
+    removeSourcegraphTokenDisposable
   )
 }
 
