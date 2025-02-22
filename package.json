@@ -110,7 +110,7 @@
         {
           "command": "cody-plus-plus.addFilesToCodySmart",
           "when": "explorerResourceIsFolder && explorerViewletFocus && cody.activated",
-          "group": "1_cody"
+          "group": "0_cody"
         }
       ],
       "view/title": [

@@ -50,64 +50,109 @@ export async function getGitignore(rootPath?: string) {
  * @param files Array of file metadata to format
  */
 export function formatFileTree(rootFolder: string, files: FileMetadata[]): string {
+  // Sort files by path for consistent ordering
   files.sort((a, b) => a.path.localeCompare(b.path))
 
-  const dirMap = new Map<string, Set<{ name: string; type: 'file' | 'directory' }>>()
-  dirMap.set(rootFolder, new Set())
+  // Create a map of parent paths to their children
+  const dirMap = new Map<string, Array<FileMetadata>>()
 
-  const entryEquals = (a: any, b: any) => a.name === b.name && a.type === b.type
+  // Initialize root directory
+  dirMap.set(rootFolder, [])
 
+  // Track processed directories to avoid duplication
+  const processedDirs = new Set<string>()
+
+  // Build directory structure
   files.forEach(file => {
-    const dir = file.path.split('/').slice(0, -1).join('/') || rootFolder
+    const parentDir = path.dirname(file.path)
+    const relativePath = path.relative(rootFolder, parentDir)
 
-    if (!dirMap.has(dir)) {
-      dirMap.set(dir, new Set())
+    // Create parent directory entries if they don't exist
+    let currentPath = rootFolder
+    if (relativePath !== '') {
+      const parts = relativePath.split(path.sep)
+      parts.forEach(part => {
+        const parentPath = currentPath
+        currentPath = path.join(currentPath, part)
 
-      const parentDir = dir.split('/').slice(0, -1).join('/') || rootFolder
-      if (parentDir !== '.') {
-        const dirEntry = {
-          name: dir.split('/').pop()!,
-          type: 'directory' as const
+        if (!dirMap.has(currentPath)) {
+          dirMap.set(currentPath, [])
+          // Only add directory entry if not processed before
+          if (!processedDirs.has(currentPath)) {
+            dirMap.get(parentPath)?.push({
+              path: currentPath,
+              type: 'directory',
+              name: part
+            })
+            processedDirs.add(currentPath)
+          }
         }
+      })
+    }
 
-        const parentSet = dirMap.get(parentDir)!
-        if (![...parentSet].some(entry => entryEquals(entry, dirEntry))) {
-          parentSet.add(dirEntry)
-        }
+    // Only add non-directory files or unprocessed directories
+    if (file.type !== 'directory' || !processedDirs.has(file.path)) {
+      dirMap.get(currentPath)?.push({
+        path: file.path,
+        type: file.type,
+        name: file.name
+      })
+      if (file.type === 'directory') {
+        processedDirs.add(file.path)
       }
-    }
-
-    const fileEntry = {
-      name: file.name,
-      type: file.type
-    }
-
-    const dirSet = dirMap.get(dir)!
-    if (![...dirSet].some(entry => entryEquals(entry, fileEntry))) {
-      dirSet.add(fileEntry)
     }
   })
 
   const treeLines: string[] = []
-  treeLines.push(rootFolder)
+  treeLines.push(path.basename(rootFolder))
 
+  // Recursive function to build the tree string
   function buildTree(dir: string, prefix: string = '') {
-    const contents = Array.from(dirMap.get(dir) || new Set()) as FileMetadata[]
+    const contents = dirMap.get(dir) || []
 
-    contents.forEach((item: FileMetadata, index) => {
+    contents.forEach((item, index) => {
       const isLast = index === contents.length - 1
       const itemPrefix = isLast ? '└── ' : '├── '
-      const line = `${prefix}${itemPrefix}${item.name}`
-      treeLines.push(line)
+      const newPrefix = prefix + (isLast ? '    ' : '│   ')
+
+      treeLines.push(`${prefix}${itemPrefix}${item.name}`)
 
       if (item.type === 'directory') {
-        const newDir = dir === rootFolder ? item.name : `${dir}/${item.name}`
-        const newPrefix = prefix + (isLast ? '    ' : '│   ')
-        buildTree(newDir, newPrefix)
+        buildTree(item.path, newPrefix)
       }
     })
   }
 
   buildTree(rootFolder)
   return treeLines.join('\n')
+}
+
+/**
+ * Retrieves a tree structure of files and directories in the workspace
+ * @param rootUri The root URI of the workspace or folder to start from
+ * @returns A promise that resolves to an array of FileMetadata objects representing the file tree
+ */
+export async function getWorkspaceFileTree(rootUri: vscode.Uri): Promise<FileMetadata[]> {
+  const fileUris: FileMetadata[] = []
+  const entries = await vscode.workspace.fs.readDirectory(rootUri)
+
+  for (const [name, type] of entries) {
+    const uri = vscode.Uri.joinPath(rootUri, name)
+    if (type === vscode.FileType.File) {
+      fileUris.push({
+        path: uri.fsPath, // Store absolute path
+        type: 'file',
+        name
+      })
+    } else if (type === vscode.FileType.Directory) {
+      fileUris.push({
+        path: uri.fsPath, // Store absolute path
+        type: 'directory',
+        name
+      })
+      const subFileUris = await getWorkspaceFileTree(uri)
+      fileUris.push(...subFileUris)
+    }
+  }
+  return fileUris
 }

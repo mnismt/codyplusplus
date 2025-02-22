@@ -1,8 +1,11 @@
 import * as vscode from 'vscode'
+import { FEW_SHOT_EXAMPLES, SYSTEM_PROMPT } from '../constants/llm'
 import { TELEMETRY_EVENTS } from '../constants/telemetry'
 import { executeMentionFileCommand } from '../core/cody/commands'
+import { formatFileTree, getWorkspaceFileTree } from '../core/filesystem/operations'
 import { getSelectedFileUris } from '../core/filesystem/processor'
 import { createProvider, LLMProvider } from '../core/llm'
+import { CompletionRequestMessage } from '../core/llm/types'
 import { TelemetryService } from '../services/telemetry.service'
 
 function getSuccessCount(count: number, successes: boolean): number {
@@ -76,20 +79,100 @@ export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.Ex
   const telemetry = TelemetryService.getInstance()
 
   try {
-    const files = await getSelectedFileUris(folderUris, {
-      recursive: true,
-      progressTitle: 'Adding files smart to Cody'
+    // Prompt user for file selection criteria
+    const prompt = await vscode.window.showInputBox({
+      prompt: 'Describe the files you want to add to Cody',
+      placeHolder: 'e.g., all test files and services related to user authentication'
     })
 
-    const llm = await createProvider(LLMProvider.Sourcegraph, context)
-
-    if (!llm.isAuthenticated) {
-      llm.loginAndObtainToken()
+    if (!prompt) {
+      return // User cancelled
     }
-    // telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_SMART_SELECTION, {
-    //   fileCount,
-    //   recursive
-    // })
+
+    // Determine the root URI (workspace or specific folder)
+    const rootUri =
+      folderUris.length === 1 &&
+      (await vscode.workspace.fs.stat(folderUris[0])).type === vscode.FileType.Directory
+        ? folderUris[0]
+        : vscode.workspace.workspaceFolders?.[0].uri
+
+    if (!rootUri) {
+      vscode.window.showErrorMessage('No workspace or folder selected.')
+      return
+    }
+
+    // Get the file tree structure
+    const fileTree = await getWorkspaceFileTree(rootUri)
+    const formattedFileTree = formatFileTree(
+      rootUri.fsPath, // Use the full fsPath
+      fileTree
+    )
+
+    // Create LLM provider and ensure authenticated
+    const llm = await createProvider(LLMProvider.Sourcegraph, context)
+    if (!llm.isAuthenticated) {
+      await llm.loginAndObtainToken()
+    }
+
+    const userMessage = `
+<file-tree>
+${rootUri.fsPath}
+${formattedFileTree}
+</file-tree>
+
+User request: ${prompt}
+`
+
+    const messages: CompletionRequestMessage[] = [
+      {
+        speaker: 'system',
+        text: SYSTEM_PROMPT
+      },
+      ...FEW_SHOT_EXAMPLES,
+      {
+        speaker: 'human',
+        text: userMessage
+      }
+    ]
+
+    // Call LLM
+    const response = await llm.complete({
+      messages,
+      config: {
+        responseFormat: {
+          type: 'json'
+        }
+      }
+    })
+
+    // Parse LLM Response
+    let selectedFiles: string[] = []
+    try {
+      selectedFiles = JSON.parse(response.text)
+      if (!Array.isArray(selectedFiles)) {
+        throw new Error('Invalid response format. Expected an array of file paths.')
+      }
+    } catch (error: any) {
+      vscode.window.showErrorMessage(`Error parsing LLM response: ${error.message}`)
+      return
+    }
+
+    // Convert paths to URIs and add to Cody
+    // No need to change this part as selectedFiles should now contain absolute paths.
+    const selectedFileUris = selectedFiles.map(filePath => vscode.Uri.file(filePath))
+    const fileCount = (await Promise.all(selectedFileUris.map(executeMentionFileCommand))).reduce(
+      getSuccessCount,
+      0
+    )
+
+    telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_SMART_SELECTION, {
+      fileCount
+    })
+
+    // Provide feedback to the user.
+    vscode.window.showInformationMessage(
+      `Added ${fileCount} of ${selectedFiles.length} files to Cody.`
+    )
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to add files smart to Cody: ${error.message}`)
   }
