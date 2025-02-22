@@ -28,8 +28,8 @@ export enum LLMProvider {
 export interface BaseLLMProvider {
   providerIdentifier: LLMProvider
   complete: (request: CompletionRequest) => Promise<CompletionResponse>
-  loginAndObtainToken?: () => Promise<string | undefined>
-  logout?: () => Promise<void>
+  loginAndObtainToken: () => Promise<string | undefined>
+  logout: () => Promise<void>
 }
 
 export interface LLMError extends Error {
