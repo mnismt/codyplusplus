@@ -66,12 +66,12 @@
       },
       {
         "command": "cody-plus-plus.requestSourcegraphToken",
-        "title": "Sign In and Request Sourcegraph's Token",
+        "title": "Enter Sourcegraph's Token",
         "category": "Cody++"
       },
       {
         "command": "cody-plus-plus.removeSourcegraphToken",
-        "title": "Logout Sourcegraph",
+        "title": "Remove Sourcegraph's Token",
         "category": "Cody++"
       },
       {

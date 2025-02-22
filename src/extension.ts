@@ -4,8 +4,8 @@ import * as vscode from 'vscode'
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
 import { addFile, addFilesSmart, addFolderCommand, addSelection } from './commands/addToCody'
 // Import services and views
+import * as llm from './core/llm'
 import { CustomCommandService } from './services/customCommand.service'
-import { SourcegraphService } from './services/sourcegraph.service'
 import { TelemetryService } from './services/telemetry.service'
 import { MainWebviewView } from './views/MainWebviewView'
 
@@ -95,9 +95,9 @@ export async function activate(context: vscode.ExtensionContext) {
   const requestSourcegraphTokenDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.requestSourcegraphToken',
     async () => {
+      const sourcegraphProvider = llm.createProvider(llm.LLMProvider.Sourcegraph, context)
       try {
-        const sourcegraphService = SourcegraphService.getInstance(context)
-        const token = await sourcegraphService.loginAndObtainToken()
+        const token = await sourcegraphProvider.loginAndObtainToken()
 
         if (token) {
           vscode.window.showInformationMessage(
@@ -116,7 +116,9 @@ export async function activate(context: vscode.ExtensionContext) {
           )
         } else {
           vscode.window.showErrorMessage(
-            `Failed to authenticate with Sourcegraph: ${error instanceof Error ? error.message : String(error)}. ` +
+            `Failed to authenticate with Sourcegraph: ${
+              error instanceof Error ? error.message : String(error)
+            }. ` +
               'Please make sure you created a valid access token with the required permissions.'
           )
         }
@@ -127,13 +129,15 @@ export async function activate(context: vscode.ExtensionContext) {
   const removeSourcegraphTokenDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.removeSourcegraphToken',
     async () => {
+      const sourcegraphProvider = llm.createProvider(llm.LLMProvider.Sourcegraph, context)
       try {
-        const sourcegraphService = SourcegraphService.getInstance(context)
-        await sourcegraphService.logout()
+        await sourcegraphProvider.logout()
         vscode.window.showInformationMessage('Successfully logged out from Sourcegraph.')
       } catch (error) {
         vscode.window.showErrorMessage(
-          `Failed to log out from Sourcegraph: ${error instanceof Error ? error.message : String(error)}.`
+          `Failed to log out from Sourcegraph: ${
+            error instanceof Error ? error.message : String(error)
+          }.`
         )
       }
     }

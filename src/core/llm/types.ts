@@ -22,8 +22,14 @@ export interface CompletionResponse {
 export enum LLMProvider {
   Sourcegraph = 'sourcegraph'
   // Future providers:
-  // OpenAI = 'openai'
   // Gemini = 'gemini'
+}
+
+export interface BaseLLMProvider {
+  providerIdentifier: LLMProvider
+  complete: (request: CompletionRequest) => Promise<CompletionResponse>
+  loginAndObtainToken?: () => Promise<string | undefined>
+  logout?: () => Promise<void>
 }
 
 export interface LLMError extends Error {
