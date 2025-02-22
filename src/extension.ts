@@ -2,7 +2,7 @@
 import * as vscode from 'vscode'
 // Import custom command handlers
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
-import { addFile, addFolderCommand, addSelection } from './commands/addToCody'
+import { addFile, addFilesSmart, addFolderCommand, addSelection } from './commands/addToCody'
 // Import services and views
 import { CustomCommandService } from './services/customCommand.service'
 import { SourcegraphService } from './services/sourcegraph.service'
@@ -47,6 +47,15 @@ export async function activate(context: vscode.ExtensionContext) {
     async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
       const urisToAdd = allSelections || [contextSelection]
       await addSelection(urisToAdd, true)
+    }
+  )
+
+  // Register the "Add Files Smart" command, which adds all files in a folder to Cody
+  const addFilesSmartDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.addFilesToCodySmart',
+    async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
+      const urisToAdd = allSelections || [contextSelection]
+      await addFilesSmart(urisToAdd, true)
     }
   )
 
@@ -152,6 +161,7 @@ export async function activate(context: vscode.ExtensionContext) {
     deleteCommandDisposable,
     addFileDisposable,
     addSelectionDisposable,
+    addFilesSmartDisposable,
     requestSourcegraphTokenDisposable,
     removeSourcegraphTokenDisposable
   )

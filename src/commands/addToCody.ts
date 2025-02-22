@@ -70,3 +70,10 @@ export async function addFolderCommand(folderUri: vscode.Uri, recursive = true) 
     vscode.window.showErrorMessage(`Failed to add folder to Cody: ${error.message}`)
   }
 }
+
+export async function addFilesSmart(folderUris: vscode.Uri[], recursive = true) {
+  console.log(
+    `Adding files smart: ${folderUris.map(uri => uri.path).join(', ')} with recursive: ${recursive}`
+  )
+  // TODO: implement addFilesSmart using Sourcegraph and LLMs
+}
