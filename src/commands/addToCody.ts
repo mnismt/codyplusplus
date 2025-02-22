@@ -2,6 +2,7 @@ import * as vscode from 'vscode'
 import { TELEMETRY_EVENTS } from '../constants/telemetry'
 import { executeMentionFileCommand } from '../core/cody/commands'
 import { getSelectedFileUris } from '../core/filesystem/processor'
+import { createProvider, LLMProvider } from '../core/llm'
 import { TelemetryService } from '../services/telemetry.service'
 
 function getSuccessCount(count: number, successes: boolean): number {
@@ -71,9 +72,25 @@ export async function addFolderCommand(folderUri: vscode.Uri, recursive = true) 
   }
 }
 
-export async function addFilesSmart(folderUris: vscode.Uri[], recursive = true) {
-  console.log(
-    `Adding files smart: ${folderUris.map(uri => uri.path).join(', ')} with recursive: ${recursive}`
-  )
-  // TODO: implement addFilesSmart using Sourcegraph and LLMs
+export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.ExtensionContext) {
+  const telemetry = TelemetryService.getInstance()
+
+  try {
+    const files = await getSelectedFileUris(folderUris, {
+      recursive: true,
+      progressTitle: 'Adding files smart to Cody'
+    })
+
+    const llm = await createProvider(LLMProvider.Sourcegraph, context)
+
+    if (!llm.isAuthenticated) {
+      llm.loginAndObtainToken()
+    }
+    // telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_SMART_SELECTION, {
+    //   fileCount,
+    //   recursive
+    // })
+  } catch (error: any) {
+    vscode.window.showErrorMessage(`Failed to add files smart to Cody: ${error.message}`)
+  }
 }

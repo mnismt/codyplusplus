@@ -18,7 +18,7 @@ export interface ValidationResult {
 
 export interface AuthOperations {
   getToken: () => Promise<string | undefined>
-  validateToken: (token: string) => Promise<ValidationResult>
+  validateToken: (token?: string) => Promise<ValidationResult>
   loginAndObtainToken: () => Promise<string | undefined>
   logout: () => Promise<void>
 }
@@ -30,7 +30,14 @@ export const createSourcegraphAuth = (context: vscode.ExtensionContext): AuthOpe
   const storeToken = (token: string) => secretStorage.storeToken(token)
   const deleteToken = () => secretStorage.deleteToken()
 
-  const validateToken = async (token: string): Promise<ValidationResult> => {
+  const validateToken = async (token?: string): Promise<ValidationResult> => {
+    if (!token) {
+      return {
+        isValid: false,
+        error: 'No token provided'
+      }
+    }
+
     try {
       const headers = {
         Authorization: `token ${token}`,
@@ -85,11 +92,12 @@ export const createSourcegraphAuth = (context: vscode.ExtensionContext): AuthOpe
       }
     }
 
+    const TITLE = `Add Sourcegraph Access Token`
     const OPEN_SOURCEGRAPH_ACCESS_TOKEN_PAGE = "Open Sourcegraph's Page"
-    const ADD_TOKEN_DIRECTLY = 'Add token directly'
+    const ADD_TOKEN_DIRECTLY = 'Enter Token Directly'
 
     const result = await vscode.window.showInformationMessage(
-      `Enter Sourcegraph's Access Token`,
+      TITLE,
       OPEN_SOURCEGRAPH_ACCESS_TOKEN_PAGE,
       ADD_TOKEN_DIRECTLY
     )

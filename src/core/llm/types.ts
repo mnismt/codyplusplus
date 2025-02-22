@@ -27,6 +27,7 @@ export enum LLMProvider {
 
 export interface BaseLLMProvider {
   providerIdentifier: LLMProvider
+  isAuthenticated: boolean
   complete: (request: CompletionRequest) => Promise<CompletionResponse>
   loginAndObtainToken: () => Promise<string | undefined>
   logout: () => Promise<void>

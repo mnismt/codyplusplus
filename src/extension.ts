@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
 import { addFile, addFilesSmart, addFolderCommand, addSelection } from './commands/addToCody'
 // Import services and views
-import * as llm from './core/llm'
+import { createProvider, LLMProvider } from './core/llm'
 import { CustomCommandService } from './services/customCommand.service'
 import { TelemetryService } from './services/telemetry.service'
 import { MainWebviewView } from './views/MainWebviewView'
@@ -55,7 +55,8 @@ export async function activate(context: vscode.ExtensionContext) {
     'cody-plus-plus.addFilesToCodySmart',
     async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
       const urisToAdd = allSelections || [contextSelection]
-      await addFilesSmart(urisToAdd, true)
+      console.log(`Adding files smart: ${urisToAdd.map(uri => uri.path).join(', ')}`)
+      await addFilesSmart(urisToAdd, context)
     }
   )
 
@@ -95,8 +96,14 @@ export async function activate(context: vscode.ExtensionContext) {
   const requestSourcegraphTokenDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.requestSourcegraphToken',
     async () => {
-      const sourcegraphProvider = llm.createProvider(llm.LLMProvider.Sourcegraph, context)
       try {
+        const sourcegraphProvider = await createProvider(LLMProvider.Sourcegraph, context)
+
+        if (sourcegraphProvider.isAuthenticated) {
+          vscode.window.showInformationMessage('You are already authenticated')
+          return
+        }
+
         const token = await sourcegraphProvider.loginAndObtainToken()
 
         if (token) {
@@ -129,7 +136,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const removeSourcegraphTokenDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.removeSourcegraphToken',
     async () => {
-      const sourcegraphProvider = llm.createProvider(llm.LLMProvider.Sourcegraph, context)
+      const sourcegraphProvider = await createProvider(LLMProvider.Sourcegraph, context)
       try {
         await sourcegraphProvider.logout()
         vscode.window.showInformationMessage('Successfully logged out from Sourcegraph.')
