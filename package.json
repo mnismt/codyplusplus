@@ -99,18 +99,18 @@
         },
         {
           "command": "cody-plus-plus.addFolder",
-          "when": "explorerResourceIsFolder && explorerViewletFocus && cody.activated",
+          "when": "!listMultiSelection && explorerResourceIsFolder && explorerViewletFocus && cody.activated",
           "group": "1_cody"
         },
         {
           "command": "cody-plus-plus.addShallowFolder",
-          "when": "explorerResourceIsFolder && explorerViewletFocus && cody.activated",
+          "when": "!listMultiSelection && explorerResourceIsFolder && explorerViewletFocus && cody.activated",
           "group": "1_cody"
         },
         {
           "command": "cody-plus-plus.addFilesToCodySmart",
           "when": "explorerResourceIsFolder && explorerViewletFocus",
-          "group": "0_cody"
+          "group": "1_cody"
         }
       ],
       "view/title": [

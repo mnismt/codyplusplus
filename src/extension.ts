@@ -22,7 +22,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // Register the "Add Folder" command, which adds all files in a folder to Cody
   const addFolderDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addFolder',
-    addFolderCommand
+    (uri: vscode.Uri) => addFolderCommand(uri, true)
   )
 
   // Register the "Add Shallow Folder" command, which adds only files in the current folder to Cody
@@ -34,20 +34,18 @@ export async function activate(context: vscode.ExtensionContext) {
   // Register the "Add File" command, which adds a single file to Cody
   const addFileDisposable = vscode.commands.registerCommand('cody-plus-plus.addFile', addFile)
 
-  // Register the "Add Selection" command, which adds multiple selected files to Cody
   const addSelectionDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addSelection',
-    async (uri: vscode.Uri[], urisFromContextMenu: vscode.Uri[]) => {
-      const urisToAdd = Array.isArray(uri) ? uri : urisFromContextMenu ? [uri] : []
-      await addSelection(urisToAdd)
+    async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
+      const urisToAdd = allSelections || [contextSelection]
+      await addSelection(urisToAdd, false)
     }
   )
 
-  // Register the "Add Selection (Recursive)" command, which adds all files in a folder to Cody recursively
   const addSelectionRecursiveDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addSelectionRecursive',
-    async (uri: vscode.Uri[], urisFromContextMenu: vscode.Uri[]) => {
-      const urisToAdd = Array.isArray(uri) ? uri : urisFromContextMenu ? [uri] : []
+    async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
+      const urisToAdd = allSelections || [contextSelection]
       await addSelection(urisToAdd, true)
     }
   )

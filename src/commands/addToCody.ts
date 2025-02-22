@@ -1,39 +1,43 @@
 import * as vscode from 'vscode'
 import { TELEMETRY_EVENTS } from '../constants/telemetry'
 import { executeMentionFileCommand } from '../core/cody/commands'
-import { processFiles } from '../core/processing/processor'
+import { getSelectedFileUris } from '../core/filesystem/processor'
 import { TelemetryService } from '../services/telemetry.service'
 
-/**
- * Add a single file to Cody through context menu
- */
-export async function addFile(uri: vscode.Uri) {
+function getSuccessCount(count: number, successes: boolean): number {
+  return count + (successes ? 1 : 0)
+}
+
+export async function addFile(folderUri: vscode.Uri) {
   const telemetry = TelemetryService.getInstance()
   try {
-    await executeMentionFileCommand(uri)
+    const files = await getSelectedFileUris([folderUri])
+    const fileCount = (await Promise.all(files.map(executeMentionFileCommand))).reduce(
+      getSuccessCount,
+      0
+    )
+
     telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_FILE, {
-      fileCount: 1
+      fileCount
     })
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to add file to Cody: ${error.message}`)
   }
 }
 
-/**
- * Add multiple selected files to Cody
- */
-export async function addSelection(uris: vscode.Uri[], recursive = false) {
+export async function addSelection(folderUris: vscode.Uri[], recursive = false) {
   const telemetry = TelemetryService.getInstance()
+  console.log(
+    `Adding selection: ${folderUris.map(uri => uri.path).join(', ')} with recursive: ${recursive}`
+  )
   try {
-    const fileCount = await processFiles(
-      uris,
-      async uri => {
-        await executeMentionFileCommand(uri)
-      },
-      {
-        progressTitle: 'Adding selected items to Cody',
-        recursive
-      }
+    const files = await getSelectedFileUris(folderUris, {
+      recursive,
+      progressTitle: 'Adding selection to Cody'
+    })
+    const fileCount = (await Promise.all(files.map(executeMentionFileCommand))).reduce(
+      getSuccessCount,
+      0
     )
 
     telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_SELECTION, {
@@ -45,21 +49,17 @@ export async function addSelection(uris: vscode.Uri[], recursive = false) {
   }
 }
 
-/**
- * Add all files in a folder to Cody recursively
- */
-export async function addFolderCommand(uri: vscode.Uri, recursive = true) {
+export async function addFolderCommand(folderUri: vscode.Uri, recursive = true) {
   const telemetry = TelemetryService.getInstance()
+  console.log(`Adding folder: ${folderUri.path} with recursive: ${recursive}`)
   try {
-    const fileCount = await processFiles(
-      [uri],
-      async uri => {
-        await executeMentionFileCommand(uri)
-      },
-      {
-        recursive,
-        progressTitle: 'Adding folder to Cody'
-      }
+    const files = await getSelectedFileUris([folderUri], {
+      recursive,
+      progressTitle: 'Adding folder to Cody'
+    })
+    const fileCount = (await Promise.all(files.map(executeMentionFileCommand))).reduce(
+      getSuccessCount,
+      0
     )
 
     telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_FOLDER, {
