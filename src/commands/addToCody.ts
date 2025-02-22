@@ -135,8 +135,6 @@ User request: ${prompt}
       }
     ]
 
-    console.log('LLM Request:', messages)
-
     // Call LLM
     const response = await llm.complete({
       messages,
