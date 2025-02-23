@@ -74,10 +74,10 @@
           "description": "Base URL for OpenAI-compatible API providers",
           "default": "https://api.openai.com/v1"
         },
-        "codyPlusPlus.openaiModel": {
+        "codyPlusPlus.llmModel": {
           "type": "string",
-          "description": "Model to use for OpenAI-compatible API providers",
-          "default": "gpt-4o-mini"
+          "description": "Model to use for LLM completions (defaults to provider-specific model if not set)",
+          "markdownDescription": "Model to use for LLM completions:\n- For OpenAI: defaults to 'gpt-4o-mini'\n- For Sourcegraph: defaults to 'claude-3.5-sonnet'"
         }
       }
     },

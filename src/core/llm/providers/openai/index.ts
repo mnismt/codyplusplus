@@ -42,16 +42,18 @@ export class OpenAIProvider implements BaseLLMProvider {
     return !!this.apiKey
   }
 
+  get model(): string {
+    return (
+      vscode.workspace.getConfiguration('codyPlusPlus').get<string>('llmModel') || 'gpt-4o-mini'
+    )
+  }
+
   async complete(request: CompletionRequest): Promise<CompletionResponse> {
     if (!this.apiKey) {
       throw new Error('Not authenticated')
     }
 
     try {
-      const model =
-        vscode.workspace.getConfiguration('codyPlusPlus').get<string>('openaiModel') ||
-        'gpt-4o-mini'
-
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -59,7 +61,7 @@ export class OpenAIProvider implements BaseLLMProvider {
           Authorization: `Bearer ${this.apiKey}`
         },
         body: JSON.stringify({
-          model,
+          model: this.model,
           messages: request.messages,
           max_completion_tokens: request.config?.maxTokens || 4000,
           temperature: request.config?.temperature || 0,

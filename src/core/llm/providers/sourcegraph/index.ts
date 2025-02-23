@@ -39,6 +39,13 @@ export class SourcegraphProvider implements BaseLLMProvider {
     return !!this.apiKey
   }
 
+  get model(): string {
+    return (
+      vscode.workspace.getConfiguration('codyPlusPlus').get<string>('llmModel') ||
+      'claude-3.5-sonnet'
+    )
+  }
+
   private async validateToken(token?: string): Promise<ValidationResult> {
     if (!token) {
       return {
@@ -120,12 +127,10 @@ export class SourcegraphProvider implements BaseLLMProvider {
           Authorization: `token ${this.apiKey}`
         },
         body: JSON.stringify({
-          model: 'claude-3.5-sonnet',
+          model: this.model,
           messages: this.convertToSourcegraphCompletionRequest(request.messages),
           temperature: 0,
-          maxTokens: config.maxTokens,
-          topK: -1,
-          topP: -1
+          maxTokens: config.maxTokens
         })
       })
 
@@ -135,9 +140,19 @@ export class SourcegraphProvider implements BaseLLMProvider {
       }
 
       const data = await response.json()
-      return {
-        text: data.message
+
+      if (
+        typeof data === 'object' &&
+        data !== null &&
+        'message' in data &&
+        typeof data.message === 'string'
+      ) {
+        return {
+          text: data.message
+        }
       }
+
+      throw new Error('Invalid response format from Sourcegraph API')
     } catch (error) {
       if (error instanceof Error) {
         throw error

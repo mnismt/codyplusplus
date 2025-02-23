@@ -72,9 +72,7 @@ export const selectProvider = async (): Promise<boolean> => {
     }
 
     // Ask for model
-    const currentModel = vscode.workspace
-      .getConfiguration('codyPlusPlus')
-      .get<string>('openaiModel')
+    const currentModel = vscode.workspace.getConfiguration('codyPlusPlus').get<string>('llmModel')
 
     // Fetch list of models from OpenAI API
     const models = await fetchOpenAIModels(baseUrl || 'https://api.openai.com/v1', apiKey)
@@ -98,7 +96,7 @@ export const selectProvider = async (): Promise<boolean> => {
     if (model !== undefined) {
       await vscode.workspace
         .getConfiguration('codyPlusPlus')
-        .update('openaiModel', model || 'gpt-4o-mini', true)
+        .update('llmModel', model || 'gpt-4o-mini', true)
     }
   }
 
