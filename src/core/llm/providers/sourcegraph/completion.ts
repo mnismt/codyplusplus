@@ -63,6 +63,7 @@ export const createSourcegraphCompletion = (
 
       return { text: result.completion }
     } catch (error) {
+      console.log(`Sourcegraph completion error: ${error}`)
       if (error instanceof LLMProviderError) {
         throw error // Re-throw if already an LLMProviderError
       }

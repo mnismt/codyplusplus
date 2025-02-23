@@ -1,3 +1,4 @@
+import * as path from 'path'
 import * as vscode from 'vscode'
 import { FEW_SHOT_EXAMPLES, SYSTEM_PROMPT } from '../constants/llm'
 import { TELEMETRY_EVENTS } from '../constants/telemetry'
@@ -31,9 +32,6 @@ export async function addFile(folderUri: vscode.Uri) {
 
 export async function addSelection(folderUris: vscode.Uri[], recursive = false) {
   const telemetry = TelemetryService.getInstance()
-  console.log(
-    `Adding selection: ${folderUris.map(uri => uri.path).join(', ')} with recursive: ${recursive}`
-  )
   try {
     const files = await getSelectedFileUris(folderUris, {
       recursive,
@@ -55,7 +53,6 @@ export async function addSelection(folderUris: vscode.Uri[], recursive = false) 
 
 export async function addFolderCommand(folderUri: vscode.Uri, recursive = true) {
   const telemetry = TelemetryService.getInstance()
-  console.log(`Adding folder: ${folderUri.path} with recursive: ${recursive}`)
   try {
     const files = await getSelectedFileUris([folderUri], {
       recursive,
@@ -170,9 +167,78 @@ User request: ${prompt}
     })
 
     // Provide feedback to the user.
-    vscode.window.showInformationMessage(
-      `Added ${fileCount} of ${selectedFiles.length} files to Cody.`
-    )
+    const relativePath = vscode.workspace.asRelativePath(rootUri)
+    const successMessage = `Added ${fileCount} file${fileCount !== 1 ? 's' : ''} from '${relativePath}' that match your criteria: "${prompt}"`
+
+    // Create a tree structure with status indicators
+    const createStatusTree = (files: string[], selectedFiles: string[]) => {
+      const dirMap = new Map<
+        string,
+        Set<{ name: string; type: 'file' | 'directory'; selected: boolean }>
+      >()
+
+      // Initialize root
+      dirMap.set(rootUri.fsPath, new Set())
+
+      // Build directory and file structure
+      files.forEach(file => {
+        const isSelected = selectedFiles.includes(file)
+        let currentPath = rootUri.fsPath
+        const relativePath = path.relative(rootUri.fsPath, file)
+        const parts = relativePath.split(path.sep)
+
+        // Add directories to the map
+        for (let i = 0; i < parts.length - 1; i++) {
+          const part = parts[i]
+          const nextPath = path.join(currentPath, part)
+          if (!dirMap.has(nextPath)) {
+            dirMap.set(nextPath, new Set())
+            dirMap.get(currentPath)?.add({ name: part, type: 'directory', selected: false })
+          }
+          currentPath = nextPath
+        }
+
+        // Add file to the map
+        const fileName = parts[parts.length - 1]
+        dirMap.get(currentPath)?.add({ name: fileName, type: 'file', selected: isSelected })
+      })
+
+      // Build tree string
+      const treeLines: string[] = []
+      treeLines.push(path.basename(rootUri.fsPath))
+
+      function buildTree(dir: string, prefix = '') {
+        const contents = Array.from(dirMap.get(dir) || []).sort((a, b) =>
+          a.name.localeCompare(b.name)
+        )
+
+        contents.forEach((item, index) => {
+          const isLast = index === contents.length - 1
+          const itemPrefix = isLast ? '└── ' : '├── '
+          const newPrefix = prefix + (isLast ? '    ' : '│   ')
+          const statusIcon = item.selected ? '✅ ' : '❌ '
+
+          // Add status icon for files only
+          const displayName = item.type === 'file' ? `${statusIcon}${item.name}` : item.name
+          treeLines.push(`${prefix}${itemPrefix}${displayName}`)
+
+          if (item.type === 'directory') {
+            buildTree(path.join(dir, item.name), newPrefix)
+          }
+        })
+      }
+
+      buildTree(rootUri.fsPath)
+      return treeLines.join('\n')
+    }
+
+    const allFiles = fileTree.map(f => f.path)
+    const treeStructure = createStatusTree(allFiles, selectedFiles)
+
+    vscode.window.showInformationMessage(successMessage, {
+      detail: treeStructure,
+      modal: true
+    })
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to add files smart to Cody: ${error.message}`)
   }
