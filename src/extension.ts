@@ -2,7 +2,7 @@
 import * as vscode from 'vscode'
 // Import custom command handlers
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
-import { addFile, addFilesSmart, addFolderCommand, addSelection } from './commands/addToCody'
+import { addFile, addFilesSmart, addFolder, addSelection } from './commands/addToCody'
 import { selectProvider } from './commands/providerCommands'
 // Import services and views
 import { CustomCommandService } from './services/customCommand.service'
@@ -19,19 +19,16 @@ export async function activate(context: vscode.ExtensionContext) {
   // Initialize the singleton service for managing custom commands
   const customCommandService = CustomCommandService.getInstance()
 
-  // Register the "Add Folder" command, which adds all files in a folder to Cody
   const addFolderDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addFolder',
-    (uri: vscode.Uri) => addFolderCommand(uri, true)
+    (uri: vscode.Uri) => addFolder(uri, true)
   )
 
-  // Register the "Add Shallow Folder" command, which adds only files in the current folder to Cody
   const addShallowFolderDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addShallowFolder',
-    (uri: vscode.Uri) => addFolderCommand(uri, false)
+    (uri: vscode.Uri) => addFolder(uri, false)
   )
 
-  // Register the "Add File" command, which adds a single file to Cody
   const addFileDisposable = vscode.commands.registerCommand('cody-plus-plus.addFile', addFile)
 
   const addSelectionDisposable = vscode.commands.registerCommand(
@@ -70,7 +67,6 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         const urisToAdd = allSelections || [contextSelection]
-        console.log(`Adding files smart: ${urisToAdd.map(uri => uri.path).join(', ')}`)
         await addFilesSmart(urisToAdd, context)
       } catch (error) {
         void vscode.window.showErrorMessage(
@@ -96,7 +92,6 @@ export async function activate(context: vscode.ExtensionContext) {
   const deleteCommandDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.deleteCommand',
     async (item: any) => {
-      // Prompt the user for confirmation before deleting the command
       const confirmation = await vscode.window.showWarningMessage(
         `Are you sure you want to delete the "${item.commandId}" command?`,
         { modal: true },
@@ -105,15 +100,12 @@ export async function activate(context: vscode.ExtensionContext) {
       )
 
       if (confirmation === 'Yes') {
-        // Remove the command from the custom command service
         customCommandService.removeCommand(item.commandId)
-        // Notify the user that the command was deleted successfully
         vscode.window.showInformationMessage(`Command "${item.commandId}" deleted successfully.`)
       }
     }
   )
 
-  // Register the select provider command
   const selectProviderDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.selectProvider',
     selectProvider

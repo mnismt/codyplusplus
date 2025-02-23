@@ -7,10 +7,7 @@ import { getSelectedFileUris } from '../core/filesystem/processor'
 import { createProvider } from '../core/llm'
 import { CompletionRequestMessage } from '../core/llm/types'
 import { TelemetryService } from '../services/telemetry.service'
-
-function getSuccessCount(count: number, successes: boolean): number {
-  return count + (successes ? 1 : 0)
-}
+import { getSuccessCount } from '../utils'
 
 export async function addFile(folderUri: vscode.Uri) {
   const telemetry = TelemetryService.getInstance()
@@ -50,7 +47,7 @@ export async function addSelection(folderUris: vscode.Uri[], recursive = false) 
   }
 }
 
-export async function addFolderCommand(folderUri: vscode.Uri, recursive = true) {
+export async function addFolder(folderUri: vscode.Uri, recursive = true) {
   const telemetry = TelemetryService.getInstance()
   try {
     const files = await getSelectedFileUris([folderUri], {
