@@ -122,15 +122,17 @@ User request: ${prompt}
 
     const messages: CompletionRequestMessage[] = [
       {
-        speaker: 'system',
-        text: SYSTEM_PROMPT
+        role: 'system',
+        content: SYSTEM_PROMPT
       },
       ...FEW_SHOT_EXAMPLES,
       {
-        speaker: 'human',
-        text: userMessage
+        role: 'user',
+        content: userMessage
       }
     ]
+
+    console.log(`CODY++: LLM provider messages`, messages)
 
     // Call LLM
     const response = await llm.complete({

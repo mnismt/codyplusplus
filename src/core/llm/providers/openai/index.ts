@@ -1,11 +1,6 @@
 import * as vscode from 'vscode'
-import {
-  BaseLLMProvider,
-  CompletionRequest,
-  CompletionResponse,
-  LLMProvider,
-  LLMProviderError
-} from '../../types'
+import { LLMProvider } from '../../../../constants/llm'
+import { BaseLLMProvider, CompletionRequest, CompletionResponse } from '../../types'
 
 interface OpenAICompletionResponse {
   id: string
@@ -13,7 +8,10 @@ interface OpenAICompletionResponse {
   created: number
   model: string
   choices: Array<{
-    text: string
+    message: {
+      content: string
+      role: string
+    }
     index: number
     logprobs: null
     finish_reason: string
@@ -46,61 +44,45 @@ export class OpenAIProvider implements BaseLLMProvider {
 
   async complete(request: CompletionRequest): Promise<CompletionResponse> {
     if (!this.apiKey) {
-      throw new LLMProviderError('Not authenticated', LLMProvider.OpenAI)
+      throw new Error('Not authenticated')
     }
 
     try {
-      // Convert our message format to OpenAI's format
-      const prompt = request.messages
-        .map(msg => {
-          switch (msg.speaker) {
-            case 'system':
-              return `System: ${msg.text}\n`
-            case 'human':
-              return `Human: ${msg.text}\n`
-            case 'assistant':
-              return `Assistant: ${msg.text}\n`
-          }
-        })
-        .join('')
+      const model =
+        vscode.workspace.getConfiguration('codyPlusPlus').get<string>('openaiModel') ||
+        'gpt-4o-mini'
 
-      const response = await fetch(`${this.baseUrl}/completions`, {
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.apiKey}`
         },
         body: JSON.stringify({
-          model: request.config?.model || 'gpt-3.5-turbo-instruct',
-          prompt,
-          max_tokens: request.config?.maxTokens || 2000,
+          model,
+          messages: request.messages,
+          max_completion_tokens: request.config?.maxTokens || 2000,
           temperature: request.config?.temperature || 0,
           stream: false
         })
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new LLMProviderError(
-          error.error?.message || 'API request failed',
-          LLMProvider.OpenAI,
-          response.status.toString(),
-          error
-        )
+        const error = await response.text()
+        console.error('CODY++: OpenAI provider error', error)
+        throw new Error(`API request failed: ${error}`)
       }
 
       const data = (await response.json()) as OpenAICompletionResponse
+      console.log(`CODY++: OpenAI provider response`, data)
       return {
-        text: data.choices[0].text.trim()
+        text: data.choices[0].message.content.trim()
       }
     } catch (error) {
-      if (error instanceof LLMProviderError) {
+      if (error instanceof Error) {
         throw error
       }
-      throw new LLMProviderError(
-        error instanceof Error ? error.message : 'Unknown error',
-        LLMProvider.OpenAI
-      )
+      throw new Error('Unknown error')
     }
   }
 

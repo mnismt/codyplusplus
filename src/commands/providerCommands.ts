@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import { LLM_PROVIDERS } from '../constants/llm'
+import { LLMProvider } from '../constants/llm'
 
 async function fetchOpenAIModels(baseUrl: string, apiKey: string): Promise<string[]> {
   try {
@@ -24,8 +24,8 @@ async function fetchOpenAIModels(baseUrl: string, apiKey: string): Promise<strin
 }
 
 export const selectProvider = async (): Promise<boolean> => {
-  const avaiableProviders = Object.values(LLM_PROVIDERS)
-  const selectedProvider = await vscode.window.showQuickPick(avaiableProviders, {
+  const availableProviders = [LLMProvider.OpenAI, LLMProvider.Sourcegraph]
+  const selectedProvider = await vscode.window.showQuickPick(availableProviders, {
     placeHolder: 'Select LLM Provider',
     title: 'Select LLM Provider'
   })
@@ -53,7 +53,7 @@ export const selectProvider = async (): Promise<boolean> => {
   }
 
   // For OpenAI and compatible providers, prompt for base URL and model
-  if (selectedProvider === LLM_PROVIDERS.openai) {
+  if (selectedProvider === LLMProvider.OpenAI) {
     const currentBaseUrl = vscode.workspace
       .getConfiguration('codyPlusPlus')
       .get<string>('openaiBaseUrl')

@@ -1,8 +1,10 @@
 import { CompletionRequestMessage } from '../core/llm/types'
 
-export const LLM_PROVIDERS = {
-  sourcegraph: 'Sourcegraph',
-  openai: 'OpenAI'
+export enum LLMProvider {
+  Sourcegraph = 'sourcegraph',
+  OpenAI = 'openai'
+  // Future providers:
+  // Gemini = 'gemini'
 }
 
 export const SYSTEM_PROMPT = `
@@ -15,8 +17,8 @@ Do not include any additional text in your response, only the JSON array.
 
 export const FEW_SHOT_EXAMPLES: CompletionRequestMessage[] = [
   {
-    speaker: 'human',
-    text: `<file-tree>
+    role: 'user',
+    content: `<file-tree>
 /Users/users/Work/Tools/mcp-servers/src/servers/perplexity
 ├── perplexity
 │   ├── __pycache__
@@ -29,15 +31,15 @@ User request: typescript files
 `
   },
   {
-    speaker: 'assistant',
-    text: `[
+    role: 'assistant',
+    content: `[
       "/Users/users/Work/Tools/mcp-servers/src/servers/perplexity/index.ts",
       "/Users/users/Work/Tools/mcp-servers/src/servers/perplexity/tools/search.ts"
     ]`
   },
   {
-    speaker: 'human',
-    text: `<file-tree>
+    role: 'user',
+    content: `<file-tree>
 /Users/user/projects/go-project
 ├── main.go
 ├── database
@@ -52,16 +54,16 @@ User request: files related to database interactions
 `
   },
   {
-    speaker: 'assistant',
-    text: `[
+    role: 'assistant',
+    content: `[
       "/Users/user/projects/go-project/database/db.go",
       "/Users/user/projects/go-project/database/migrations/0001_init.sql",
       "/Users/user/projects/go-project/database/migrations/0002_add_users.sql"
     ]`
   },
   {
-    speaker: 'human',
-    text: `<file-tree>
+    role: 'user',
+    content: `<file-tree>
 /Users/user/projects/webapp
 ├── frontend
 │    ├── src
@@ -81,14 +83,14 @@ User request: styling files
 `
   },
   {
-    speaker: 'assistant',
-    text: `[
+    role: 'assistant',
+    content: `[
       "/Users/user/projects/webapp/frontend/src/styles/AuthForm.css"
     ]`
   },
   {
-    speaker: 'human',
-    text: `<file-tree>
+    role: 'user',
+    content: `<file-tree>
 /Users/user/projects/python-project
 ├── src
 │    ├── main.py
@@ -101,8 +103,8 @@ User request: test files
 `
   },
   {
-    speaker: 'assistant',
-    text: `[
+    role: 'assistant',
+    content: `[
       "/Users/user/projects/python-project/tests/test_main.py",
       "/Users/user/projects/python-project/tests/test_utils.py"
     ]`

@@ -8,7 +8,16 @@ export interface CompletionConfig {
   }
 }
 
-export type CompletionRequestMessage = { speaker: 'system' | 'human' | 'assistant'; text: string }
+export type CompletionRequestMessage = {
+  role: 'system' | 'user' | 'assistant'
+  content: string
+}
+
+// Sourcegraph-specific types
+export type SourcegraphCompletionRequestMessage = {
+  speaker: 'human' | 'assistant' | 'system'
+  text: string
+}
 
 export interface CompletionRequest {
   messages: Array<CompletionRequestMessage>
@@ -41,13 +50,10 @@ export interface LLMError extends Error {
 }
 
 export class LLMProviderError extends Error implements LLMError {
-  constructor(
-    message: string,
-    public provider: LLMProvider,
-    public code?: string,
-    public details?: unknown
-  ) {
+  public provider: LLMProvider
+  constructor(message: string, provider: LLMProvider) {
     super(message)
+    this.provider = provider
     this.name = 'LLMProviderError'
   }
 }

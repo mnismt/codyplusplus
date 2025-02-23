@@ -1,9 +1,7 @@
 import * as vscode from 'vscode'
-import { createOpenAIProvider } from './providers/openai/factory'
-import { createSourcegraphProvider } from './providers/sourcegraph/factory'
-import { LLMProvider } from './types'
-
-export { LLMProvider } from './types'
+import { LLMProvider } from '../../constants/llm'
+import { OpenAIProvider } from './providers/openai'
+import { SourcegraphProvider } from './providers/sourcegraph'
 
 export const createProvider = () => {
   const llmProvider = vscode.workspace
@@ -12,9 +10,9 @@ export const createProvider = () => {
 
   switch (llmProvider) {
     case LLMProvider.Sourcegraph:
-      return createSourcegraphProvider()
+      return new SourcegraphProvider()
     case LLMProvider.OpenAI:
-      return createOpenAIProvider()
+      return new OpenAIProvider()
     default:
       throw new Error(`Unsupported LLM provider: ${llmProvider}`)
   }

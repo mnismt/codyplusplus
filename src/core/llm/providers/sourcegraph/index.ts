@@ -1,11 +1,12 @@
 import * as vscode from 'vscode'
+import { LLMProvider } from '../../../../constants/llm'
 import {
   BaseLLMProvider,
   CompletionRequest,
+  CompletionRequestMessage,
   CompletionResponse,
   DEFAULT_CONFIG,
-  LLMProvider,
-  LLMProviderError
+  SourcegraphCompletionRequestMessage
 } from '../../types'
 
 interface GraphQLResponse {
@@ -88,13 +89,22 @@ export class SourcegraphProvider implements BaseLLMProvider {
     }
   }
 
+  private convertToSourcegraphCompletionRequest(
+    messages: CompletionRequestMessage[]
+  ): SourcegraphCompletionRequestMessage[] {
+    return messages.map(message => {
+      const speaker: SourcegraphCompletionRequestMessage['speaker'] =
+        message.role === 'user' ? 'human' : message.role
+      return {
+        speaker,
+        text: message.content
+      } as SourcegraphCompletionRequestMessage
+    })
+  }
+
   async complete(request: CompletionRequest): Promise<CompletionResponse> {
     if (!this.apiKey) {
-      throw new LLMProviderError(
-        'Authentication required. Please sign in to Sourcegraph.',
-        LLMProvider.Sourcegraph,
-        'NEEDS_AUTH'
-      )
+      throw new Error('Authentication required. Please sign in to Sourcegraph.')
     }
 
     const config = {
@@ -111,7 +121,7 @@ export class SourcegraphProvider implements BaseLLMProvider {
         },
         body: JSON.stringify({
           model: config.model,
-          messages: request.messages,
+          messages: this.convertToSourcegraphCompletionRequest(request.messages),
           temperature: config.temperature,
           maxTokens: config.maxTokens,
           topK: -1,
@@ -120,13 +130,8 @@ export class SourcegraphProvider implements BaseLLMProvider {
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new LLMProviderError(
-          error.error?.message || 'API request failed',
-          LLMProvider.Sourcegraph,
-          response.status.toString(),
-          error
-        )
+        const error = await response.text()
+        throw new Error(`API request failed: ${error}`)
       }
 
       const data = await response.json()
@@ -134,13 +139,10 @@ export class SourcegraphProvider implements BaseLLMProvider {
         text: data.message
       }
     } catch (error) {
-      if (error instanceof LLMProviderError) {
+      if (error instanceof Error) {
         throw error
       }
-      throw new LLMProviderError(
-        error instanceof Error ? error.message : 'Unknown error',
-        LLMProvider.Sourcegraph
-      )
+      throw new Error(error instanceof Error ? error.message : 'Unknown error')
     }
   }
 
