@@ -1,11 +1,10 @@
 import * as vscode from 'vscode'
-import { FEW_SHOT_EXAMPLES, SYSTEM_PROMPT } from '../constants/llm'
 import { TELEMETRY_EVENTS } from '../constants/telemetry'
 import { executeMentionFileCommand } from '../core/cody/commands'
 import { formatFileTree, getWorkspaceFileTree } from '../core/filesystem/operations'
 import { getSelectedFileUris } from '../core/filesystem/processor'
 import { createProvider } from '../core/llm'
-import { CompletionRequestMessage } from '../core/llm/types'
+import { createCompletionRequestMessages, parseLLMResponse } from '../core/llm/utils'
 import { TelemetryService } from '../services/telemetry.service'
 import { getSuccessCount } from '../utils'
 
@@ -94,66 +93,23 @@ export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.Ex
       return
     }
 
-    // Get the file tree structure
-    const fileTree = await getWorkspaceFileTree(rootUri)
-    const formattedFileTree = formatFileTree(
-      rootUri.fsPath, // Use the full fsPath
-      fileTree
-    )
-
     // Create LLM provider and ensure authenticated
     const llm = createProvider()
     if (!llm.isAuthenticated) {
       await llm.getLLMProviderToken()
     }
 
-    const userMessage = `
-<file-tree>
-${rootUri.fsPath}
-${formattedFileTree}
-</file-tree>
-
-User request: ${prompt}
-`
-
-    const messages: CompletionRequestMessage[] = [
-      {
-        role: 'system',
-        content: SYSTEM_PROMPT
-      },
-      ...FEW_SHOT_EXAMPLES,
-      {
-        role: 'user',
-        content: userMessage
-      }
-    ]
-
-    console.log(`User message: ${userMessage}`)
+    const fileTree = await getWorkspaceFileTree(rootUri)
+    const messages = await createCompletionRequestMessages(prompt, rootUri)
 
     // Call LLM
     const response = await llm.complete({
-      messages,
-      config: {
-        responseFormat: {
-          type: 'json'
-        }
-      }
+      messages
     })
 
-    // Parse LLM Response
-    let selectedFiles: string[] = []
-    try {
-      selectedFiles = JSON.parse(response.text)
-      if (!Array.isArray(selectedFiles)) {
-        throw new Error('Invalid response format. Expected an array of file paths.')
-      }
-    } catch (error: any) {
-      vscode.window.showErrorMessage(`Error parsing LLM response: ${error.message}`)
-      return
-    }
+    const selectedFiles: string[] = parseLLMResponse(response.text)
 
     // Convert paths to URIs and add to Cody
-    // No need to change this part as selectedFiles should now contain absolute paths.
     const selectedFileUris = selectedFiles.map(filePath => vscode.Uri.file(filePath))
     const fileCount = (await Promise.all(selectedFileUris.map(executeMentionFileCommand))).reduce(
       getSuccessCount,
@@ -168,7 +124,8 @@ User request: ${prompt}
     const relativePath = vscode.workspace.asRelativePath(rootUri)
     const successMessage = `Added ${fileCount} file${fileCount !== 1 ? 's' : ''} from '${relativePath}' that match your criteria: "${prompt}"`
 
-    const treeStructure = formatFileTree(rootUri.fsPath, fileTree, selectedFiles)
+    // Use simplified tree view with maxDisplayLength of 50
+    const treeStructure = formatFileTree(rootUri.fsPath, fileTree, selectedFiles, 50)
 
     vscode.window.showInformationMessage(successMessage, {
       detail: treeStructure,

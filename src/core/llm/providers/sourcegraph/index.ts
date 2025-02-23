@@ -120,9 +120,9 @@ export class SourcegraphProvider implements BaseLLMProvider {
           Authorization: `token ${this.apiKey}`
         },
         body: JSON.stringify({
-          model: config.model,
+          model: 'claude-3.5-sonnet',
           messages: this.convertToSourcegraphCompletionRequest(request.messages),
-          temperature: config.temperature,
+          temperature: 0,
           maxTokens: config.maxTokens,
           topK: -1,
           topP: -1

@@ -43,21 +43,6 @@ export interface BaseLLMProvider {
   logout: () => Promise<void>
 }
 
-export interface LLMError extends Error {
-  provider: LLMProvider
-  code?: string
-  details?: unknown
-}
-
-export class LLMProviderError extends Error implements LLMError {
-  public provider: LLMProvider
-  constructor(message: string, provider: LLMProvider) {
-    super(message)
-    this.provider = provider
-    this.name = 'LLMProviderError'
-  }
-}
-
 export const DEFAULT_CONFIG: CompletionConfig = {
   model: 'claude-3.5-sonnet',
   maxTokens: 4000,

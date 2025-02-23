@@ -21,21 +21,21 @@ export const FEW_SHOT_EXAMPLES: CompletionRequestMessage[] = [
     content: `<file-tree>
 /Users/users/Work/Tools/mcp-servers/src/servers/perplexity
 ├── perplexity
-│   ├── __pycache__
-│   ├── index.ts
-│   └── tools
-│       ├── cookies.json
-│       └── search.ts
+│   ├── __pycache__
+│   ├── index.ts
+│   └── tools
+│       ├── cookies.json
+│       └── search.ts
 </file-tree>
 User request: typescript files
 `
   },
   {
     role: 'assistant',
-    content: `[
+    content: `{"files": [
       "/Users/users/Work/Tools/mcp-servers/src/servers/perplexity/index.ts",
       "/Users/users/Work/Tools/mcp-servers/src/servers/perplexity/tools/search.ts"
-    ]`
+    ]}`
   },
   {
     role: 'user',
@@ -43,10 +43,10 @@ User request: typescript files
 /Users/user/projects/go-project
 ├── main.go
 ├── database
-│   ├── db.go
-│   └── migrations
-│       ├── 0001_init.sql
-│       └── 0002_add_users.sql
+│   ├── db.go
+│   └── migrations
+│       ├── 0001_init.sql
+│       └── 0002_add_users.sql
 └── utils
      └── helpers.go
 </file-tree>
@@ -55,28 +55,28 @@ User request: files related to database interactions
   },
   {
     role: 'assistant',
-    content: `[
+    content: `{"files": [
       "/Users/user/projects/go-project/database/db.go",
       "/Users/user/projects/go-project/database/migrations/0001_init.sql",
       "/Users/user/projects/go-project/database/migrations/0002_add_users.sql"
-    ]`
+    ]}`
   },
   {
     role: 'user',
     content: `<file-tree>
 /Users/user/projects/webapp
 ├── frontend
-│    ├── src
-│    │    ├── components
-│    │    │    ├── AuthForm.js
-│    │    │    └── Button.js
-│    │    ├── styles
-│    │    │    └── AuthForm.css
-│    │    └── index.html
-│    └── package.json
+│    ├── src
+│    │    ├── components
+│    │    │    ├── AuthForm.js
+│    │    │    └── Button.js
+│    │    ├── styles
+│    │    │    └── AuthForm.css
+│    │    └── index.html
+│    └── package.json
 ├── backend
-│    ├── auth.py
-│    └── server.py
+│    ├── auth.py
+│    └── server.py
 └── README.md
 </file-tree>
 User request: styling files
@@ -84,17 +84,17 @@ User request: styling files
   },
   {
     role: 'assistant',
-    content: `[
+    content: `{"files": [
       "/Users/user/projects/webapp/frontend/src/styles/AuthForm.css"
-    ]`
+    ]}`
   },
   {
     role: 'user',
     content: `<file-tree>
 /Users/user/projects/python-project
 ├── src
-│    ├── main.py
-│    └── utils.py
+│    ├── main.py
+│    └── utils.py
 └── tests
       ├── test_main.py
       └── test_utils.py
@@ -104,9 +104,9 @@ User request: test files
   },
   {
     role: 'assistant',
-    content: `[
+    content: `{"files": [
       "/Users/user/projects/python-project/tests/test_main.py",
       "/Users/user/projects/python-project/tests/test_utils.py"
-    ]`
+    ]}`
   }
 ]

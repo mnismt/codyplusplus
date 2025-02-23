@@ -49,14 +49,43 @@ export async function getGitignore(rootPath?: string) {
  * @param rootFolder The root folder name
  * @param files Array of file metadata to format
  * @param selectedFiles Array of selected file absolute paths
+ * @param maxDisplayLength Maximum number of files to display before simplifying
  */
 export function formatFileTree(
   rootFolder: string,
   files: FileMetadata[],
-  selectedFiles: string[] = []
+  selectedFiles: string[] = [],
+  maxDisplayLength: number = 20
 ): string {
   // Sort files by path for consistent ordering
   files.sort((a, b) => a.path.localeCompare(b.path))
+
+  // If we have too many files and some are selected, show simplified view
+  if (selectedFiles.length > 0 && files.length > maxDisplayLength) {
+    const treeLines: string[] = []
+    const selectedFileMetadata = files.filter(file => selectedFiles.includes(file.path))
+
+    // Add root folder
+    treeLines.push(path.basename(rootFolder))
+
+    // Add selected files with their immediate parent directory
+    selectedFileMetadata.forEach(file => {
+      const relativePath = path.relative(rootFolder, file.path)
+      const parts = relativePath.split(path.sep)
+      if (parts.length > 2) {
+        // Show immediate parent directory + file
+        treeLines.push(`├── .../${parts[parts.length - 2]}/${parts[parts.length - 1]} ✅`)
+      } else {
+        // Show full relative path if it's short
+        treeLines.push(`├── ${relativePath} ✅`)
+      }
+    })
+
+    // Add ellipsis to indicate there are more files
+    treeLines.push('└── ...')
+
+    return treeLines.join('\n')
+  }
 
   // Create a map of parent paths to their children
   const dirMap = new Map<string, Array<FileMetadata>>()
@@ -118,7 +147,7 @@ export function formatFileTree(
     contents.forEach((item, index) => {
       const isLast = index === contents.length - 1
       const itemPrefix = isLast ? '└── ' : '├── '
-      const newPrefix = prefix + (isLast ? '    ' : '│    ')
+      const newPrefix = prefix + (isLast ? '    ' : '│    ')
       let statusIcon = ''
 
       if (selectedFiles && selectedFiles.length > 0) {

@@ -63,7 +63,10 @@ export class OpenAIProvider implements BaseLLMProvider {
           messages: request.messages,
           max_completion_tokens: request.config?.maxTokens || 4000,
           temperature: request.config?.temperature || 0,
-          stream: false
+          stream: false,
+          response_format: {
+            type: 'json_object'
+          }
         })
       })
 
