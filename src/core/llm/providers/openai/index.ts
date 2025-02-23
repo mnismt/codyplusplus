@@ -61,7 +61,7 @@ export class OpenAIProvider implements BaseLLMProvider {
         body: JSON.stringify({
           model,
           messages: request.messages,
-          max_completion_tokens: request.config?.maxTokens || 2000,
+          max_completion_tokens: request.config?.maxTokens || 4000,
           temperature: request.config?.temperature || 0,
           stream: false
         })

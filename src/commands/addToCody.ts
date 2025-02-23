@@ -132,8 +132,6 @@ User request: ${prompt}
       }
     ]
 
-    console.log(`CODY++: LLM provider messages`, messages)
-
     // Call LLM
     const response = await llm.complete({
       messages,
