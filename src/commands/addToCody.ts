@@ -5,7 +5,7 @@ import { executeMentionFileCommand } from '../core/cody/commands'
 import { formatFileTree, getWorkspaceFileTree } from '../core/filesystem/operations'
 import { getSelectedFileUris } from '../core/filesystem/processor'
 import { createStatusTree } from '../core/filesystem/utils'
-import { createProvider, LLMProvider } from '../core/llm'
+import { createProvider } from '../core/llm'
 import { CompletionRequestMessage } from '../core/llm/types'
 import { TelemetryService } from '../services/telemetry.service'
 
@@ -106,9 +106,9 @@ export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.Ex
     )
 
     // Create LLM provider and ensure authenticated
-    const llm = await createProvider(LLMProvider.Sourcegraph, context)
+    const llm = createProvider()
     if (!llm.isAuthenticated) {
-      await llm.loginAndObtainToken()
+      await llm.getLLMProviderToken()
     }
 
     const userMessage = `

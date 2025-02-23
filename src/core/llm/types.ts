@@ -20,7 +20,8 @@ export interface CompletionResponse {
 }
 
 export enum LLMProvider {
-  Sourcegraph = 'sourcegraph'
+  Sourcegraph = 'sourcegraph',
+  OpenAI = 'openai'
   // Future providers:
   // Gemini = 'gemini'
 }
@@ -29,7 +30,7 @@ export interface BaseLLMProvider {
   providerIdentifier: LLMProvider
   isAuthenticated: boolean
   complete: (request: CompletionRequest) => Promise<CompletionResponse>
-  loginAndObtainToken: () => Promise<string | undefined>
+  getLLMProviderToken: () => Promise<string | undefined>
   logout: () => Promise<void>
 }
 

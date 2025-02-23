@@ -1,14 +1,21 @@
 import * as vscode from 'vscode'
-import { createSourcegraphProvider } from './providers/sourcegraph/index'
+import { createOpenAIProvider } from './providers/openai/factory'
+import { createSourcegraphProvider } from './providers/sourcegraph/factory'
 import { LLMProvider } from './types'
 
 export { LLMProvider } from './types'
 
-export const createProvider = (type: LLMProvider, context: vscode.ExtensionContext) => {
-  switch (type) {
+export const createProvider = () => {
+  const llmProvider = vscode.workspace
+    .getConfiguration('codyPlusPlus')
+    .get<LLMProvider>('llmProvider')
+
+  switch (llmProvider) {
     case LLMProvider.Sourcegraph:
-      return createSourcegraphProvider(context)
+      return createSourcegraphProvider()
+    case LLMProvider.OpenAI:
+      return createOpenAIProvider()
     default:
-      throw new Error(`Unsupported LLM provider: ${type}`)
+      throw new Error(`Unsupported LLM provider: ${llmProvider}`)
   }
 }

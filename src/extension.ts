@@ -3,8 +3,8 @@ import * as vscode from 'vscode'
 // Import custom command handlers
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
 import { addFile, addFilesSmart, addFolderCommand, addSelection } from './commands/addToCody'
+import { selectProvider } from './commands/providerCommands'
 // Import services and views
-import { createProvider, LLMProvider } from './core/llm'
 import { CustomCommandService } from './services/customCommand.service'
 import { TelemetryService } from './services/telemetry.service'
 import { MainWebviewView } from './views/MainWebviewView'
@@ -54,9 +54,29 @@ export async function activate(context: vscode.ExtensionContext) {
   const addFilesSmartDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addFilesToCodySmart',
     async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
-      const urisToAdd = allSelections || [contextSelection]
-      console.log(`Adding files smart: ${urisToAdd.map(uri => uri.path).join(', ')}`)
-      await addFilesSmart(urisToAdd, context)
+      try {
+        // Check if API key is configured
+        const config = vscode.workspace.getConfiguration('codyPlusPlus')
+        const apiKey = config.get<string>('llmApiKey')
+
+        if (!apiKey) {
+          const result = await selectProvider()
+          if (!result) {
+            void vscode.window.showInformationMessage(
+              'Please configure an LLM provider and API key to use smart features'
+            )
+            return
+          }
+        }
+
+        const urisToAdd = allSelections || [contextSelection]
+        console.log(`Adding files smart: ${urisToAdd.map(uri => uri.path).join(', ')}`)
+        await addFilesSmart(urisToAdd, context)
+      } catch (error) {
+        void vscode.window.showErrorMessage(
+          error instanceof Error ? error.message : 'An unknown error occurred'
+        )
+      }
     }
   )
 
@@ -93,61 +113,10 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   )
 
-  const requestSourcegraphTokenDisposable = vscode.commands.registerCommand(
-    'cody-plus-plus.requestSourcegraphToken',
-    async () => {
-      try {
-        const sourcegraphProvider = await createProvider(LLMProvider.Sourcegraph, context)
-
-        if (sourcegraphProvider.isAuthenticated) {
-          vscode.window.showInformationMessage('You are already authenticated')
-          return
-        }
-
-        const token = await sourcegraphProvider.loginAndObtainToken()
-
-        if (token) {
-          vscode.window.showInformationMessage(
-            'Successfully authenticated with Sourcegraph. You can now use Smart File Selection feature.'
-          )
-        } else {
-          // User cancelled the flow
-          vscode.window.showInformationMessage(
-            'Authentication cancelled. You can try again later by running the "Sign in to Sourcegraph" command.'
-          )
-        }
-      } catch (error) {
-        if (error instanceof Error && error.message === 'No token provided') {
-          vscode.window.showInformationMessage(
-            'No token was entered. You can try again later by running the "Sign in to Sourcegraph" command.'
-          )
-        } else {
-          vscode.window.showErrorMessage(
-            `Failed to authenticate with Sourcegraph: ${
-              error instanceof Error ? error.message : String(error)
-            }. ` +
-              'Please make sure you created a valid access token with the required permissions.'
-          )
-        }
-      }
-    }
-  )
-
-  const removeSourcegraphTokenDisposable = vscode.commands.registerCommand(
-    'cody-plus-plus.removeSourcegraphToken',
-    async () => {
-      const sourcegraphProvider = await createProvider(LLMProvider.Sourcegraph, context)
-      try {
-        await sourcegraphProvider.logout()
-        vscode.window.showInformationMessage('Successfully logged out from Sourcegraph.')
-      } catch (error) {
-        vscode.window.showErrorMessage(
-          `Failed to log out from Sourcegraph: ${
-            error instanceof Error ? error.message : String(error)
-          }.`
-        )
-      }
-    }
+  // Register the select provider command
+  const selectProviderDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.selectProvider',
+    selectProvider
   )
 
   // Create and register the webview view for displaying custom commands in the sidebar
@@ -155,6 +124,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.extensionUri,
     context.extensionMode
   )
+
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       MainWebviewView.viewType,
@@ -166,15 +136,14 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     addFolderDisposable,
     addShallowFolderDisposable,
-    addSelectionRecursiveDisposable,
-    addCustomCommandDisposable,
-    editCommandDisposable,
-    deleteCommandDisposable,
     addFileDisposable,
     addSelectionDisposable,
+    addSelectionRecursiveDisposable,
     addFilesSmartDisposable,
-    requestSourcegraphTokenDisposable,
-    removeSourcegraphTokenDisposable
+    selectProviderDisposable,
+    addCustomCommandDisposable,
+    editCommandDisposable,
+    deleteCommandDisposable
   )
 }
 

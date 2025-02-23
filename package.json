@@ -20,6 +20,67 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Cody++ Configuration",
+      "properties": {
+        "codyPlusPlus.fileThreshold": {
+          "type": "number",
+          "default": 15,
+          "description": "The maximum number of files allowed before showing a warning message."
+        },
+        "codyPlusPlus.excludedFileTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            ".exe",
+            ".bin"
+          ],
+          "description": "List of file extensions to exclude from being added to Cody."
+        },
+        "codyPlusPlus.excludedFolders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "node_modules",
+            ".git"
+          ],
+          "description": "List of folders to exclude from being added to Cody."
+        },
+        "codyPlusPlus.enableTelemetry": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable anonymous telemetry data collection to help improve Cody++."
+        },
+        "codyPlusPlus.llmProvider": {
+          "type": "string",
+          "enum": [
+            "sourcegraph",
+            "openai"
+          ],
+          "default": "sourcegraph",
+          "description": "Select the LLM provider to use"
+        },
+        "codyPlusPlus.llmApiKey": {
+          "type": "string",
+          "description": "API key for the selected provider"
+        },
+        "codyPlusPlus.openaiBaseUrl": {
+          "type": "string",
+          "description": "Base URL for OpenAI-compatible API providers",
+          "default": "https://api.openai.com/v1"
+        },
+        "codyPlusPlus.openaiModel": {
+          "type": "string",
+          "description": "Model to use for OpenAI-compatible API providers",
+          "default": "gpt-4o-mini"
+        }
+      }
+    },
     "commands": [
       {
         "command": "cody-plus-plus.addFile",
@@ -65,18 +126,13 @@
         "icon": "$(trash)"
       },
       {
-        "command": "cody-plus-plus.requestSourcegraphToken",
-        "title": "Enter Sourcegraph's Token",
-        "category": "Cody++"
-      },
-      {
-        "command": "cody-plus-plus.removeSourcegraphToken",
-        "title": "Remove Sourcegraph's Token",
-        "category": "Cody++"
-      },
-      {
         "command": "cody-plus-plus.addFilesToCodySmart",
         "title": "Add Files to Cody (Smart)",
+        "category": "Cody++"
+      },
+      {
+        "command": "cody-plus-plus.selectProvider",
+        "title": "Select LLM Provider",
         "category": "Cody++"
       }
     ],
@@ -132,44 +188,6 @@
           "group": "inline"
         }
       ]
-    },
-    "configuration": {
-      "type": "object",
-      "title": "Cody++ Configuration",
-      "properties": {
-        "codyPlusPlus.fileThreshold": {
-          "type": "number",
-          "default": 15,
-          "description": "The maximum number of files allowed before showing a warning message."
-        },
-        "codyPlusPlus.excludedFileTypes": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [
-            ".exe",
-            ".bin"
-          ],
-          "description": "List of file extensions to exclude from being added to Cody."
-        },
-        "codyPlusPlus.excludedFolders": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [
-            "node_modules",
-            ".git"
-          ],
-          "description": "List of folders to exclude from being added to Cody."
-        },
-        "codyPlusPlus.enableTelemetry": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable anonymous telemetry data collection to help improve Cody++."
-        }
-      }
     },
     "viewsContainers": {
       "activitybar": [

@@ -1,5 +1,10 @@
 import { CompletionRequestMessage } from '../core/llm/types'
 
+export const LLM_PROVIDERS = {
+  sourcegraph: 'Sourcegraph',
+  openai: 'OpenAI'
+}
+
 export const SYSTEM_PROMPT = `
 You are a helpful assistant that helps select files in a codebase based on user requests.
 You are given the file tree of the codebase and the user's request.
