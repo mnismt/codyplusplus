@@ -4,7 +4,6 @@ import { TELEMETRY_EVENTS } from '../constants/telemetry'
 import { executeMentionFileCommand } from '../core/cody/commands'
 import { formatFileTree, getWorkspaceFileTree } from '../core/filesystem/operations'
 import { getSelectedFileUris } from '../core/filesystem/processor'
-import { createStatusTree } from '../core/filesystem/utils'
 import { createProvider } from '../core/llm'
 import { CompletionRequestMessage } from '../core/llm/types'
 import { TelemetryService } from '../services/telemetry.service'
@@ -132,6 +131,8 @@ User request: ${prompt}
       }
     ]
 
+    console.log(`User message: ${userMessage}`)
+
     // Call LLM
     const response = await llm.complete({
       messages,
@@ -170,8 +171,7 @@ User request: ${prompt}
     const relativePath = vscode.workspace.asRelativePath(rootUri)
     const successMessage = `Added ${fileCount} file${fileCount !== 1 ? 's' : ''} from '${relativePath}' that match your criteria: "${prompt}"`
 
-    const allFiles = fileTree.map(f => f.path)
-    const treeStructure = createStatusTree(allFiles, selectedFiles, rootUri)
+    const treeStructure = formatFileTree(rootUri.fsPath, fileTree, selectedFiles)
 
     vscode.window.showInformationMessage(successMessage, {
       detail: treeStructure,

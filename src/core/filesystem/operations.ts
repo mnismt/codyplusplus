@@ -48,8 +48,13 @@ export async function getGitignore(rootPath?: string) {
  * Format a file tree structure as a string
  * @param rootFolder The root folder name
  * @param files Array of file metadata to format
+ * @param selectedFiles Array of selected file absolute paths
  */
-export function formatFileTree(rootFolder: string, files: FileMetadata[]): string {
+export function formatFileTree(
+  rootFolder: string,
+  files: FileMetadata[],
+  selectedFiles: string[] = []
+): string {
   // Sort files by path for consistent ordering
   files.sort((a, b) => a.path.localeCompare(b.path))
 
@@ -113,9 +118,18 @@ export function formatFileTree(rootFolder: string, files: FileMetadata[]): strin
     contents.forEach((item, index) => {
       const isLast = index === contents.length - 1
       const itemPrefix = isLast ? '└── ' : '├── '
-      const newPrefix = prefix + (isLast ? '    ' : '│   ')
+      const newPrefix = prefix + (isLast ? '    ' : '│    ')
+      let statusIcon = ''
 
-      treeLines.push(`${prefix}${itemPrefix}${item.name}`)
+      if (selectedFiles && selectedFiles.length > 0) {
+        item.type === 'file' && selectedFiles.includes(item.path)
+          ? (statusIcon = '✅ ')
+          : item.type === 'file'
+            ? (statusIcon = '❌ ')
+            : ''
+      }
+
+      treeLines.push(`${prefix}${itemPrefix}${statusIcon}${item.name}`)
 
       if (item.type === 'directory') {
         buildTree(item.path, newPrefix)
