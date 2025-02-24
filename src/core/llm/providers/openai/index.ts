@@ -2,6 +2,10 @@ import * as vscode from 'vscode'
 import { LLMProvider } from '../../../../constants/llm'
 import { BaseLLMProvider, CompletionRequest, CompletionResponse } from '../../types'
 
+interface OpenAIModelsResponse {
+  data: Array<{ id: string }>
+}
+
 interface OpenAICompletionResponse {
   id: string
   object: string
@@ -24,6 +28,27 @@ interface OpenAICompletionResponse {
 }
 
 export class OpenAIProvider implements BaseLLMProvider {
+  static async fetchModels(baseUrl: string, apiKey: string): Promise<string[]> {
+    try {
+      const response = await fetch(`${baseUrl}/models`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch models: ${response.statusText}`)
+      }
+
+      const data = (await response.json()) as OpenAIModelsResponse
+      return data.data.map(model => model.id)
+    } catch (error) {
+      console.error('Error fetching OpenAI models:', error)
+      return []
+    }
+  }
+
   private apiKey?: string
   private baseUrl: string
 

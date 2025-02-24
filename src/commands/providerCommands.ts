@@ -1,33 +1,14 @@
 import * as vscode from 'vscode'
-import { LLMProvider } from '../constants/llm'
-
-async function fetchOpenAIModels(baseUrl: string, apiKey: string): Promise<string[]> {
-  try {
-    console.log(`Fetching OpenAI models from ${baseUrl}/models`)
-    const response = await fetch(`${baseUrl}/models`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch models: ${response.statusText}`)
-    }
-
-    const data = (await response.json()) as { data: { id: string }[] }
-    return data.data.map((model: { id: string }) => model.id)
-  } catch (error) {
-    console.error('Error fetching OpenAI models:', error)
-    return []
-  }
-}
+import { LLM_PROVIDER_API_BASE_URL, LLMProvider } from '../constants/llm'
+import { OpenAIProvider } from '../core/llm/providers/openai'
+import { SourcegraphProvider } from '../core/llm/providers/sourcegraph'
 
 export const selectProvider = async (): Promise<boolean> => {
   const availableProviders = [LLMProvider.OpenAI, LLMProvider.Sourcegraph]
   const selectedProvider = await vscode.window.showQuickPick(availableProviders, {
     placeHolder: 'Select LLM Provider',
-    title: 'Select LLM Provider'
+    title: 'Select LLM Provider',
+    ignoreFocusOut: true
   })
 
   if (!selectedProvider) {
@@ -42,7 +23,8 @@ export const selectProvider = async (): Promise<boolean> => {
   const apiKey = await vscode.window.showInputBox({
     prompt: `Enter your ${selectedProvider} API key`,
     password: true,
-    placeHolder: 'Paste your API key here...'
+    placeHolder: 'Paste your API key here...',
+    ignoreFocusOut: true
   })
 
   if (!apiKey) {
@@ -52,43 +34,59 @@ export const selectProvider = async (): Promise<boolean> => {
     return false
   }
 
-  // For OpenAI and compatible providers, prompt for base URL and model
-  if (selectedProvider === LLMProvider.OpenAI) {
+  // For providers that require base URL and model selection
+  if (selectedProvider === LLMProvider.OpenAI || selectedProvider === LLMProvider.Sourcegraph) {
     const currentBaseUrl = vscode.workspace
       .getConfiguration('codyPlusPlus')
       .get<string>('openaiBaseUrl')
 
-    const baseUrl = await vscode.window.showInputBox({
-      prompt: 'Enter base URL for OpenAI API (leave empty for default)',
-      placeHolder: 'https://api.openai.com/v1',
-      value: currentBaseUrl
-    })
+    let baseUrl = currentBaseUrl
+    if (selectedProvider === LLMProvider.OpenAI) {
+      baseUrl = await vscode.window.showInputBox({
+        prompt: 'Enter base URL for OpenAI API (leave empty for default)',
+        placeHolder: LLM_PROVIDER_API_BASE_URL[LLMProvider.OpenAI],
+        value: currentBaseUrl,
+        ignoreFocusOut: true
+      })
 
-    // Only update if user entered something or explicitly cleared it
-    if (baseUrl !== undefined) {
-      await vscode.workspace
-        .getConfiguration('codyPlusPlus')
-        .update('openaiBaseUrl', baseUrl || 'https://api.openai.com/v1', true)
+      // Only update if user entered something or explicitly cleared it
+      if (baseUrl !== undefined) {
+        await vscode.workspace
+          .getConfiguration('codyPlusPlus')
+          .update('openaiBaseUrl', baseUrl || LLM_PROVIDER_API_BASE_URL[LLMProvider.OpenAI], true)
+      }
+    } else {
+      baseUrl = LLM_PROVIDER_API_BASE_URL[LLMProvider.Sourcegraph]
     }
 
     // Ask for model
     const currentModel = vscode.workspace.getConfiguration('codyPlusPlus').get<string>('llmModel')
 
-    // Fetch list of models from OpenAI API
-    const models = await fetchOpenAIModels(baseUrl || 'https://api.openai.com/v1', apiKey)
-    console.log(`Fetched models: ${JSON.stringify(models)}`)
+    // Fetch list of models based on provider
+    const models =
+      selectedProvider === LLMProvider.OpenAI
+        ? await OpenAIProvider.fetchModels(
+            baseUrl || LLM_PROVIDER_API_BASE_URL[LLMProvider.OpenAI],
+            apiKey
+          )
+        : await SourcegraphProvider.fetchModels(
+            baseUrl || LLM_PROVIDER_API_BASE_URL[LLMProvider.Sourcegraph],
+            apiKey
+          )
 
     let model: string | undefined
     if (models.length > 0) {
       model = await vscode.window.showQuickPick(models, {
         placeHolder: 'Select a model',
-        title: 'Choose OpenAI Model'
+        title: `Choose ${selectedProvider} Model`
       })
     } else {
       model = await vscode.window.showInputBox({
         prompt: 'Enter model name (leave empty for default)',
-        placeHolder: 'gpt-4o-mini',
-        value: currentModel
+        placeHolder:
+          selectedProvider === LLMProvider.OpenAI ? 'gpt-4o-mini' : 'claude-3-5-sonnet-latest',
+        value: currentModel,
+        ignoreFocusOut: true
       })
     }
 
@@ -96,7 +94,12 @@ export const selectProvider = async (): Promise<boolean> => {
     if (model !== undefined) {
       await vscode.workspace
         .getConfiguration('codyPlusPlus')
-        .update('llmModel', model || 'gpt-4o-mini', true)
+        .update(
+          'llmModel',
+          model ||
+            (selectedProvider === LLMProvider.OpenAI ? 'gpt-4o-mini' : 'claude-3-5-sonnet-latest'),
+          true
+        )
     }
   }
 

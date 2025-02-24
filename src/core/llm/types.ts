@@ -48,3 +48,30 @@ export const DEFAULT_CONFIG: CompletionConfig = {
   maxTokens: 4000,
   temperature: 0.0
 }
+
+export interface SourcegraphModelConfig {
+  schemaVersion: string
+  revision: string
+  providers: {
+    id: string
+    displayName: string
+  }[]
+  models: {
+    modelRef: string
+    displayName: string
+    modelName: string
+    capabilities: string[]
+    category: string
+    status: string
+    tier: string
+    contextWindow: {
+      maxInputTokens: number
+      maxOutputTokens: number
+    }
+    estimatedModelCost?: {
+      unit: string
+      inputTokenPennies: number
+      outputTokenPennies: number
+    }
+  }[]
+}

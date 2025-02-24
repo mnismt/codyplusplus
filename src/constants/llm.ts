@@ -7,6 +7,11 @@ export enum LLMProvider {
   // Gemini = 'gemini'
 }
 
+export const LLM_PROVIDER_API_BASE_URL: Record<LLMProvider, string> = {
+  [LLMProvider.Sourcegraph]: 'https://sourcegraph.com/',
+  [LLMProvider.OpenAI]: 'https://api.openai.com/v1/'
+}
+
 export const SYSTEM_PROMPT = `
 You are a helpful assistant that helps select files in a codebase based on user requests.
 You are given the file tree of the codebase and the user's request.

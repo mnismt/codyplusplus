@@ -6,7 +6,8 @@ import {
   CompletionRequestMessage,
   CompletionResponse,
   DEFAULT_CONFIG,
-  SourcegraphCompletionRequestMessage
+  SourcegraphCompletionRequestMessage,
+  SourcegraphModelConfig
 } from '../../types'
 
 interface GraphQLResponse {
@@ -25,6 +26,39 @@ interface ValidationResult {
 }
 
 export class SourcegraphProvider implements BaseLLMProvider {
+  static async fetchModels(baseUrl: string, apiKey: string): Promise<string[]> {
+    try {
+      console.log(
+        `Fetching Sourcegraph models from ${baseUrl}/.api/modelconfig/supported-models.json`
+      )
+      const response = await fetch(`${baseUrl}/.api/modelconfig/supported-models.json`, {
+        headers: {
+          Authorization: `token ${apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to fetch models: ${response.statusText}`)
+      }
+
+      const data = (await response.json()) as SourcegraphModelConfig
+
+      return data.models
+        .filter(model => {
+          // Extract provider from modelRef (format: "provider::date::model")
+          const provider = model.modelRef.split('::')[0]
+          // Only include specific providers and non-deprecated models
+          return (
+            ['anthropic', 'google', 'openai'].includes(provider) && model.status !== 'deprecated'
+          )
+        })
+        .map(model => model.modelName)
+    } catch (error) {
+      console.error('Error fetching Sourcegraph models:', error)
+      return []
+    }
+  }
+
   private apiKey?: string
 
   constructor() {

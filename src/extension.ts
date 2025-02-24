@@ -53,8 +53,9 @@ export async function activate(context: vscode.ExtensionContext) {
     async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
       try {
         // Check if API key is configured
-        const config = vscode.workspace.getConfiguration('codyPlusPlus')
-        const apiKey = config.get<string>('llmApiKey')
+        const apiKey = vscode.workspace.getConfiguration('codyPlusPlus').get<string>('llmApiKey')
+
+        console.log(`Adding files smart with API key: ${apiKey}`)
 
         if (!apiKey) {
           const result = await selectProvider()
