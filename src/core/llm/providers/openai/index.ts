@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import { selectProvider } from '../../../../commands/providerCommands'
 import { LLMProvider } from '../../../../constants/llm'
 import {
   API_ENDPOINTS,
@@ -9,31 +10,7 @@ import {
   HEADERS
 } from '../../constants'
 import { BaseLLMProvider, CompletionRequest, CompletionResponse } from '../../types'
-
-interface OpenAIModelsResponse {
-  data: Array<{ id: string }>
-}
-
-interface OpenAICompletionResponse {
-  id: string
-  object: string
-  created: number
-  model: string
-  choices: Array<{
-    message: {
-      content: string
-      role: string
-    }
-    index: number
-    logprobs: null
-    finish_reason: string
-  }>
-  usage: {
-    prompt_tokens: number
-    completion_tokens: number
-    total_tokens: number
-  }
-}
+import { OpenAICompletionResponse, OpenAIModelsResponse } from './types'
 
 export class OpenAIProvider implements BaseLLMProvider {
   static async fetchModels(baseUrl: string, apiKey: string): Promise<string[]> {
@@ -125,15 +102,8 @@ export class OpenAIProvider implements BaseLLMProvider {
     }
   }
 
-  async getLLMProviderToken(): Promise<string | undefined> {
-    // This is handled by the provider selection command
+  async requestLLMProviderToken(): Promise<string | undefined> {
+    await selectProvider()
     return this.apiKey
-  }
-
-  async logout(): Promise<void> {
-    this.apiKey = undefined
-    await vscode.workspace
-      .getConfiguration('codyPlusPlus')
-      .update(CONFIG_KEYS.API_KEY, undefined, true)
   }
 }

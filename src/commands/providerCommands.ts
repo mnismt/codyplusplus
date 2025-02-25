@@ -108,5 +108,6 @@ export const selectProvider = async (): Promise<boolean> => {
   void vscode.window.showInformationMessage(
     `Successfully configured ${selectedProvider} as LLM provider`
   )
+
   return true
 }

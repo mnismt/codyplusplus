@@ -96,7 +96,7 @@ export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.Ex
     // Create LLM provider and ensure authenticated
     const llm = createProvider()
     if (!llm.isAuthenticated) {
-      await llm.getLLMProviderToken()
+      await llm.requestLLMProviderToken()
     }
 
     const fileTree = await getWorkspaceFileTree(rootUri)

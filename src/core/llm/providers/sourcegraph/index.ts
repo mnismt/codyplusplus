@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import { selectProvider } from '../../../../commands/providerCommands'
 import { LLMProvider } from '../../../../constants/llm'
 import {
   API_ENDPOINTS,
@@ -10,28 +11,24 @@ import {
 } from '../../constants'
 import {
   BaseLLMProvider,
+  CompletionConfig,
   CompletionRequest,
   CompletionRequestMessage,
-  CompletionResponse,
-  DEFAULT_CONFIG,
-  SourcegraphCompletionRequestMessage,
-  SourcegraphModelConfig
+  CompletionResponse
 } from '../../types'
+import {
+  GraphQLResponse,
+  SourcegraphCompletionRequestMessage,
+  SourcegraphModelConfig,
+  ValidationResult
+} from './types'
 
-interface GraphQLResponse {
-  data?: {
-    currentUser?: {
-      username: string
-    }
-  }
-  error?: string
+const DEFAULT_CONFIG: CompletionConfig = {
+  model: 'claude-3.5-sonnet',
+  maxTokens: 4000,
+  temperature: 0.0
 }
-
-interface ValidationResult {
-  isValid: boolean
-  username?: string
-  error?: string
-}
+const SUPPORTED_LLM_PROVIDERS = ['anthropic', 'google', 'openai']
 
 export class SourcegraphProvider implements BaseLLMProvider {
   static async fetchModels(baseUrl: string, apiKey: string): Promise<string[]> {
@@ -52,9 +49,7 @@ export class SourcegraphProvider implements BaseLLMProvider {
         .filter(model => {
           const provider = model.modelRef.split('::')[0]
           // Only return models from "anthropic", "google", "openai"
-          return (
-            ['anthropic', 'google', 'openai'].includes(provider) && model.status !== 'deprecated'
-          )
+          return SUPPORTED_LLM_PROVIDERS.includes(provider) && model.status !== 'deprecated'
         })
         .map(model => model.modelName)
     } catch (error) {
@@ -205,32 +200,8 @@ export class SourcegraphProvider implements BaseLLMProvider {
     }
   }
 
-  async getLLMProviderToken(): Promise<string | undefined> {
-    const token = await vscode.window.showInputBox({
-      prompt: 'Enter your Sourcegraph API token',
-      password: true,
-      placeHolder: 'Paste your token here...'
-    })
-
-    if (!token) {
-      return undefined
-    }
-
-    const validation = await this.validateToken(token)
-    if (!validation.isValid) {
-      void vscode.window.showErrorMessage(`Invalid token: ${validation.error}`)
-      return undefined
-    }
-
-    this.apiKey = token
-    await vscode.workspace.getConfiguration('codyPlusPlus').update(CONFIG_KEYS.API_KEY, token, true)
-    return token
-  }
-
-  async logout(): Promise<void> {
-    this.apiKey = undefined
-    await vscode.workspace
-      .getConfiguration('codyPlusPlus')
-      .update(CONFIG_KEYS.API_KEY, undefined, true)
+  async requestLLMProviderToken(): Promise<string | undefined> {
+    await selectProvider()
+    return this.apiKey
   }
 }
