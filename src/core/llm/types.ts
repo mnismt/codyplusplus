@@ -31,7 +31,5 @@ export enum LLMProvider {
 
 export interface BaseLLMProvider {
   providerIdentifier: LLMProvider
-  isAuthenticated: boolean
   complete: (request: CompletionRequest) => Promise<CompletionResponse>
-  requestLLMProviderToken: () => Promise<string | undefined>
 }

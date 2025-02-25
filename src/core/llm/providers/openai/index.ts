@@ -1,5 +1,4 @@
 import * as vscode from 'vscode'
-import { selectProvider } from '../../../../commands/providerCommands'
 import { LLMProvider } from '../../../../constants/llm'
 import {
   API_ENDPOINTS,
@@ -46,10 +45,6 @@ export class OpenAIProvider implements BaseLLMProvider {
 
   get providerIdentifier(): LLMProvider {
     return LLMProvider.OpenAI
-  }
-
-  get isAuthenticated(): boolean {
-    return !!this.apiKey
   }
 
   get model(): string {
@@ -100,10 +95,5 @@ export class OpenAIProvider implements BaseLLMProvider {
       }
       throw new Error(ERROR_MESSAGES.UNKNOWN_ERROR)
     }
-  }
-
-  async requestLLMProviderToken(): Promise<string | undefined> {
-    await selectProvider()
-    return this.apiKey
   }
 }

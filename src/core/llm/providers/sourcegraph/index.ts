@@ -1,5 +1,4 @@
 import * as vscode from 'vscode'
-import { selectProvider } from '../../../../commands/providerCommands'
 import { LLMProvider } from '../../../../constants/llm'
 import {
   API_ENDPOINTS,
@@ -61,10 +60,6 @@ export class SourcegraphProvider implements BaseLLMProvider {
 
   get providerIdentifier(): LLMProvider {
     return LLMProvider.Sourcegraph
-  }
-
-  get isAuthenticated(): boolean {
-    return !!this.apiKey
   }
 
   get model(): string {
@@ -194,10 +189,5 @@ export class SourcegraphProvider implements BaseLLMProvider {
       }
       throw new Error(error instanceof Error ? error.message : ERROR_MESSAGES.UNKNOWN_ERROR)
     }
-  }
-
-  async requestLLMProviderToken(): Promise<string | undefined> {
-    await selectProvider()
-    return this.apiKey
   }
 }
