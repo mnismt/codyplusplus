@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@vscode-elements/react-elements": "^0.8.0",
+    "@vscode/codicons": "^0.0.36",
     "lucide-react": "^0.471.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

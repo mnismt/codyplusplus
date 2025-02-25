@@ -2,19 +2,15 @@
 import * as vscode from 'vscode'
 // Import custom command handlers
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
-import {
-  addFile,
-  addFolderCommand,
-  addSelection,
-  addShallowFolderCommand
-} from './commands/addToCody'
+import { addFile, addFilesSmart, addFolder, addSelection } from './commands/addToCody'
+import { selectProvider } from './commands/providerCommands'
 // Import services and views
 import { CustomCommandService } from './services/customCommand.service'
 import { TelemetryService } from './services/telemetry.service'
 import { MainWebviewView } from './views/MainWebviewView'
 
 // Function called when the extension is activated
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   console.log('Cody++ is now active!')
 
   // Initialize telemetry
@@ -23,49 +19,14 @@ export function activate(context: vscode.ExtensionContext) {
   // Initialize the singleton service for managing custom commands
   const customCommandService = CustomCommandService.getInstance()
 
-  // Register the "Add Folder" command, which adds all files in a folder to Cody
   const addFolderDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addFolder',
-    addFolderCommand
+    (uri: vscode.Uri) => addFolder(uri, true)
   )
 
-  // Register the "Add Shallow Folder" command, which adds only files in the current folder to Cody
   const addShallowFolderDisposable = vscode.commands.registerCommand(
     'cody-plus-plus.addShallowFolder',
-    addShallowFolderCommand
-  )
-
-  // Register the "Add Custom Command" command, which opens a UI to create a custom command
-  const addCustomCommandDisposable = vscode.commands.registerCommand(
-    'cody-plus-plus.addCustomCommand',
-    () => addCustomCommand(context)
-  )
-
-  // Register the "Edit Command" command, allowing users to edit existing custom commands
-  const editCommandDisposable = vscode.commands.registerCommand(
-    'cody-plus-plus.editCommand',
-    async (item: any) => editCustomCommand(context, item.commandId)
-  )
-
-  // Register the "Delete Command" command, enabling users to delete custom commands
-  const deleteCommandDisposable = vscode.commands.registerCommand(
-    'cody-plus-plus.deleteCommand',
-    async (item: any) => {
-      // Prompt the user for confirmation before deleting the command
-      const confirmation = await vscode.window.showWarningMessage(
-        `Are you sure you want to delete the "${item.commandId}" command?`,
-        { modal: true },
-        'Yes',
-        'No'
-      )
-
-      if (confirmation === 'Yes') {
-        // Remove the command from the custom command service
-        customCommandService.removeCommand(item.commandId)
-        // Notify the user that the command was deleted successfully
-        vscode.window.showInformationMessage(`Command "${item.commandId}" deleted successfully.`)
-      }
-    }
+    (uri: vscode.Uri) => addFolder(uri, false)
   )
 
   const addFileDisposable = vscode.commands.registerCommand('cody-plus-plus.addFile', addFile)
@@ -86,11 +47,75 @@ export function activate(context: vscode.ExtensionContext) {
     }
   )
 
+  // Register the "Add Files Smart" command, which adds all files in a folder to Cody
+  const addFilesSmartDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.addFilesToCodySmart',
+    async (contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {
+      try {
+        // Check if API key is configured
+        const apiKey = vscode.workspace.getConfiguration('codyPlusPlus').get<string>('llmApiKey')
+
+        if (!apiKey) {
+          const result = await selectProvider()
+          if (!result) {
+            void vscode.window.showInformationMessage(
+              'Please configure an LLM provider and API key to use smart features'
+            )
+            return
+          }
+        }
+
+        const urisToAdd = allSelections || [contextSelection]
+        await addFilesSmart(urisToAdd, context)
+      } catch (error) {
+        void vscode.window.showErrorMessage(
+          error instanceof Error ? error.message : 'An unknown error occurred'
+        )
+      }
+    }
+  )
+
+  // Register the "Add Custom Command" command, which opens a UI to create a custom command
+  const addCustomCommandDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.addCustomCommand',
+    () => addCustomCommand(context)
+  )
+
+  // Register the "Edit Command" command, allowing users to edit existing custom commands
+  const editCommandDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.editCommand',
+    async (item: any) => editCustomCommand(context, item.commandId)
+  )
+
+  // Register the "Delete Command" command, enabling users to delete custom commands
+  const deleteCommandDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.deleteCommand',
+    async (item: any) => {
+      const confirmation = await vscode.window.showWarningMessage(
+        `Are you sure you want to delete the "${item.commandId}" command?`,
+        { modal: true },
+        'Yes',
+        'No'
+      )
+
+      if (confirmation === 'Yes') {
+        customCommandService.removeCommand(item.commandId)
+        vscode.window.showInformationMessage(`Command "${item.commandId}" deleted successfully.`)
+      }
+    }
+  )
+
+  const selectProviderDisposable = vscode.commands.registerCommand(
+    'cody-plus-plus.selectProvider',
+    selectProvider
+  )
+
   // Create and register the webview view for displaying custom commands in the sidebar
   const customCommandsWebviewProvider = new MainWebviewView(
     context.extensionUri,
     context.extensionMode
   )
+
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       MainWebviewView.viewType,
@@ -102,12 +127,14 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     addFolderDisposable,
     addShallowFolderDisposable,
-    addCustomCommandDisposable,
-    editCommandDisposable,
-    deleteCommandDisposable,
     addFileDisposable,
     addSelectionDisposable,
-    addSelectionRecursiveDisposable
+    addSelectionRecursiveDisposable,
+    addFilesSmartDisposable,
+    selectProviderDisposable,
+    addCustomCommandDisposable,
+    editCommandDisposable,
+    deleteCommandDisposable
   )
 }
 

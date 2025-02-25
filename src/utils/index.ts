@@ -18,3 +18,7 @@ export function slugify(text: string): string {
     .replace(/[^\w\-]+/g, '') // Remove all non-word chars (except hyphens)
     .replace(/\-\-+/g, '-') // Replace multiple hyphens with a single hyphen
 }
+
+export function getSuccessCount(count: number, successes: boolean): number {
+  return count + (successes ? 1 : 0)
+}

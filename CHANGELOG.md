@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+- New: Add Files to Cody (Smart) command
 - Improve UI for adding custom commands
 - Add Telemetry option and update dependencies
 - Refactors the extension to use webviews instead of a tree view for displaying custom commands
+- Upgraded VS Code API from 1.89.0 to 1.93.0
 
 ## [0.2.1] - 2025-01-08
 

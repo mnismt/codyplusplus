@@ -11,6 +11,9 @@ importers:
       '@vscode-elements/react-elements':
         specifier: ^0.8.0
         version: 0.8.0(@types/react@18.3.18)(react@18.3.1)
+      '@vscode/codicons':
+        specifier: ^0.0.36
+        version: 0.0.36
       lucide-react:
         specifier: ^0.471.1
         version: 0.471.2(react@18.3.1)
@@ -528,6 +531,9 @@ packages:
     resolution: {integrity: sha512-lSOynIyoUsRYuLEKRokKu1UL58GTXwixM5zjmQDLbs5WoDbdHZTr6YQKcqV7kcd2UBzN8hdclKMsnliuxYESpw==}
     peerDependencies:
       react: ^18.0.0
+
+  '@vscode/codicons@0.0.36':
+    resolution: {integrity: sha512-wsNOvNMMJ2BY8rC2N2MNBG7yOowV3ov8KlvUE/AiVUlHKTfWsw3OgAOQduX7h0Un6GssKD3aoTVH+TF3DSQwKQ==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -1459,6 +1465,8 @@ snapshots:
       react: 18.3.1
     transitivePeerDependencies:
       - '@types/react'
+
+  '@vscode/codicons@0.0.36': {}
 
   acorn-jsx@5.3.2(acorn@8.14.0):
     dependencies:

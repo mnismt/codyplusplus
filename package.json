@@ -12,7 +12,7 @@
     "url": "https://github.com/mnismt/codyplusplus"
   },
   "engines": {
-    "vscode": "^1.89.0"
+    "vscode": "^1.93.0"
   },
   "categories": [
     "Other"
@@ -20,6 +20,67 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Cody++ Configuration",
+      "properties": {
+        "codyPlusPlus.fileThreshold": {
+          "type": "number",
+          "default": 15,
+          "description": "The maximum number of files allowed before showing a warning message."
+        },
+        "codyPlusPlus.excludedFileTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            ".exe",
+            ".bin"
+          ],
+          "description": "List of file extensions to exclude from being added to Cody."
+        },
+        "codyPlusPlus.excludedFolders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "node_modules",
+            ".git"
+          ],
+          "description": "List of folders to exclude from being added to Cody."
+        },
+        "codyPlusPlus.enableTelemetry": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable anonymous telemetry data collection to help improve Cody++."
+        },
+        "codyPlusPlus.llmProvider": {
+          "type": "string",
+          "enum": [
+            "sourcegraph",
+            "openai"
+          ],
+          "default": "sourcegraph",
+          "description": "Select the LLM provider to use"
+        },
+        "codyPlusPlus.llmApiKey": {
+          "type": "string",
+          "description": "API key for the selected provider"
+        },
+        "codyPlusPlus.openaiBaseUrl": {
+          "type": "string",
+          "description": "Base URL for OpenAI-compatible API providers",
+          "default": "https://api.openai.com/v1"
+        },
+        "codyPlusPlus.llmModel": {
+          "type": "string",
+          "description": "Model to use for LLM completions (defaults to provider-specific model if not set)",
+          "markdownDescription": "Model to use for LLM completions:\n- For OpenAI: defaults to 'gpt-4o-mini'\n- For Sourcegraph: defaults to 'claude-3.5-sonnet'"
+        }
+      }
+    },
     "commands": [
       {
         "command": "cody-plus-plus.addFile",
@@ -63,6 +124,16 @@
         "title": "Delete",
         "category": "Cody++",
         "icon": "$(trash)"
+      },
+      {
+        "command": "cody-plus-plus.addFilesToCodySmart",
+        "title": "Add Files to Cody (Smart)",
+        "category": "Cody++"
+      },
+      {
+        "command": "cody-plus-plus.selectProvider",
+        "title": "Select LLM Provider",
+        "category": "Cody++"
       }
     ],
     "menus": {
@@ -84,13 +155,18 @@
         },
         {
           "command": "cody-plus-plus.addFolder",
-          "when": "explorerResourceIsFolder && explorerViewletFocus && cody.activated",
+          "when": "!listMultiSelection && explorerResourceIsFolder && explorerViewletFocus && cody.activated",
           "group": "1_cody"
         },
         {
           "command": "cody-plus-plus.addShallowFolder",
-          "when": "explorerResourceIsFolder && explorerViewletFocus && cody.activated",
+          "when": "!listMultiSelection && explorerResourceIsFolder && explorerViewletFocus && cody.activated",
           "group": "1_cody"
+        },
+        {
+          "command": "cody-plus-plus.addFilesToCodySmart",
+          "when": "explorerResourceIsFolder && explorerViewletFocus && cody.activated",
+          "group": "0_cody"
         }
       ],
       "view/title": [
@@ -112,44 +188,6 @@
           "group": "inline"
         }
       ]
-    },
-    "configuration": {
-      "type": "object",
-      "title": "Cody++ Configuration",
-      "properties": {
-        "codyPlusPlus.fileThreshold": {
-          "type": "number",
-          "default": 15,
-          "description": "The maximum number of files allowed before showing a warning message."
-        },
-        "codyPlusPlus.excludedFileTypes": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [
-            ".exe",
-            ".bin"
-          ],
-          "description": "List of file extensions to exclude from being added to Cody."
-        },
-        "codyPlusPlus.excludedFolders": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [
-            "node_modules",
-            ".git"
-          ],
-          "description": "List of folders to exclude from being added to Cody."
-        },
-        "codyPlusPlus.enableTelemetry": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable anonymous telemetry data collection to help improve Cody++."
-        }
-      }
     },
     "viewsContainers": {
       "activitybar": [
@@ -192,7 +230,7 @@
     "@release-it/keep-a-changelog": "^5.0.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
-    "@types/vscode": "^1.89.0",
+    "@types/vscode": "^1.93.0",
     "@typescript-eslint/eslint-plugin": "^7.7.1",
     "@typescript-eslint/parser": "^7.7.1",
     "@vscode/test-cli": "^0.0.9",
@@ -217,6 +255,7 @@
     ]
   },
   "dependencies": {
+    "ignore": "^7.0.3",
     "posthog-node": "^4.4.0",
     "zod": "^3.23.8"
   },

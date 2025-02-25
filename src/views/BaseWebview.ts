@@ -23,7 +23,8 @@ export abstract class BaseWebview {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src http://localhost:5173 ws://localhost:5173; img-src http://localhost:5173 https:; script-src 'unsafe-eval' 'unsafe-inline' http://localhost:5173; style-src 'unsafe-inline' http://localhost:5173;">
+    <link href="${DEV_WEBVIEW_URL}/node_modules/@vscode/codicons/dist/codicon.css" rel="stylesheet" id="vscode-codicon-stylesheet" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src ${DEV_WEBVIEW_URL}; connect-src http://localhost:5173 ws://localhost:5173; img-src http://localhost:5173 https:; script-src 'unsafe-eval' 'unsafe-inline' http://localhost:5173; style-src 'unsafe-inline' http://localhost:5173;">
     <script type="module">
       import { injectIntoGlobalHook } from "${DEV_WEBVIEW_URL}/@react-refresh"
       injectIntoGlobalHook(window)
@@ -53,6 +54,16 @@ export abstract class BaseWebview {
     const styleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, 'dist', 'webviews', 'assets', 'index.css')
     )
+    const codiconUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this._extensionUri,
+        'node_modules',
+        '@vscode',
+        'codicons',
+        'dist',
+        'codicon.css'
+      )
+    )
     const nonce = getNonce()
     const cspSource = webview.cspSource
 
@@ -61,7 +72,8 @@ export abstract class BaseWebview {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${cspSource} https:; script-src 'nonce-${nonce}' ${cspSource}; style-src 'unsafe-inline' ${cspSource};">
+      <link href="${codiconUri}" rel="stylesheet" id="vscode-codicon-stylesheet" />
+      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src ${cspSource}; img-src ${cspSource} https:; script-src 'nonce-${nonce}' ${cspSource}; style-src 'unsafe-inline' ${cspSource};">
       <link rel="stylesheet" type="text/css" href="${styleUri}">
     </head>
     <body>
