@@ -7,11 +7,11 @@ import {
   CONTENT_TYPES,
   DEFAULT_MODELS,
   ERROR_MESSAGES,
-  HEADERS
+  HEADERS,
+  SOURCEGRAPH_SUPPORTED_LLM_PROVIDERS
 } from '../../constants'
 import {
   BaseLLMProvider,
-  CompletionConfig,
   CompletionRequest,
   CompletionRequestMessage,
   CompletionResponse
@@ -22,13 +22,6 @@ import {
   SourcegraphModelConfig,
   ValidationResult
 } from './types'
-
-const DEFAULT_CONFIG: CompletionConfig = {
-  model: 'claude-3.5-sonnet',
-  maxTokens: 4000,
-  temperature: 0.0
-}
-const SUPPORTED_LLM_PROVIDERS = ['anthropic', 'google', 'openai']
 
 export class SourcegraphProvider implements BaseLLMProvider {
   static async fetchModels(baseUrl: string, apiKey: string): Promise<string[]> {
@@ -48,8 +41,10 @@ export class SourcegraphProvider implements BaseLLMProvider {
       return data.models
         .filter(model => {
           const provider = model.modelRef.split('::')[0]
-          // Only return models from "anthropic", "google", "openai"
-          return SUPPORTED_LLM_PROVIDERS.includes(provider) && model.status !== 'deprecated'
+          return (
+            // Only return models from "anthropic", "google", "openai"
+            SOURCEGRAPH_SUPPORTED_LLM_PROVIDERS.includes(provider) && model.status !== 'deprecated'
+          )
         })
         .map(model => model.modelName)
     } catch (error) {
@@ -151,7 +146,8 @@ export class SourcegraphProvider implements BaseLLMProvider {
     }
 
     const config = {
-      ...DEFAULT_CONFIG,
+      temperature: 0,
+      maxTokens: 4000,
       ...request.config
     }
 
@@ -167,7 +163,7 @@ export class SourcegraphProvider implements BaseLLMProvider {
           body: JSON.stringify({
             model: this.model,
             messages: this.convertToSourcegraphCompletionRequest(request.messages),
-            temperature: 0,
+            temperature: config.temperature,
             maxTokens: config.maxTokens
           })
         }

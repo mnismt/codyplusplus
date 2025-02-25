@@ -23,6 +23,8 @@ export const DEFAULT_MODELS = {
   OPENAI: 'gpt-4o-mini'
 } as const
 
+export const SOURCEGRAPH_SUPPORTED_LLM_PROVIDERS = ['anthropic', 'google', 'openai']
+
 export const ERROR_MESSAGES = {
   NOT_AUTHENTICATED: 'Authentication required. Please sign in.',
   INVALID_TOKEN: 'Invalid authentication token.',
