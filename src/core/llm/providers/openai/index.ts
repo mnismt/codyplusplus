@@ -1,5 +1,13 @@
 import * as vscode from 'vscode'
 import { LLMProvider } from '../../../../constants/llm'
+import {
+  API_ENDPOINTS,
+  CONFIG_KEYS,
+  CONTENT_TYPES,
+  DEFAULT_MODELS,
+  ERROR_MESSAGES,
+  HEADERS
+} from '../../constants'
 import { BaseLLMProvider, CompletionRequest, CompletionResponse } from '../../types'
 
 interface OpenAIModelsResponse {
@@ -30,15 +38,15 @@ interface OpenAICompletionResponse {
 export class OpenAIProvider implements BaseLLMProvider {
   static async fetchModels(baseUrl: string, apiKey: string): Promise<string[]> {
     try {
-      const response = await fetch(`${baseUrl}/models`, {
+      const response = await fetch(`${baseUrl}${API_ENDPOINTS.OPENAI.MODELS}`, {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`
+          [HEADERS.CONTENT_TYPE]: CONTENT_TYPES.JSON,
+          [HEADERS.AUTHORIZATION]: `Bearer ${apiKey}`
         }
       })
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch models: ${response.statusText}`)
+        throw new Error(`${ERROR_MESSAGES.NETWORK_ERROR} ${response.statusText}`)
       }
 
       const data = (await response.json()) as OpenAIModelsResponse
@@ -53,10 +61,10 @@ export class OpenAIProvider implements BaseLLMProvider {
   private baseUrl: string
 
   constructor() {
-    this.apiKey = vscode.workspace.getConfiguration('codyPlusPlus').get<string>('llmApiKey')
+    this.apiKey = vscode.workspace.getConfiguration('codyPlusPlus').get<string>(CONFIG_KEYS.API_KEY)
     this.baseUrl =
-      vscode.workspace.getConfiguration('codyPlusPlus').get<string>('openaiBaseUrl') ||
-      'https://api.openai.com/v1'
+      vscode.workspace.getConfiguration('codyPlusPlus').get<string>(CONFIG_KEYS.OPENAI_BASE_URL) ||
+      API_ENDPOINTS.OPENAI.DEFAULT_BASE_URL
   }
 
   get providerIdentifier(): LLMProvider {
@@ -69,21 +77,22 @@ export class OpenAIProvider implements BaseLLMProvider {
 
   get model(): string {
     return (
-      vscode.workspace.getConfiguration('codyPlusPlus').get<string>('llmModel') || 'gpt-4o-mini'
+      vscode.workspace.getConfiguration('codyPlusPlus').get<string>(CONFIG_KEYS.MODEL) ||
+      DEFAULT_MODELS.OPENAI
     )
   }
 
   async complete(request: CompletionRequest): Promise<CompletionResponse> {
     if (!this.apiKey) {
-      throw new Error('Not authenticated')
+      throw new Error(ERROR_MESSAGES.NOT_AUTHENTICATED)
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      const response = await fetch(`${this.baseUrl}${API_ENDPOINTS.OPENAI.CHAT_COMPLETIONS}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`
+          [HEADERS.CONTENT_TYPE]: CONTENT_TYPES.JSON,
+          [HEADERS.AUTHORIZATION]: `Bearer ${this.apiKey}`
         },
         body: JSON.stringify({
           model: this.model,
@@ -100,7 +109,7 @@ export class OpenAIProvider implements BaseLLMProvider {
       if (!response.ok) {
         const error = await response.text()
         console.error('CODY++: OpenAI provider error', error)
-        throw new Error(`API request failed: ${error}`)
+        throw new Error(`${ERROR_MESSAGES.NETWORK_ERROR} ${error}`)
       }
 
       const data = (await response.json()) as OpenAICompletionResponse
@@ -112,7 +121,7 @@ export class OpenAIProvider implements BaseLLMProvider {
       if (error instanceof Error) {
         throw error
       }
-      throw new Error('Unknown error')
+      throw new Error(ERROR_MESSAGES.UNKNOWN_ERROR)
     }
   }
 
@@ -123,6 +132,8 @@ export class OpenAIProvider implements BaseLLMProvider {
 
   async logout(): Promise<void> {
     this.apiKey = undefined
-    await vscode.workspace.getConfiguration('codyPlusPlus').update('llmApiKey', undefined, true)
+    await vscode.workspace
+      .getConfiguration('codyPlusPlus')
+      .update(CONFIG_KEYS.API_KEY, undefined, true)
   }
 }

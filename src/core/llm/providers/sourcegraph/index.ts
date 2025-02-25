@@ -1,6 +1,14 @@
 import * as vscode from 'vscode'
 import { LLMProvider } from '../../../../constants/llm'
 import {
+  API_ENDPOINTS,
+  CONFIG_KEYS,
+  CONTENT_TYPES,
+  DEFAULT_MODELS,
+  ERROR_MESSAGES,
+  HEADERS
+} from '../../constants'
+import {
   BaseLLMProvider,
   CompletionRequest,
   CompletionRequestMessage,
@@ -28,26 +36,22 @@ interface ValidationResult {
 export class SourcegraphProvider implements BaseLLMProvider {
   static async fetchModels(baseUrl: string, apiKey: string): Promise<string[]> {
     try {
-      console.log(
-        `Fetching Sourcegraph models from ${baseUrl}/.api/modelconfig/supported-models.json`
-      )
-      const response = await fetch(`${baseUrl}/.api/modelconfig/supported-models.json`, {
+      const response = await fetch(`${baseUrl}${API_ENDPOINTS.SOURCEGRAPH.MODELS}`, {
         headers: {
-          Authorization: `token ${apiKey}`,
-          'Content-Type': 'application/json'
+          [HEADERS.AUTHORIZATION]: `token ${apiKey}`,
+          [HEADERS.CONTENT_TYPE]: CONTENT_TYPES.JSON
         }
       })
       if (!response.ok) {
-        throw new Error(`Failed to fetch models: ${response.statusText}`)
+        throw new Error(`${ERROR_MESSAGES.NETWORK_ERROR} ${response.statusText}`)
       }
 
       const data = (await response.json()) as SourcegraphModelConfig
 
       return data.models
         .filter(model => {
-          // Extract provider from modelRef (format: "provider::date::model")
           const provider = model.modelRef.split('::')[0]
-          // Only include specific providers and non-deprecated models
+          // Only return models from "anthropic", "google", "openai"
           return (
             ['anthropic', 'google', 'openai'].includes(provider) && model.status !== 'deprecated'
           )
@@ -62,7 +66,7 @@ export class SourcegraphProvider implements BaseLLMProvider {
   private apiKey?: string
 
   constructor() {
-    this.apiKey = vscode.workspace.getConfiguration('codyPlusPlus').get<string>('llmApiKey')
+    this.apiKey = vscode.workspace.getConfiguration('codyPlusPlus').get<string>(CONFIG_KEYS.API_KEY)
   }
 
   get providerIdentifier(): LLMProvider {
@@ -75,8 +79,8 @@ export class SourcegraphProvider implements BaseLLMProvider {
 
   get model(): string {
     return (
-      vscode.workspace.getConfiguration('codyPlusPlus').get<string>('llmModel') ||
-      'claude-3.5-sonnet'
+      vscode.workspace.getConfiguration('codyPlusPlus').get<string>(CONFIG_KEYS.MODEL) ||
+      DEFAULT_MODELS.SOURCEGRAPH
     )
   }
 
@@ -84,37 +88,40 @@ export class SourcegraphProvider implements BaseLLMProvider {
     if (!token) {
       return {
         isValid: false,
-        error: 'No token provided'
+        error: ERROR_MESSAGES.NO_TOKEN
       }
     }
 
     try {
       const headers = {
-        Authorization: `token ${token}`,
-        'Content-Type': 'application/json'
+        [HEADERS.AUTHORIZATION]: `token ${token}`,
+        [HEADERS.CONTENT_TYPE]: CONTENT_TYPES.JSON
       }
 
-      const response = await fetch('https://sourcegraph.com/.api/graphql', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          query: 'query { currentUser { username } }'
-        })
-      })
+      const response = await fetch(
+        `${API_ENDPOINTS.SOURCEGRAPH.BASE_URL}${API_ENDPOINTS.SOURCEGRAPH.GRAPHQL}`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            query: 'query { currentUser { username } }'
+          })
+        }
+      )
 
       const data = (await response.json()) as GraphQLResponse
 
       if (!response.ok) {
         return {
           isValid: false,
-          error: data.error || 'Network request failed'
+          error: data.error || ERROR_MESSAGES.NETWORK_ERROR
         }
       }
 
       if (!data.data?.currentUser?.username) {
         return {
           isValid: false,
-          error: 'Invalid token'
+          error: ERROR_MESSAGES.INVALID_TOKEN
         }
       }
 
@@ -125,7 +132,7 @@ export class SourcegraphProvider implements BaseLLMProvider {
     } catch (error) {
       return {
         isValid: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error: error instanceof Error ? error.message : ERROR_MESSAGES.UNKNOWN_ERROR
       }
     }
   }
@@ -145,7 +152,7 @@ export class SourcegraphProvider implements BaseLLMProvider {
 
   async complete(request: CompletionRequest): Promise<CompletionResponse> {
     if (!this.apiKey) {
-      throw new Error('Authentication required. Please sign in to Sourcegraph.')
+      throw new Error(ERROR_MESSAGES.NOT_AUTHENTICATED)
     }
 
     const config = {
@@ -154,23 +161,26 @@ export class SourcegraphProvider implements BaseLLMProvider {
     }
 
     try {
-      const response = await fetch('https://sourcegraph.com/.api/completions/stream', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `token ${this.apiKey}`
-        },
-        body: JSON.stringify({
-          model: this.model,
-          messages: this.convertToSourcegraphCompletionRequest(request.messages),
-          temperature: 0,
-          maxTokens: config.maxTokens
-        })
-      })
+      const response = await fetch(
+        `${API_ENDPOINTS.SOURCEGRAPH.BASE_URL}${API_ENDPOINTS.SOURCEGRAPH.COMPLETIONS}`,
+        {
+          method: 'POST',
+          headers: {
+            [HEADERS.CONTENT_TYPE]: CONTENT_TYPES.JSON,
+            [HEADERS.AUTHORIZATION]: `token ${this.apiKey}`
+          },
+          body: JSON.stringify({
+            model: this.model,
+            messages: this.convertToSourcegraphCompletionRequest(request.messages),
+            temperature: 0,
+            maxTokens: config.maxTokens
+          })
+        }
+      )
 
       if (!response.ok) {
         const error = await response.text()
-        throw new Error(`API request failed: ${error}`)
+        throw new Error(`${ERROR_MESSAGES.NETWORK_ERROR} ${error}`)
       }
 
       const data = await response.json()
@@ -186,12 +196,12 @@ export class SourcegraphProvider implements BaseLLMProvider {
         }
       }
 
-      throw new Error('Invalid response format from Sourcegraph API')
+      throw new Error(ERROR_MESSAGES.INVALID_RESPONSE)
     } catch (error) {
       if (error instanceof Error) {
         throw error
       }
-      throw new Error(error instanceof Error ? error.message : 'Unknown error')
+      throw new Error(error instanceof Error ? error.message : ERROR_MESSAGES.UNKNOWN_ERROR)
     }
   }
 
@@ -213,12 +223,14 @@ export class SourcegraphProvider implements BaseLLMProvider {
     }
 
     this.apiKey = token
-    await vscode.workspace.getConfiguration('codyPlusPlus').update('llmApiKey', token, true)
+    await vscode.workspace.getConfiguration('codyPlusPlus').update(CONFIG_KEYS.API_KEY, token, true)
     return token
   }
 
   async logout(): Promise<void> {
     this.apiKey = undefined
-    await vscode.workspace.getConfiguration('codyPlusPlus').update('llmApiKey', undefined, true)
+    await vscode.workspace
+      .getConfiguration('codyPlusPlus')
+      .update(CONFIG_KEYS.API_KEY, undefined, true)
   }
 }
