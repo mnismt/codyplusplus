@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - New: Add Files to Cody (Smart) command
+  - Supported Providers: OpenAI-compatible
 - Improve UI for adding custom commands
 - Add Telemetry option and update dependencies
 - Refactors the extension to use webviews instead of a tree view for displaying custom commands
