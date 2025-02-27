@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-02-27
+
 - New: Add Files to Cody (Smart) command
   - Supported Providers: OpenAI-compatible
 - Improve UI for adding custom commands
