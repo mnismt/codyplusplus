@@ -15,6 +15,7 @@ The following usage information is collected and reported:
 - When files are added to Cody (excluding file contents)
 - When folders are added to Cody (excluding folder contents)
 - When selections are added to Cody (excluding selected content)
+- When smart selections are added to Cody (excluding selected content)
 
 #### File Counting
 
