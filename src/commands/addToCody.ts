@@ -96,38 +96,62 @@ export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.Ex
     // Create LLM provider and ensure authenticated
     const llm = createProvider()
 
-    const fileTree = await getWorkspaceFileTree(rootUri)
-    const messages = await createCompletionRequestMessages(prompt, rootUri)
+    // Show progress notification
+    return vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: 'Analyzing files that match your criteria...',
+        cancellable: true
+      },
+      async (progress, token) => {
+        try {
+          progress.report({ increment: 20, message: 'Scanning workspace files...' })
+          const fileTree = await getWorkspaceFileTree(rootUri)
 
-    // Call LLM
-    const response = await llm.complete({
-      messages
-    })
+          progress.report({
+            increment: 30,
+            message: `Creating file selection query for ${fileTree.length} files...`
+          })
+          const messages = await createCompletionRequestMessages(prompt, rootUri)
 
-    const selectedFiles: string[] = parseLLMResponse(response.text)
+          progress.report({ increment: 20, message: 'Getting AI recommendations...' })
+          // Call LLM
+          const response = await llm.complete({
+            messages
+          })
 
-    // Convert paths to URIs and add to Cody
-    const selectedFileUris = selectedFiles.map(filePath => vscode.Uri.file(filePath))
-    const fileCount = (await Promise.all(selectedFileUris.map(executeMentionFileCommand))).reduce(
-      getSuccessCount,
-      0
+          progress.report({ increment: 15, message: 'Processing selected files...' })
+          const selectedFiles: string[] = parseLLMResponse(response.text)
+
+          // Convert paths to URIs and add to Cody
+          const selectedFileUris = selectedFiles.map(filePath => vscode.Uri.file(filePath))
+
+          progress.report({ increment: 15, message: 'Adding files to Cody...' })
+          const fileCount = (
+            await Promise.all(selectedFileUris.map(executeMentionFileCommand))
+          ).reduce(getSuccessCount, 0)
+
+          telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_SMART_SELECTION, {
+            fileCount
+          })
+
+          // Provide feedback to the user.
+          const relativePath = vscode.workspace.asRelativePath(rootUri)
+          const successMessage = `Added ${fileCount} file${fileCount !== 1 ? 's' : ''} from '${relativePath}' that match your criteria: "${prompt}"`
+
+          // Use simplified tree view with maxDisplayLength of 50
+          const treeStructure = formatFileTree(rootUri.fsPath, fileTree, selectedFiles, 50)
+
+          vscode.window.showInformationMessage(successMessage, {
+            detail: treeStructure,
+            modal: true
+          })
+        } catch (error: any) {
+          vscode.window.showErrorMessage(`Failed to add files smart to Cody: ${error.message}`)
+          throw error
+        }
+      }
     )
-
-    telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_SMART_SELECTION, {
-      fileCount
-    })
-
-    // Provide feedback to the user.
-    const relativePath = vscode.workspace.asRelativePath(rootUri)
-    const successMessage = `Added ${fileCount} file${fileCount !== 1 ? 's' : ''} from '${relativePath}' that match your criteria: "${prompt}"`
-
-    // Use simplified tree view with maxDisplayLength of 50
-    const treeStructure = formatFileTree(rootUri.fsPath, fileTree, selectedFiles, 50)
-
-    vscode.window.showInformationMessage(successMessage, {
-      detail: treeStructure,
-      modal: true
-    })
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to add files smart to Cody: ${error.message}`)
   }

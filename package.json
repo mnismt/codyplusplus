@@ -60,7 +60,7 @@
           "type": "string",
           "enum": [
             "sourcegraph",
-            "openai"
+            "openai-compatible"
           ],
           "default": "sourcegraph",
           "description": "Select the LLM provider to use"

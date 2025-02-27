@@ -1,11 +1,10 @@
 import * as vscode from 'vscode'
-import { LLM_PROVIDER_API_BASE_URL, LLMProvider } from '../constants/llm'
+import { AVAILABLE_LLM_PROVIDERS, LLM_PROVIDER_API_BASE_URL, LLMProvider } from '../constants/llm'
 import { OpenAIProvider } from '../core/llm/providers/openai'
 import { SourcegraphProvider } from '../core/llm/providers/sourcegraph'
 
 export const selectProvider = async (): Promise<boolean> => {
-  const availableProviders = [LLMProvider.OpenAI, LLMProvider.Sourcegraph]
-  const selectedProvider = await vscode.window.showQuickPick(availableProviders, {
+  const selectedProvider = await vscode.window.showQuickPick(AVAILABLE_LLM_PROVIDERS, {
     placeHolder: 'Select LLM Provider',
     title: 'Select LLM Provider',
     ignoreFocusOut: true
