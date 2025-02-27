@@ -137,15 +137,19 @@ export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.Ex
 
           // Provide feedback to the user.
           const relativePath = vscode.workspace.asRelativePath(rootUri)
-          const successMessage = `Added ${fileCount} file${fileCount !== 1 ? 's' : ''} from '${relativePath}' that match your criteria: "${prompt}"`
+          const successMessage = `Added ${fileCount} file${fileCount !== 1 ? 's' : ''} from '${relativePath}' that match your criteria:\n "${prompt}"`
 
           // Use simplified tree view with maxDisplayLength of 50
           const treeStructure = formatFileTree(rootUri.fsPath, fileTree, selectedFiles, 50)
 
-          vscode.window.showInformationMessage(successMessage, {
-            detail: treeStructure,
-            modal: true
-          })
+          const totalFiles = fileTree.length
+          vscode.window.showInformationMessage(
+            `Cody++: ${fileCount}/${totalFiles} files successfully added`,
+            {
+              detail: `${successMessage}\n\n${treeStructure}`,
+              modal: true
+            }
+          )
         } catch (error: any) {
           vscode.window.showErrorMessage(`Failed to add files smart to Cody: ${error.message}`)
           throw error
