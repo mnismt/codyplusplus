@@ -28,6 +28,10 @@ code --install-extension mnismt.cody-plus-plus
 ## Features
 
 ### Files control
+- **Add Files to Cody (Smart)**:
+  - Describe what files you want to add to Cody, and let's AI do the rest.
+
+![image](https://github.com/user-attachments/assets/025a69a1-51ba-4ce7-8529-b06f5ecd2e62)
 
 - **Add File to Cody**:
   - Adds a single file to Cody's context.
