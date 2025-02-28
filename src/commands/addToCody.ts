@@ -74,7 +74,8 @@ export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.Ex
     // Prompt user for file selection criteria
     const prompt = await vscode.window.showInputBox({
       prompt: 'Describe the files you want to add to Cody',
-      placeHolder: 'e.g., all test files and services related to user authentication'
+      placeHolder: 'e.g., all test files and services related to user authentication',
+      ignoreFocusOut: true
     })
 
     if (!prompt) {
