@@ -150,6 +150,9 @@ export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.Ex
               modal: true
             }
           )
+          telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_SMART_SELECTION, {
+            fileCount
+          })
         } catch (error: any) {
           vscode.window.showErrorMessage(`Failed to add files smart to Cody: ${error.message}`)
           throw error
