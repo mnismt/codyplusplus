@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix: Telemetry doesn't track file count for "Add Files to Cody (Smart)"
+
 ## [0.3.0] - 2025-02-27
 
 - New: Add Files to Cody (Smart) command
