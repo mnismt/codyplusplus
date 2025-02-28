@@ -2,9 +2,8 @@
 
 ## [Unreleased]
 
-## [0.3.1] - 2025-02-28
-
 - Fix: Telemetry doesn't track file count for "Add Files to Cody (Smart)"
+- Fix: Add ignoreFocusOut to prevent the input box from disappearing in the "Add Files to Cody (Smart)" command
 
 ## [0.3.0] - 2025-02-27
 
