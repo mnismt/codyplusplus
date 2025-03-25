@@ -1,6 +1,6 @@
 <div align=center>
 
-# <img src="https://i.imgur.com/T1aoBgL.png" width="64">  Cody++
+# <img src="https://i.imgur.com/T1aoBgL.png" width="64"> Cody++
 
 </div>
 
@@ -10,6 +10,7 @@ Enhances [Cody AI](https://sourcegraph.com/cody) with additional files control a
 
 [![](https://img.shields.io/badge/Chat_with_Cody++-Ask_Cody-%238A16D7?labelColor=%23383838)](https://sourcegraph.com/github.com/mnismt/CodyPlusPlus)
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/CodyPlusPlus)](https://twitter.com/CodyPlusPlus)
+![CI Tests](https://github.com/mnismt/CodyPlusPlus/actions/workflows/test.yml/badge.svg)
 
 ## Requirements
 
@@ -28,6 +29,7 @@ code --install-extension mnismt.cody-plus-plus
 ## Features
 
 ### Files control
+
 - **Add Files to Cody (Smart)**:
   - Describe what files you want to add to Cody, and let's AI do the rest.
 
@@ -73,22 +75,59 @@ This extension contributes the following settings:
 To configure this setting in two ways:
 
 1. Using the Settings UI:
-    - Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P` on Mac).
-    - Type `Preferences: Open Settings (UI)` and press Enter.
-    - In the search bar, type `Cody Plus Plus`.
-    - Adjust the:
-      - `File Threshold` setting to your desired value.
-      - `Excluded File Types` setting to your desired value.
-      - `Excluded Folders` setting to your desired value.
+
+   - Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P` on Mac).
+   - Type `Preferences: Open Settings (UI)` and press Enter.
+   - In the search bar, type `Cody Plus Plus`.
+   - Adjust the:
+     - `File Threshold` setting to your desired value.
+     - `Excluded File Types` setting to your desired value.
+     - `Excluded Folders` setting to your desired value.
 
 2. Using the `settings.json` file:
-    - Add these lines to your `settings.json` file:
 
-        ```json
-        "codyPlusPlus.fileThreshold": 15,
-        "codyPlusPlus.excludedFileTypes": [".exe", ".bin"],
-        "codyPlusPlus.excludedFolders": [".git", "node_modules"]
-        ```
+   - Add these lines to your `settings.json` file:
+
+     ```json
+     "codyPlusPlus.fileThreshold": 15,
+     "codyPlusPlus.excludedFileTypes": [".exe", ".bin"],
+     "codyPlusPlus.excludedFolders": [".git", "node_modules"]
+     ```
+
+## Development
+
+### Requirements
+
+- Node.js 18.x
+- pnpm 9.11.0 (specified as the package manager)
+
+### Testing
+
+The extension comes with a comprehensive test suite. To run tests locally:
+
+```sh
+# Install dependencies
+pnpm install
+
+# Run linting checks
+pnpm run lint
+
+# Compile the extension
+pnpm run compile
+
+# Run tests
+pnpm test
+```
+
+### Continuous Integration
+
+The project uses GitHub Actions for automated testing and building:
+
+- Tests run on push to main branch and pull requests
+- Tests run on multiple platforms (Windows, macOS, Linux)
+- Tests run against multiple VS Code versions (stable and insiders)
+
+For details about the CI setup, see [docs/ci-setup.md](docs/ci-setup.md).
 
 ## Telemetry
 
