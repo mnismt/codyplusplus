@@ -17,9 +17,9 @@ The following usage information is collected and reported:
 - When selections are added to Cody (excluding selected content)
 - When smart selections are added to Cody (excluding selected content)
 
-#### File Counting
+#### File & Folder Counting
 
-We track the total number of files added to Cody, but **we never read or store the actual contents of these files**. This helps us understand usage patterns without compromising your privacy. The count is purely numerical and anonymized.
+We track the total number of files & folders added to Cody, but **we never read or store the actual contents of these files**. This helps us understand usage patterns without compromising your privacy. The count is purely numerical and anonymized.
 
 ### Custom Commands
 

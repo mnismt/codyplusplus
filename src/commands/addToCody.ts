@@ -1,8 +1,9 @@
+import * as path from 'path'
 import * as vscode from 'vscode'
 import { TELEMETRY_EVENTS } from '../constants/telemetry'
 import { executeMentionFileCommand } from '../core/cody/commands'
 import { formatFileTree, getWorkspaceFileTree } from '../core/filesystem/operations'
-import { getSelectedFileUris } from '../core/filesystem/processor'
+import { getSelectedFileUris, getSelectedFolderCount } from '../core/filesystem/processor'
 import { createProvider } from '../core/llm'
 import { createCompletionRequestMessages, parseLLMResponse } from '../core/llm/utils'
 import { TelemetryService } from '../services/telemetry.service'
@@ -18,7 +19,8 @@ export async function addFile(folderUri: vscode.Uri) {
     )
 
     telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_FILE, {
-      fileCount
+      fileCount,
+      folderCount: 1 // Single file operation always has 1 folder
     })
   } catch (error: any) {
     vscode.window.showErrorMessage(`Failed to add file to Cody: ${error.message}`)
@@ -28,17 +30,19 @@ export async function addFile(folderUri: vscode.Uri) {
 export async function addSelection(folderUris: vscode.Uri[], recursive = false) {
   const telemetry = TelemetryService.getInstance()
   try {
-    const files = await getSelectedFileUris(folderUris, {
+    const { folderCount, fileUris } = await getSelectedFolderCount(folderUris, {
       recursive,
       progressTitle: 'Adding selection to Cody'
     })
-    const fileCount = (await Promise.all(files.map(executeMentionFileCommand))).reduce(
+
+    const fileCount = (await Promise.all(fileUris.map(executeMentionFileCommand))).reduce(
       getSuccessCount,
       0
     )
 
     telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_SELECTION, {
       fileCount,
+      folderCount,
       recursive
     })
   } catch (error: any) {
@@ -49,17 +53,19 @@ export async function addSelection(folderUris: vscode.Uri[], recursive = false) 
 export async function addFolder(folderUri: vscode.Uri, recursive = true) {
   const telemetry = TelemetryService.getInstance()
   try {
-    const files = await getSelectedFileUris([folderUri], {
+    const { folderCount, fileUris } = await getSelectedFolderCount([folderUri], {
       recursive,
       progressTitle: 'Adding folder to Cody'
     })
-    const fileCount = (await Promise.all(files.map(executeMentionFileCommand))).reduce(
+
+    const fileCount = (await Promise.all(fileUris.map(executeMentionFileCommand))).reduce(
       getSuccessCount,
       0
     )
 
     telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_FOLDER, {
       fileCount,
+      folderCount,
       recursive
     })
   } catch (error: any) {
@@ -127,13 +133,22 @@ export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.Ex
           // Convert paths to URIs and add to Cody
           const selectedFileUris = selectedFiles.map(filePath => vscode.Uri.file(filePath))
 
+          // Count unique folders from the selected files
+          const uniqueFolders = new Set<string>()
+          selectedFiles.forEach(filePath => {
+            const dirPath = path.dirname(filePath)
+            uniqueFolders.add(dirPath)
+          })
+          const folderCount = uniqueFolders.size
+
           progress.report({ increment: 15, message: 'Adding files to Cody...' })
           const fileCount = (
             await Promise.all(selectedFileUris.map(executeMentionFileCommand))
           ).reduce(getSuccessCount, 0)
 
           telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_SMART_SELECTION, {
-            fileCount
+            fileCount,
+            folderCount
           })
 
           // Provide feedback to the user.
@@ -151,9 +166,6 @@ export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.Ex
               modal: true
             }
           )
-          telemetry.trackEvent(TELEMETRY_EVENTS.FILES.ADD_SMART_SELECTION, {
-            fileCount
-          })
         } catch (error: any) {
           vscode.window.showErrorMessage(`Failed to add files smart to Cody: ${error.message}`)
           throw error
