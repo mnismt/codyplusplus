@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.3.2] - 2025-03-26
+
 - New: Add Telemetry to track folder counts
 - Security: Remove release-it.sh from the bundle (added to .vscodeignore)
 
