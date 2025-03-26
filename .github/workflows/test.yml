@@ -73,36 +73,3 @@ jobs:
           name: test-results-${{ matrix.os }}-${{ matrix.vscode-version }}
           path: .vscode-test/
           if-no-files-found: ignore
-
-  build:
-    name: Build Extension Package
-    needs: test
-    runs-on: ubuntu-latest
-    if: success() && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18.x
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 9.11.0
-          run_install: false
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Package Extension
-        run: pnpm run package
-
-      - name: Upload Extension Package
-        uses: actions/upload-artifact@v4
-        with:
-          name: extension-package
-          path: '*.vsix'
