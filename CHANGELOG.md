@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- New: Add Telemetry to track folder counts
+- Security: Remove release-it.sh from the bundle (added to .vscodeignore)
+
 ## [0.3.1] - 2025-02-28
 
 - Fix: Telemetry doesn't track file count for "Add Files to Cody (Smart)"
