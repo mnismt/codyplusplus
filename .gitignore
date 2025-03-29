@@ -7,3 +7,4 @@ release-it.sh
 .cursorrules
 .clinerules
 .windsuftrules
+.cursor/*
