@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2025-03-30
+
 - Add Gemini provider
 - Refactor OpenAI provider to OpenAI & OpenAI-compatible for better configuration
 - Significantly improve tests coverage
