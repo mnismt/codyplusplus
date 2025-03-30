@@ -4,7 +4,5 @@ node_modules
 .vscode-test/
 *.vsix
 release-it.sh
-.cursorrules
-.clinerules
-.windsuftrules
+.*rules
 .cursor/*
