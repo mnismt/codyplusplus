@@ -227,7 +227,6 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@langchain/google-genai": "^0.2.1",
     "@release-it/conventional-changelog": "^8.0.1",
     "@release-it/keep-a-changelog": "^5.0.0",
     "@types/mocha": "^10.0.6",
@@ -263,8 +262,6 @@
     ]
   },
   "dependencies": {
-    "@langchain/core": "^0.3.43",
-    "@langchain/openai": "^0.5.2",
     "ignore": "^7.0.3",
     "posthog-node": "^4.4.0",
     "zod": "^3.23.8"
