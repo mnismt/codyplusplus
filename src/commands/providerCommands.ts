@@ -1,6 +1,11 @@
 import * as vscode from 'vscode'
 import { createProvider } from '../core/llm'
-import { CONFIG_KEYS, LLMProviderDetails, SUPPORTED_PROVIDERS } from '../core/llm/constants'
+import {
+  CONFIG_KEYS,
+  LLMProviderDetails,
+  SUPPORTED_PROVIDERS,
+  SUPPORTED_PROVIDER_CODES
+} from '../core/llm/constants'
 import {
   updateApiKeyConfig,
   updateBaseUrlConfig,
@@ -139,6 +144,96 @@ export const selectProvider = async (): Promise<boolean> => {
     console.error('Failed to update provider configuration:', error)
     vscode.window.showErrorMessage(
       `Failed to save provider configuration: ${error.message || 'Unknown error'}`
+    )
+    return false // Indicate failure during update
+  }
+}
+
+export const selectLLM = async (): Promise<boolean> => {
+  // Get current configuration
+  const config = vscode.workspace.getConfiguration('codyPlusPlus')
+  const currentProviderCode = config.get<string>(CONFIG_KEYS.PROVIDER) || 'openai'
+  const currentApiKey = config.get<string>(CONFIG_KEYS.API_KEY)
+  const currentBaseUrl = config.get<string>(CONFIG_KEYS.OPENAI_BASE_URL)
+  const currentModel = config.get<string>(CONFIG_KEYS.MODEL)
+
+  // Ensure provider and API key are set
+  if (!currentProviderCode || !currentApiKey) {
+    vscode.window.showWarningMessage(
+      'Provider and API key must be configured first. Use the "Select LLM Provider" command.'
+    )
+    return false
+  }
+
+  const providerDetails = SUPPORTED_PROVIDERS.find(p => p.code === currentProviderCode)
+  if (!providerDetails) {
+    vscode.window.showErrorMessage(
+      `Configuration Error: Invalid provider code '${currentProviderCode}'.`
+    )
+    return false
+  }
+
+  let models: string[] = []
+  try {
+    // Use current config to create provider for fetching models
+    const provider = createProvider(currentProviderCode as SUPPORTED_PROVIDER_CODES, {
+      apiKey: currentApiKey,
+      baseUrl:
+        currentProviderCode === 'openai-compatible' ? currentBaseUrl : providerDetails.baseURL
+    })
+    models = await provider.fetchModels()
+  } catch (error: any) {
+    console.error(`Failed to fetch models for ${providerDetails.name}:`, error)
+    vscode.window.showWarningMessage(
+      `Could not fetch models. Error: ${error.message}. Please enter the model name manually.`
+    )
+    // Allow manual entry even if fetch fails
+  }
+
+  let modelInput: string | undefined
+  if (models.length > 0) {
+    modelInput = await vscode.window.showQuickPick(models, {
+      placeHolder: `Select a model (current: ${currentModel || providerDetails.defaultModel})`,
+      title: `Choose ${providerDetails.name} Model`,
+      canPickMany: false,
+      ignoreFocusOut: true
+    })
+  } else {
+    modelInput = await vscode.window.showInputBox({
+      prompt: `Enter model name (leave empty for default: ${providerDetails.defaultModel})`,
+      placeHolder: providerDetails.defaultModel,
+      value: currentModel || '', // Use empty string if undefined
+      ignoreFocusOut: true
+    })
+  }
+
+  if (modelInput === undefined) {
+    vscode.window.showInformationMessage('Model selection cancelled.')
+    return false // Cancelled
+  }
+
+  // Use provider default if model input is empty string, otherwise use the input
+  const finalModel = modelInput || providerDetails.defaultModel
+
+  if (finalModel === currentModel) {
+    vscode.window.showInformationMessage(
+      'Selected model is the same as the current one. No changes made.'
+    )
+    return true // No change needed, considered success
+  }
+
+  // Update only the model configuration
+  try {
+    await updateModelConfig(finalModel)
+    console.log(
+      `Successfully updated LLM model to ${finalModel} for provider ${providerDetails.name}`
+    )
+    vscode.window.showInformationMessage(`Successfully updated LLM model to ${finalModel}`)
+    return true // Indicate success
+  } catch (error: any) {
+    console.error('Failed to update model configuration:', error)
+    vscode.window.showErrorMessage(
+      `Failed to save model configuration: ${error.message || 'Unknown error'}`
     )
     return false // Indicate failure during update
   }

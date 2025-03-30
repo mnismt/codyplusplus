@@ -3,7 +3,7 @@ import * as vscode from 'vscode'
 // Import custom command handlers
 import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
 import { addFile, addFilesSmart, addFolder, addSelection } from './commands/addToCody'
-import { selectProvider } from './commands/providerCommands'
+import { selectLLM, selectProvider } from './commands/providerCommands'
 // Import services and views
 import { CustomCommandService } from './services/customCommand.service'
 import { TelemetryService } from './services/telemetry.service'
@@ -110,6 +110,8 @@ export async function activate(context: vscode.ExtensionContext) {
     selectProvider
   )
 
+  const selectLlmDisposable = vscode.commands.registerCommand('cody-plus-plus.selectLlm', selectLLM)
+
   // Create and register the webview view for displaying custom commands in the sidebar
   const customCommandsWebviewProvider = new MainWebviewView(
     context.extensionUri,
@@ -132,6 +134,7 @@ export async function activate(context: vscode.ExtensionContext) {
     addSelectionRecursiveDisposable,
     addFilesSmartDisposable,
     selectProviderDisposable,
+    selectLlmDisposable,
     addCustomCommandDisposable,
     editCommandDisposable,
     deleteCommandDisposable

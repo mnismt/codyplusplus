@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 import * as llmModule from '../../core/llm'
 import { CONFIG_KEYS, SUPPORTED_PROVIDERS } from '../../core/llm/constants'
 import * as workspaceConfigUtils from '../../utils/workspace-config'
-import { selectProvider } from '../providerCommands'
+import { selectLLM, selectProvider } from '../providerCommands'
 
 suite('Provider Commands Tests', () => {
   let sandbox: sinon.SinonSandbox
@@ -209,6 +209,163 @@ suite('Provider Commands Tests', () => {
       assert.strictEqual(updateModelConfigStub.calledOnceWith('gpt-4'), true)
       assert.strictEqual(showInformationMessageStub.calledOnce, true)
       assert.ok(showInformationMessageStub.firstCall.args[0].includes('Successfully configured'))
+    })
+  })
+
+  suite('selectLLM', () => {
+    test('should return false when provider or API key is not configured', async () => {
+      // Simulate missing provider and API key
+      configGet.withArgs(CONFIG_KEYS.PROVIDER).returns(undefined)
+      configGet.withArgs(CONFIG_KEYS.API_KEY).returns(undefined)
+
+      const result = await selectLLM()
+
+      assert.strictEqual(result, false)
+      assert.strictEqual(showWarningMessageStub.calledOnce, true)
+      assert.strictEqual(
+        showWarningMessageStub.firstCall.args[0],
+        'Provider and API key must be configured first. Use the "Select LLM Provider" command.'
+      )
+      assert.strictEqual(showQuickPickStub.called, false) // No further prompts
+    })
+
+    test('should return false when provider code is invalid', async () => {
+      // Simulate configured but invalid provider
+      configGet.withArgs(CONFIG_KEYS.PROVIDER).returns('invalid-provider')
+      configGet.withArgs(CONFIG_KEYS.API_KEY).returns('test-api-key')
+
+      const result = await selectLLM()
+
+      assert.strictEqual(result, false)
+      assert.strictEqual(showErrorMessageStub.calledOnce, true)
+      assert.strictEqual(
+        showErrorMessageStub.firstCall.args[0],
+        "Configuration Error: Invalid provider code 'invalid-provider'."
+      )
+      assert.strictEqual(showQuickPickStub.called, false) // No further prompts
+    })
+
+    test('should return false when model selection is cancelled', async () => {
+      // Mock valid configuration
+      const mockProvider = SUPPORTED_PROVIDERS[0]
+      configGet.withArgs(CONFIG_KEYS.PROVIDER).returns(mockProvider.code)
+      configGet.withArgs(CONFIG_KEYS.API_KEY).returns('test-api-key')
+      configGet.withArgs(CONFIG_KEYS.MODEL).returns('current-model')
+
+      // Simulate user cancelling model selection
+      showQuickPickStub.resolves(undefined)
+
+      const result = await selectLLM()
+
+      assert.strictEqual(result, false)
+      assert.strictEqual(showQuickPickStub.calledOnce, true)
+      assert.strictEqual(showInformationMessageStub.calledOnce, true)
+      assert.strictEqual(showInformationMessageStub.firstCall.args[0], 'Model selection cancelled.')
+    })
+
+    test('should handle model fetch errors and fall back to input box', async () => {
+      // Mock valid configuration
+      const mockProvider = SUPPORTED_PROVIDERS[0]
+      configGet.withArgs(CONFIG_KEYS.PROVIDER).returns(mockProvider.code)
+      configGet.withArgs(CONFIG_KEYS.API_KEY).returns('test-api-key')
+      configGet.withArgs(CONFIG_KEYS.MODEL).returns('current-model')
+
+      // Simulate models fetch error
+      fetchModelsStub.rejects(new Error('Network error'))
+
+      // Mock model input (after fetch error)
+      showInputBoxStub.resolves('new-model')
+
+      const result = await selectLLM()
+
+      assert.strictEqual(result, true)
+      assert.strictEqual(showWarningMessageStub.calledOnce, true)
+      assert.ok(showWarningMessageStub.firstCall.args[0].includes('Could not fetch models'))
+      assert.strictEqual(showInputBoxStub.calledOnce, true)
+      assert.strictEqual(updateModelConfigStub.calledOnceWith('new-model'), true)
+    })
+
+    test('should return true without updating when selected model is the same as current', async () => {
+      // Mock valid configuration
+      const mockProvider = SUPPORTED_PROVIDERS[0]
+      configGet.withArgs(CONFIG_KEYS.PROVIDER).returns(mockProvider.code)
+      configGet.withArgs(CONFIG_KEYS.API_KEY).returns('test-api-key')
+      configGet.withArgs(CONFIG_KEYS.MODEL).returns('current-model')
+
+      // Simulate user selecting the same model
+      showQuickPickStub.resolves('current-model')
+
+      const result = await selectLLM()
+
+      assert.strictEqual(result, true)
+      assert.strictEqual(showQuickPickStub.calledOnce, true)
+      assert.strictEqual(showInformationMessageStub.calledOnce, true)
+      assert.strictEqual(
+        showInformationMessageStub.firstCall.args[0],
+        'Selected model is the same as the current one. No changes made.'
+      )
+      assert.strictEqual(updateModelConfigStub.called, false) // Config not updated
+    })
+
+    test('should successfully update model configuration for OpenAI-compatible provider', async () => {
+      // Find the OpenAI Compatible provider
+      const openAICompatibleProvider = SUPPORTED_PROVIDERS.find(
+        p => p.code === 'openai-compatible'
+      )!
+
+      // Mock valid configuration
+      configGet.withArgs(CONFIG_KEYS.PROVIDER).returns(openAICompatibleProvider.code)
+      configGet.withArgs(CONFIG_KEYS.API_KEY).returns('test-api-key')
+      configGet.withArgs(CONFIG_KEYS.OPENAI_BASE_URL).returns('https://custom-api.com')
+      configGet.withArgs(CONFIG_KEYS.MODEL).returns('current-model')
+
+      // Simulate user selecting a different model
+      showQuickPickStub.resolves('new-model')
+
+      const result = await selectLLM()
+
+      assert.strictEqual(result, true)
+      assert.strictEqual(showQuickPickStub.calledOnce, true)
+      assert.strictEqual(createProviderStub.calledOnce, true)
+      assert.deepStrictEqual(createProviderStub.firstCall.args, [
+        openAICompatibleProvider.code,
+        {
+          apiKey: 'test-api-key',
+          baseUrl: 'https://custom-api.com'
+        }
+      ])
+      assert.strictEqual(updateModelConfigStub.calledOnceWith('new-model'), true)
+      assert.strictEqual(showInformationMessageStub.calledOnce, true)
+      assert.strictEqual(
+        showInformationMessageStub.firstCall.args[0],
+        'Successfully updated LLM model to new-model'
+      )
+    })
+
+    test('should handle config update errors', async () => {
+      // Mock valid configuration
+      const mockProvider = SUPPORTED_PROVIDERS[0]
+      configGet.withArgs(CONFIG_KEYS.PROVIDER).returns(mockProvider.code)
+      configGet.withArgs(CONFIG_KEYS.API_KEY).returns('test-api-key')
+      configGet.withArgs(CONFIG_KEYS.MODEL).returns('current-model')
+
+      // Simulate user selecting a new model
+      showQuickPickStub.resolves('new-model')
+
+      // Mock configuration update error
+      const updateError = new Error('Configuration update failed')
+      updateModelConfigStub.rejects(updateError)
+
+      const result = await selectLLM()
+
+      assert.strictEqual(result, false)
+      assert.strictEqual(showQuickPickStub.calledOnce, true)
+      assert.strictEqual(updateModelConfigStub.calledOnceWith('new-model'), true)
+      assert.strictEqual(showErrorMessageStub.calledOnce, true)
+      assert.strictEqual(
+        showErrorMessageStub.firstCall.args[0],
+        'Failed to save model configuration: Configuration update failed'
+      )
     })
   })
 })
