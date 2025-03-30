@@ -5,8 +5,7 @@ import {
   CONTENT_TYPES,
   DEFAULT_MODELS,
   ERROR_MESSAGES,
-  HEADERS,
-  SOURCEGRAPH_SUPPORTED_LLM_PROVIDERS
+  HEADERS
 } from '../constants'
 
 suite('LLM Constants', () => {
@@ -19,12 +18,6 @@ suite('LLM Constants', () => {
   })
 
   test('should export API_ENDPOINTS with correct values', () => {
-    assert.ok(API_ENDPOINTS.SOURCEGRAPH)
-    assert.strictEqual(API_ENDPOINTS.SOURCEGRAPH.BASE_URL, 'https://sourcegraph.com')
-    assert.strictEqual(API_ENDPOINTS.SOURCEGRAPH.MODELS, '/.api/modelconfig/supported-models.json')
-    assert.strictEqual(API_ENDPOINTS.SOURCEGRAPH.COMPLETIONS, '/.api/completions/stream')
-    assert.strictEqual(API_ENDPOINTS.SOURCEGRAPH.GRAPHQL, '/.api/graphql')
-
     assert.ok(API_ENDPOINTS.OPENAI)
     assert.strictEqual(API_ENDPOINTS.OPENAI.DEFAULT_BASE_URL, 'https://api.openai.com/v1')
     assert.strictEqual(API_ENDPOINTS.OPENAI.MODELS, '/models')
@@ -33,13 +26,8 @@ suite('LLM Constants', () => {
 
   test('should export DEFAULT_MODELS with correct values', () => {
     assert.deepStrictEqual(DEFAULT_MODELS, {
-      SOURCEGRAPH: 'claude-3.5-sonnet',
       OPENAI: 'gpt-4o-mini'
     })
-  })
-
-  test('should export SOURCEGRAPH_SUPPORTED_LLM_PROVIDERS with correct values', () => {
-    assert.deepStrictEqual(SOURCEGRAPH_SUPPORTED_LLM_PROVIDERS, ['anthropic', 'google', 'openai'])
   })
 
   test('should export ERROR_MESSAGES with correct values', () => {

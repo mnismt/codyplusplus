@@ -1,16 +1,14 @@
 import { CompletionRequestMessage } from '../core/llm/types'
 
 export enum LLMProvider {
-  Sourcegraph = 'sourcegraph',
   OpenAI = 'openai-compatible'
   // Future providers:
-  // Gemini = 'gemini'
+  // Langchain = 'langchain'
 }
 
 export const AVAILABLE_LLM_PROVIDERS = [LLMProvider.OpenAI]
 
 export const LLM_PROVIDER_API_BASE_URL: Record<LLMProvider, string> = {
-  [LLMProvider.Sourcegraph]: 'https://sourcegraph.com/',
   [LLMProvider.OpenAI]: 'https://api.openai.com/v1/'
 }
 

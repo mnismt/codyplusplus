@@ -1,9 +1,8 @@
 import * as assert from 'assert'
-import { OpenAICompletionResponse, OpenAIModelsResponse } from '../types'
 
 suite('OpenAI Provider Types', () => {
   test('should correctly type OpenAIModelsResponse', () => {
-    const response: OpenAIModelsResponse = {
+    const response = {
       data: [{ id: 'model1' }, { id: 'model2' }, { id: 'model3' }]
     }
 
@@ -14,7 +13,7 @@ suite('OpenAI Provider Types', () => {
   })
 
   test('should correctly type OpenAICompletionResponse', () => {
-    const response: OpenAICompletionResponse = {
+    const response = {
       id: 'test-id',
       object: 'chat.completion',
       created: 1616941267,

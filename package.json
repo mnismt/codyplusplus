@@ -261,6 +261,8 @@
     ]
   },
   "dependencies": {
+    "@langchain/core": "^0.3.43",
+    "@langchain/openai": "^0.5.2",
     "ignore": "^7.0.3",
     "posthog-node": "^4.4.0",
     "zod": "^3.23.8"

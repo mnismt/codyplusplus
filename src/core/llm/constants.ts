@@ -5,12 +5,6 @@ export const CONFIG_KEYS = {
 } as const
 
 export const API_ENDPOINTS = {
-  SOURCEGRAPH: {
-    BASE_URL: 'https://sourcegraph.com',
-    MODELS: '/.api/modelconfig/supported-models.json',
-    COMPLETIONS: '/.api/completions/stream',
-    GRAPHQL: '/.api/graphql'
-  },
   OPENAI: {
     DEFAULT_BASE_URL: 'https://api.openai.com/v1',
     MODELS: '/models',
@@ -19,11 +13,8 @@ export const API_ENDPOINTS = {
 } as const
 
 export const DEFAULT_MODELS = {
-  SOURCEGRAPH: 'claude-3.5-sonnet',
   OPENAI: 'gpt-4o-mini'
 } as const
-
-export const SOURCEGRAPH_SUPPORTED_LLM_PROVIDERS = ['anthropic', 'google', 'openai']
 
 export const ERROR_MESSAGES = {
   NOT_AUTHENTICATED: 'Authentication required. Please sign in.',

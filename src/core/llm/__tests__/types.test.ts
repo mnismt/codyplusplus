@@ -1,6 +1,5 @@
 import * as assert from 'assert'
-import { LLMProvider } from '../../../constants/llm'
-import { BaseLLMProvider, CompletionConfig, CompletionRequest, CompletionResponse } from '../types'
+import { CompletionConfig, CompletionRequest, CompletionResponse } from '../types'
 
 suite('LLM Types', () => {
   test('should correctly type CompletionConfig', () => {
@@ -46,23 +45,5 @@ suite('LLM Types', () => {
     }
 
     assert.strictEqual(response.text, 'This is a response')
-  })
-
-  test('should correctly implement BaseLLMProvider interface', async () => {
-    // Create a mock implementation of BaseLLMProvider
-    const mockProvider: BaseLLMProvider = {
-      providerIdentifier: LLMProvider.OpenAI,
-      complete: async (request: CompletionRequest): Promise<CompletionResponse> => {
-        return { text: 'Mock response' }
-      }
-    }
-
-    assert.strictEqual(mockProvider.providerIdentifier, LLMProvider.OpenAI)
-
-    const response = await mockProvider.complete({
-      messages: [{ role: 'user', content: 'Test' }]
-    })
-
-    assert.strictEqual(response.text, 'Mock response')
   })
 })
