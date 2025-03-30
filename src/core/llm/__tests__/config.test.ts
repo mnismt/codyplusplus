@@ -1,18 +1,13 @@
 import * as assert from 'assert'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as vscode from 'vscode'
+// No longer need vscode for workspace folders here
+// import * as vscode from 'vscode'
 import { SUPPORTED_PROVIDERS } from '../constants'
 
 // Note: No Sinon usage needed for this specific test, but structure follows guidelines
 
-// Helper function to get the workspace root
-function getWorkspaceRoot(): string {
-  if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-    throw new Error('Test requires an open workspace folder.')
-  }
-  return vscode.workspace.workspaceFolders[0].uri.fsPath
-}
+// Helper function removed as it's no longer needed for finding package.json
 
 // Using suite() instead of describe()
 suite('Cody++ LLM Configuration Validation', () => {
@@ -22,8 +17,14 @@ suite('Cody++ LLM Configuration Validation', () => {
   // Using setup() instead of before()
   setup(() => {
     try {
-      const workspaceRoot = getWorkspaceRoot()
-      const packageJsonPath = path.join(workspaceRoot, 'package.json')
+      // Construct path relative to the current test file directory (__dirname)
+      // Go up three levels: __tests__ -> llm -> core -> root
+      const packageJsonPath = path.join(__dirname, '../../../../package.json')
+
+      // Verify the path exists before reading
+      if (!fs.existsSync(packageJsonPath)) {
+        throw new Error(`package.json not found at expected path: ${packageJsonPath}`)
+      }
 
       // Read package.json
       const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf8')
@@ -35,7 +36,7 @@ suite('Cody++ LLM Configuration Validation', () => {
       console.error('Error during test setup:', error)
       // Fail the test suite if setup fails
       throw new Error(
-        `Failed to set up configuration test: ${error instanceof Error ? error.message : error}`
+        `Failed to set up configuration test: ${error instanceof Error ? error.message : String(error)}`
       )
     }
   })

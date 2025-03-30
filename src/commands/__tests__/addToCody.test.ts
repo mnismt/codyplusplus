@@ -8,7 +8,9 @@ import * as fileProcessor from '../../core/filesystem/processor'
 import * as llmModule from '../../core/llm'
 import * as llmUtils from '../../core/llm/utils'
 import { TelemetryService } from '../../services/telemetry.service'
+import * as workspaceConfigUtils from '../../utils/workspace-config'
 import { addFile, addFilesSmart, addFolder, addSelection } from '../addToCody'
+import * as providerCommands from '../providerCommands'
 
 suite('Add to Cody Commands Tests', () => {
   let sandbox: sinon.SinonSandbox
@@ -243,7 +245,6 @@ suite('Add to Cody Commands Tests', () => {
 
   suite('addFilesSmart', () => {
     let showInputBoxStub: sinon.SinonStub
-    let fsStatStub: sinon.SinonStub
     let createProviderStub: sinon.SinonStub
     let withProgressStub: sinon.SinonStub
     let getWorkspaceFileTreeStub: sinon.SinonStub
@@ -253,12 +254,31 @@ suite('Add to Cody Commands Tests', () => {
     let formatFileTreeStub: sinon.SinonStub
     let showInformationMessageStub: sinon.SinonStub
     let showErrorMessageStub: sinon.SinonStub
+    let showWarningMessageStub: sinon.SinonStub
     let asRelativePathStub: sinon.SinonStub
     let mockLlmComplete: sinon.SinonStub
+    let getProviderConfigStub: sinon.SinonStub
+    let selectProviderStub: sinon.SinonStub
+    let executeCommandStub: sinon.SinonStub
+    let selectProviderDirectStub: sinon.SinonStub
+
+    // Declare fsStatStub here but initialize it in setup
+    let fsStatStub: sinon.SinonStub
 
     setup(() => {
       showInputBoxStub = sandbox.stub(vscode.window, 'showInputBox')
-      fsStatStub = sandbox.stub(vscode.workspace.fs, 'stat')
+      getProviderConfigStub = sandbox.stub(workspaceConfigUtils, 'getProviderConfig')
+
+      // Create a mock fs object with a stubbed stat method
+      fsStatStub = sandbox.stub()
+      const mockFs = {
+        stat: fsStatStub
+      }
+
+      // Stub vscode.workspace to return our mock fs
+      // Note: This might be too broad if other fs methods are needed by the tests
+      // We might need to add more methods to mockFs if required.
+      sandbox.stub(vscode.workspace, 'fs').value(mockFs)
 
       // Setup workspace folders
       sandbox.stub(vscode.workspace, 'workspaceFolders').value([
@@ -304,19 +324,35 @@ suite('Add to Cody Commands Tests', () => {
       formatFileTreeStub = sandbox.stub(fileOperations, 'formatFileTree')
       showInformationMessageStub = sandbox.stub(vscode.window, 'showInformationMessage')
       showErrorMessageStub = sandbox.stub(vscode.window, 'showErrorMessage')
+      showWarningMessageStub = sandbox.stub(vscode.window, 'showWarningMessage')
       asRelativePathStub = sandbox.stub(vscode.workspace, 'asRelativePath')
+
+      // Stub executeCommand for selectProvider
+      selectProviderStub = sandbox.stub().resolves(true)
+      executeCommandStub = sandbox.stub(vscode.commands, 'executeCommand')
+      executeCommandStub.callsFake((command: string, ...args: any[]) => {
+        if (command === 'cody-plus-plus.selectProvider') {
+          return selectProviderStub()
+        }
+        return Promise.resolve()
+      })
+
+      // Stub the directly imported selectProvider function
+      selectProviderDirectStub = sandbox.stub(providerCommands, 'selectProvider').resolves(true)
     })
 
-    test('should add files using AI when prompt is provided', async () => {
+    test('should add files using AI when prompt and provider are provided', async () => {
       const folderUri = vscode.Uri.file('/test/folder')
       const prompt = 'test files'
       const context = {} as vscode.ExtensionContext
+      const mockProviderConfig = { provider: 'openai', apiKey: 'key', model: 'gpt-4' }
 
       // Mock user input
       showInputBoxStub.resolves(prompt)
-
+      // Mock existing provider config
+      getProviderConfigStub.resolves(mockProviderConfig)
       // Mock file system check
-      fsStatStub.resolves({ type: vscode.FileType.Directory })
+      fsStatStub.resolves({ type: vscode.FileType.Directory } as vscode.FileStat)
 
       // Mock file tree operations
       const mockFileTree = [
@@ -340,7 +376,11 @@ suite('Add to Cody Commands Tests', () => {
 
       // Verify user input was requested
       assert.strictEqual(showInputBoxStub.calledOnce, true)
-
+      // Verify provider config was checked
+      assert.strictEqual(getProviderConfigStub.calledOnce, true)
+      // Verify selectProvider was NOT called (neither command nor direct)
+      assert.strictEqual(executeCommandStub.withArgs('cody-plus-plus.selectProvider').called, false)
+      assert.strictEqual(selectProviderDirectStub.called, false)
       // Verify file system was checked
       assert.strictEqual(fsStatStub.calledOnce, true)
 
@@ -370,6 +410,140 @@ suite('Add to Cody Commands Tests', () => {
       })
     })
 
+    test('should prompt for provider setup if none exists, then proceed', async () => {
+      const folderUri = vscode.Uri.file('/test/folder')
+      const prompt = 'test files'
+      const context = {} as vscode.ExtensionContext
+      const mockProviderConfig = { provider: 'openai', apiKey: 'key', model: 'gpt-4' }
+
+      // Mock user input
+      showInputBoxStub.resolves(prompt)
+      // Mock NO initial provider config, then mock it after selection
+      getProviderConfigStub.onFirstCall().resolves(undefined)
+      getProviderConfigStub.onSecondCall().resolves(mockProviderConfig)
+      // Mock successful provider selection
+      selectProviderStub.resolves(true)
+      // Mock file system check
+      fsStatStub.resolves({ type: vscode.FileType.Directory } as vscode.FileStat)
+
+      // Mock downstream operations (file tree, LLM, etc.)
+      const mockFileTree = [
+        { name: 'file1.js', path: '/test/folder/file1.js', type: 'file' },
+        { name: 'file2.js', path: '/test/folder/file2.js', type: 'file' }
+      ]
+      getWorkspaceFileTreeStub.resolves(mockFileTree)
+      createCompletionRequestMessagesStub.resolves([{ role: 'user', content: 'test prompt' }])
+      parseLLMResponseStub.returns(['/test/folder/file1.js']) // Simulate 1 file selected
+      executeMentionFileCommandStub.resolves(true)
+      formatFileTreeStub.returns('formatted tree')
+      asRelativePathStub.returns('folder')
+
+      await addFilesSmart([folderUri], context)
+
+      // Verify user input was requested
+      assert.strictEqual(showInputBoxStub.calledOnce, true)
+      // Verify provider config was checked twice
+      assert.strictEqual(getProviderConfigStub.callCount, 2)
+      // Verify selectProvider was called (direct import path)
+      assert.strictEqual(selectProviderDirectStub.calledOnce, true)
+      // Verify selectProvider command was NOT called
+      assert.strictEqual(executeCommandStub.withArgs('cody-plus-plus.selectProvider').called, false)
+      // Verify downstream operations happened
+      assert.strictEqual(fsStatStub.calledOnce, true)
+      assert.strictEqual(getWorkspaceFileTreeStub.calledOnce, true)
+      assert.strictEqual(mockLlmComplete.calledOnce, true)
+      assert.strictEqual(executeMentionFileCommandStub.callCount, 1) // Only 1 file added
+      assert.strictEqual(telemetryTrackStub.calledOnce, true)
+      assert.deepStrictEqual(telemetryTrackStub.firstCall.args[1], {
+        fileCount: 1,
+        folderCount: 1 // Based on the directory of the selected file
+      })
+    })
+
+    test('should cancel if provider setup is cancelled or fails', async () => {
+      const folderUri = vscode.Uri.file('/test/folder')
+      const prompt = 'test files'
+      const context = {} as vscode.ExtensionContext
+
+      // Mock user input
+      showInputBoxStub.resolves(prompt)
+      // Mock NO initial provider config
+      getProviderConfigStub.onFirstCall().resolves(undefined)
+      // Mock FAILED/CANCELLED provider selection (direct import path)
+      selectProviderDirectStub.resolves(false)
+      // Mock provider config still undefined after failed attempt
+      getProviderConfigStub.onSecondCall().resolves(undefined)
+
+      await addFilesSmart([folderUri], context)
+      // Verify provider config checked
+      assert.strictEqual(getProviderConfigStub.callCount, 1)
+      assert.strictEqual(getProviderConfigStub.calledOnce, true) // Only first check happens
+      // Verify selectProvider was called (direct import path)
+      assert.strictEqual(selectProviderDirectStub.calledOnce, true)
+      // Verify warning message shown
+      assert.strictEqual(
+        showWarningMessageStub.calledOnceWith(
+          'Provider setup cancelled or failed. Smart Add cannot proceed.'
+        ),
+        true
+      )
+      // Verify NO downstream operations happened
+      assert.strictEqual(fsStatStub.called, false)
+      assert.strictEqual(getWorkspaceFileTreeStub.called, false)
+      assert.strictEqual(mockLlmComplete.called, false)
+      assert.strictEqual(telemetryTrackStub.called, false)
+    })
+
+    test('should use workspace root if multiple folderUris or a file URI is provided', async () => {
+      const fileUri = vscode.Uri.file('/test/workspace/file.js')
+      const folderUri = vscode.Uri.file('/test/workspace/folder')
+      const folderUris = [fileUri, folderUri] // Mixed URIs
+      const prompt = 'test files'
+      const context = {} as vscode.ExtensionContext
+      const mockProviderConfig = { provider: 'openai', apiKey: 'key', model: 'gpt-4' }
+      const workspaceUri = vscode.workspace.workspaceFolders![0].uri
+
+      showInputBoxStub.resolves(prompt)
+      getProviderConfigStub.resolves(mockProviderConfig)
+      // fs.stat will NOT be called because folderUris.length > 1
+      fsStatStub.resolves({ type: vscode.FileType.Directory } as vscode.FileStat) // Setup just in case, but shouldn't be called
+
+      const mockFileTree = [
+        { name: 'file1.js', path: '/test/workspace/file1.js', type: 'file' },
+        { name: 'sub/file2.js', path: '/test/workspace/sub/file2.js', type: 'file' }
+      ]
+      // Expect getWorkspaceFileTree to be called with the workspace root
+      getWorkspaceFileTreeStub.withArgs(workspaceUri).resolves(mockFileTree)
+
+      createCompletionRequestMessagesStub.resolves([{ role: 'user', content: 'test prompt' }])
+      // Simulate LLM selecting files from different subdirectories
+      parseLLMResponseStub.returns(['/test/workspace/file1.js', '/test/workspace/sub/file2.js'])
+      executeMentionFileCommandStub.resolves(true)
+      formatFileTreeStub.returns('formatted tree')
+      asRelativePathStub.withArgs(workspaceUri).returns('workspace') // Expect relative path of workspace root
+
+      await addFilesSmart(folderUris, context)
+
+      assert.strictEqual(fsStatStub.called, false, 'fs.stat should not be called for multiple URIs')
+      assert.strictEqual(
+        getWorkspaceFileTreeStub.calledOnceWith(workspaceUri),
+        true,
+        'Should scan workspace root'
+      )
+      assert.strictEqual(
+        createCompletionRequestMessagesStub.calledOnceWith(prompt, workspaceUri),
+        true,
+        'Should use workspace URI for context message'
+      )
+      assert.strictEqual(executeMentionFileCommandStub.callCount, 2)
+      assert.strictEqual(asRelativePathStub.calledOnceWith(workspaceUri), true) // Verify root used for message
+      assert.strictEqual(telemetryTrackStub.calledOnce, true)
+      assert.deepStrictEqual(telemetryTrackStub.firstCall.args[1], {
+        fileCount: 2,
+        folderCount: 2 // Folders are /test/workspace and /test/workspace/sub
+      })
+    })
+
     test('should cancel operation when user cancels prompt', async () => {
       const folderUri = vscode.Uri.file('/test/folder')
       const context = {} as vscode.ExtensionContext
@@ -380,7 +554,9 @@ suite('Add to Cody Commands Tests', () => {
       await addFilesSmart([folderUri], context)
 
       // Verify input was requested but no further operations took place
-      assert.strictEqual(showInputBoxStub.calledOnce, true)
+      assert.strictEqual(getProviderConfigStub.called, true)
+      assert.strictEqual(selectProviderDirectStub.called, true)
+      assert.strictEqual(executeCommandStub.withArgs('cody-plus-plus.selectProvider').called, false) // Command should not be called
       assert.strictEqual(createProviderStub.called, false)
       assert.strictEqual(getWorkspaceFileTreeStub.called, false)
       assert.strictEqual(executeMentionFileCommandStub.called, false)
@@ -392,14 +568,19 @@ suite('Add to Cody Commands Tests', () => {
       const prompt = 'test files'
       const context = {} as vscode.ExtensionContext
       const testError = new Error('LLM error')
+      const mockProviderConfig = { provider: 'openai', apiKey: 'key', model: 'gpt-4' }
 
       // Mock user input
       showInputBoxStub.resolves(prompt)
-
+      // Mock provider config
+      getProviderConfigStub.resolves(mockProviderConfig)
       // Mock file system check
-      fsStatStub.resolves({ type: vscode.FileType.Directory })
+      fsStatStub.resolves({ type: vscode.FileType.Directory } as vscode.FileStat)
+      // Mock file tree
+      getWorkspaceFileTreeStub.resolves([{ name: 'f.js', path: '/test/folder/f.js', type: 'file' }])
+      createCompletionRequestMessagesStub.resolves([{ role: 'user', content: 'msg' }])
 
-      // Force LLM error
+      // Mock LLM operations to return empty result
       mockLlmComplete.rejects(testError)
 
       // Use withProgress to execute the task even though it'll error
@@ -417,60 +598,38 @@ suite('Add to Cody Commands Tests', () => {
 
       // Verify error was shown
       assert.strictEqual(showErrorMessageStub.called, true)
+      assert.strictEqual(
+        showErrorMessageStub.firstCall.args[0],
+        'Failed to add files smart to Cody: LLM error'
+      )
       assert.strictEqual(telemetryTrackStub.called, false)
     })
 
-    test('should handle missing workspace or folder', async () => {
+    test('should handle missing workspace', async () => {
       const folderUri = vscode.Uri.file('/test/folder')
       const prompt = 'test files'
       const context = {} as vscode.ExtensionContext
+      const mockProviderConfig = { provider: 'openai', apiKey: 'key', model: 'gpt-4' }
 
       // Mock user input
       showInputBoxStub.resolves(prompt)
+      // Mock provider config
+      getProviderConfigStub.resolves(mockProviderConfig)
 
       // Mock workspace folders as empty
       sandbox.stub(vscode.workspace, 'workspaceFolders').value(undefined)
+      // Mock fs.stat to return FileType.File when workspace is missing
+      // This forces the rootUri ternary to check workspaceFolders, resulting in undefined rootUri
+      fsStatStub.resolves({ type: vscode.FileType.File } as vscode.FileStat)
 
       await addFilesSmart([folderUri], context)
 
-      // Verify error was shown
-      assert.strictEqual(showErrorMessageStub.called, true)
-      assert.strictEqual(executeMentionFileCommandStub.called, false)
-      assert.strictEqual(telemetryTrackStub.called, false)
-    })
-
-    test('should handle API configuration errors', async () => {
-      const folderUri = vscode.Uri.file('/test/folder')
-      const prompt = 'test files'
-      const context = {} as vscode.ExtensionContext
-
-      // Mock user input
-      showInputBoxStub.resolves(prompt)
-
-      // Mock file system check
-      fsStatStub.resolves({ type: vscode.FileType.Directory })
-
-      // Mock missing API configuration
-      sandbox.stub(vscode.workspace, 'getConfiguration').returns({
-        get: sandbox.stub().returns(undefined)
-      } as any)
-
-      // Force provider selection to fail
-      const selectProviderStub = sandbox.stub().resolves(false)
-      sandbox
-        .stub(vscode.commands, 'executeCommand')
-        .callsFake((command: string, ...args: any[]) => {
-          if (command === 'cody-plus-plus.selectProvider') {
-            return selectProviderStub()
-          }
-          return Promise.resolve()
-        })
-
-      await addFilesSmart([folderUri], context)
-
-      // Verify provider selection was attempted but failed
-      assert.strictEqual(selectProviderStub.calledOnce, true)
-      assert.strictEqual(showInformationMessageStub.called, true)
+      // Verify error was shown because workspace is needed
+      assert.strictEqual(
+        showErrorMessageStub.calledOnceWith('No workspace or folder selected.'),
+        true
+      )
+      assert.strictEqual(fsStatStub.calledOnce, true) // fs.stat is called to check folderUri[0]
       assert.strictEqual(executeMentionFileCommandStub.called, false)
       assert.strictEqual(telemetryTrackStub.called, false)
     })
@@ -479,12 +638,14 @@ suite('Add to Cody Commands Tests', () => {
       const folderUri = vscode.Uri.file('/test/folder')
       const prompt = 'test files'
       const context = {} as vscode.ExtensionContext
+      const mockProviderConfig = { provider: 'openai', apiKey: 'key', model: 'gpt-4' }
 
       // Mock user input
       showInputBoxStub.resolves(prompt)
-
+      // Mock provider config
+      getProviderConfigStub.resolves(mockProviderConfig)
       // Mock file system check
-      fsStatStub.resolves({ type: vscode.FileType.Directory })
+      fsStatStub.resolves({ type: vscode.FileType.Directory } as vscode.FileStat)
 
       // Mock file tree operations
       const mockFileTree = [
@@ -506,11 +667,7 @@ suite('Add to Cody Commands Tests', () => {
 
       // Verify LLM was called
       assert.strictEqual(mockLlmComplete.calledOnce, true)
-
-      // Verify no files were added
-      assert.strictEqual(executeMentionFileCommandStub.called, false)
-
-      // Verify telemetry was still tracked
+      // Verify telemetry was still tracked with 0 files/folders
       assert.strictEqual(telemetryTrackStub.calledOnce, true)
       assert.strictEqual(
         telemetryTrackStub.firstCall.args[0],
@@ -518,8 +675,13 @@ suite('Add to Cody Commands Tests', () => {
       )
       assert.deepStrictEqual(telemetryTrackStub.firstCall.args[1], {
         fileCount: 0,
-        folderCount: 0
+        folderCount: 0 // Since no files were selected, folder count is 0
       })
+      // Verify user feedback indicates no files added
+      assert.strictEqual(showInformationMessageStub.calledOnce, true)
+      assert.ok(
+        showInformationMessageStub.firstCall.args[0].includes('0/2 files successfully added')
+      )
     })
   })
 })
