@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+- Add Gemini provider
+- Modify OpenAI provider to OpenAI & OpenAI-compatible for better configuration
+- Refactor llm module
+- Improve tests
+
 ## [0.3.2] - 2025-03-26
 
 - New: Add Telemetry to track folder counts

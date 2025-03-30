@@ -1,5 +1,3 @@
-import { LLMProvider } from '../../constants/llm'
-
 export interface CompletionConfig {
   model?: string
   maxTokens?: number
@@ -22,9 +20,4 @@ export interface CompletionRequest {
 
 export interface CompletionResponse {
   text: string
-}
-
-export interface BaseLLMProvider {
-  providerIdentifier: LLMProvider
-  complete: (request: CompletionRequest) => Promise<CompletionResponse>
 }

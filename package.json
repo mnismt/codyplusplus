@@ -59,25 +59,26 @@
         "codyPlusPlus.llmProvider": {
           "type": "string",
           "enum": [
-            "sourcegraph",
+            "openai",
+            "gemini",
             "openai-compatible"
           ],
-          "default": "sourcegraph",
-          "description": "Select the LLM provider to use"
+          "default": "openai",
+          "description": "Select the LLM provider for Smart Add (OpenAI, Gemini, or OpenAI-Compatible)"
         },
         "codyPlusPlus.llmApiKey": {
           "type": "string",
-          "description": "API key for the selected provider"
+          "description": "API key for the selected provider (OpenAI, Gemini, or OpenAI-Compatible)"
         },
         "codyPlusPlus.openaiBaseUrl": {
           "type": "string",
-          "description": "Base URL for OpenAI-compatible API providers",
+          "description": "Base URL for \"openai-compatible\" provider ONLY (e.g., for local models or proxies)",
           "default": "https://api.openai.com/v1"
         },
         "codyPlusPlus.llmModel": {
           "type": "string",
           "description": "Model to use for LLM completions (defaults to provider-specific model if not set)",
-          "markdownDescription": "Model to use for LLM completions:\n- For OpenAI: defaults to 'gpt-4o-mini'\n- For Sourcegraph: defaults to 'claude-3.5-sonnet'"
+          "markdownDescription": "Model to use for LLM completions:\n- For OpenAI/OpenAI-Compatible: defaults to 'gpt-4o-mini'\n- For Gemini: defaults to 'gemini-1.5-flash'"
         }
       }
     },
@@ -222,7 +223,7 @@
     "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
     "check-types": "tsc --noEmit",
     "lint": "eslint src --ext ts --ignore-pattern \"src/webviews/**\"",
-    "test": "vscode-test",
+    "test": "vscode-test .",
     "prepare": "husky"
   },
   "devDependencies": {
