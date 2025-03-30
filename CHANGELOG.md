@@ -3,9 +3,9 @@
 ## [Unreleased]
 
 - Add Gemini provider
-- Modify OpenAI provider to OpenAI & OpenAI-compatible for better configuration
-- Refactor llm module
-- Improve tests
+- Refactor OpenAI provider to OpenAI & OpenAI-compatible for better configuration
+- Significantly improve tests coverage
+- Add "Select LLM (switch model)" command to switch between models of the selected provider
 
 ## [0.3.2] - 2025-03-26
 
