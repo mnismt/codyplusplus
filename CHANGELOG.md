@@ -4,10 +4,30 @@
 
 ## [0.4.0] - 2025-03-30
 
-- Add Gemini provider
 - Refactor OpenAI provider to OpenAI & OpenAI-compatible for better configuration
-- Significantly improve tests coverage
+- Add Gemini provider
 - Add "Select LLM (switch model)" command to switch between models of the selected provider
+
+  ![image](https://github.com/user-attachments/assets/025a69a1-51ba-4ce7-8529-b06f5ecd2e62)
+
+  - Supported LLM Providers:
+    - OpenAI
+    - Gemini
+    - OpenAI-compatible
+
+  ![image](https://github.com/user-attachments/assets/2ac04927-db04-4280-8cba-04e409a1eb7e)
+
+  - Select and switch between available models for each provider using the "Select LLM (switch model)" command.
+
+  - Google Gemini Models
+
+    ![image](https://github.com/user-attachments/assets/03916253-210c-4aa6-85e9-cb7cab6f6289)
+
+  - OpenAI-compatible (Groq, Ollama, etc.) (example: Groq)
+
+    ![groq(openai-compatible)](https://github.com/user-attachments/assets/dd3d83f0-82e7-4730-b8cc-87ed01986b92)
+
+- Improve tests coverage
 
 ## [0.3.2] - 2025-03-26
 
