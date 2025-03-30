@@ -9,11 +9,15 @@ export const API_ENDPOINTS = {
     DEFAULT_BASE_URL: 'https://api.openai.com/v1',
     MODELS: '/models',
     CHAT_COMPLETIONS: '/chat/completions'
+  },
+  GEMINI: {
+    BASE_URL: 'https://generativelanguage.googleapis.com/v1beta/openai/'
   }
 } as const
 
 export const DEFAULT_MODELS = {
-  OPENAI: 'gpt-4o-mini'
+  OPENAI: 'gpt-4o-mini',
+  GEMINI: 'gemini-1.5-flash'
 } as const
 
 export const ERROR_MESSAGES = {

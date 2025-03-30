@@ -1,8 +1,8 @@
-import { OpenAIProvider } from './openai-provider'
+import { OpenAICompatibleProvider } from './providers/openai-compatible'
 
 export { CompletionRequest, CompletionRequestMessage, CompletionResponse } from './types'
-export { OpenAIProvider }
+export { OpenAICompatibleProvider }
 
-export const createProvider = (): OpenAIProvider => {
-  return new OpenAIProvider()
+export const createProvider = (): OpenAICompatibleProvider => {
+  return new OpenAICompatibleProvider()
 }

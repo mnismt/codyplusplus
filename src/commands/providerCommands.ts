@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 import { LLM_PROVIDER_API_BASE_URL, LLMProvider } from '../constants/llm'
-import { OpenAIProvider } from '../core/llm/openai-provider'
+import { OpenAICompatibleProvider } from '../core/llm/providers/openai-compatible'
 
 export const selectProvider = async (): Promise<boolean> => {
   // Currently we only support OpenAI, but this function is designed
@@ -49,7 +49,7 @@ export const selectProvider = async (): Promise<boolean> => {
   const currentModel = vscode.workspace.getConfiguration('codyPlusPlus').get<string>('llmModel')
 
   // Fetch list of models
-  const models = await OpenAIProvider.fetchModels(
+  const models = await OpenAICompatibleProvider.fetchModels(
     baseUrl || LLM_PROVIDER_API_BASE_URL[LLMProvider.OpenAI],
     apiKey
   )

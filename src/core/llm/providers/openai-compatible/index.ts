@@ -2,21 +2,20 @@ import * as vscode from 'vscode'
 import {
   API_ENDPOINTS,
   CONFIG_KEYS,
-  CONTENT_TYPES,
   DEFAULT_MODELS,
   ERROR_MESSAGES,
   HEADERS
-} from './constants'
-import { OpenAICompletionResponse, OpenAIModelsResponse } from './openai-types'
-import { CompletionRequest, CompletionResponse } from './types'
+} from '../../constants'
+import { CompletionRequest, CompletionResponse } from '../../types'
+import { OpenAICompletionResponse, OpenAIModelsResponse } from './types'
 
-export class OpenAIProvider {
+export class OpenAICompatibleProvider {
   static async fetchModels(baseUrl: string, apiKey: string): Promise<string[]> {
     try {
       const response = await fetch(`${baseUrl}${API_ENDPOINTS.OPENAI.MODELS}`, {
         headers: {
-          [HEADERS.CONTENT_TYPE]: CONTENT_TYPES.JSON,
-          [HEADERS.AUTHORIZATION]: `Bearer ${apiKey}`
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`
         }
       })
 
@@ -27,14 +26,14 @@ export class OpenAIProvider {
       const data = (await response.json()) as OpenAIModelsResponse
       return data.data.map(model => model.id)
     } catch (error) {
-      console.error('Error fetching OpenAI models:', error)
+      console.error('Error fetching models:', error)
       return []
     }
   }
 
-  private apiKey?: string
-  private baseUrl: string
-  private model: string
+  protected apiKey?: string
+  protected baseUrl: string
+  protected model: string
   private readonly headers = { 'Content-Type': 'application/json' }
 
   constructor() {
