@@ -2,6 +2,7 @@ import * as assert from 'assert'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as vscode from 'vscode'
+import { SUPPORTED_PROVIDERS } from '../constants'
 
 // Note: No Sinon usage needed for this specific test, but structure follows guidelines
 
@@ -16,24 +17,20 @@ function getWorkspaceRoot(): string {
 // Using suite() instead of describe()
 suite('Cody++ LLM Configuration Validation', () => {
   let packageJson: any
-  let providerDirs: string[]
+  let supportedProviderCodes: string[]
 
   // Using setup() instead of before()
   setup(() => {
     try {
       const workspaceRoot = getWorkspaceRoot()
       const packageJsonPath = path.join(workspaceRoot, 'package.json')
-      const providersPath = path.join(workspaceRoot, 'src', 'core', 'llm', 'providers')
 
       // Read package.json
       const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf8')
       packageJson = JSON.parse(packageJsonContent)
 
-      // Read provider directory names
-      providerDirs = fs
-        .readdirSync(providersPath, { withFileTypes: true })
-        .filter(dirent => dirent.isDirectory())
-        .map(dirent => dirent.name)
+      // Get codes from SUPPORTED_PROVIDERS array
+      supportedProviderCodes = SUPPORTED_PROVIDERS.map(p => p.code)
     } catch (error) {
       console.error('Error during test setup:', error)
       // Fail the test suite if setup fails
@@ -45,11 +42,10 @@ suite('Cody++ LLM Configuration Validation', () => {
 
   // Using teardown() for consistency, even if empty
   teardown(() => {
-    // No cleanup needed for this test (e.g., sandbox.restore() if Sinon was used)
+    // No cleanup needed for this test
   })
 
-  // Using test() instead of it()
-  test('should have llmProvider enum in package.json matching provider directories', () => {
+  test('should have llmProvider enum in package.json matching SUPPORTED_PROVIDERS codes', () => {
     assert.ok(packageJson, 'package.json should be loaded')
     assert.ok(
       packageJson.contributes?.configuration?.properties?.['codyPlusPlus.llmProvider']?.enum,
@@ -62,12 +58,12 @@ suite('Cody++ LLM Configuration Validation', () => {
 
     // Use Sets for easier comparison (ignores order and duplicates)
     const enumProviderSet = new Set(enumProviders)
-    const dirProviderSet = new Set(providerDirs)
+    const supportedProvidersSet = new Set(supportedProviderCodes)
 
     assert.deepStrictEqual(
       enumProviderSet,
-      dirProviderSet,
-      `Mismatch between package.json llmProvider enum (${[...enumProviderSet].join(', ')}) and provider directories (${[...dirProviderSet].join(', ')})`
+      supportedProvidersSet,
+      `Mismatch between package.json llmProvider enum (${[...enumProviderSet].join(', ')}) and SUPPORTED_PROVIDERS codes (${[...supportedProvidersSet].join(', ')})`
     )
   })
 

@@ -8,6 +8,8 @@ import { createProvider } from '../core/llm'
 import { createCompletionRequestMessages, parseLLMResponse } from '../core/llm/utils'
 import { TelemetryService } from '../services/telemetry.service'
 import { getSuccessCount } from '../utils'
+import { getProviderConfig } from '../utils/workspace-config'
+import { selectProvider } from './providerCommands'
 
 export async function addFile(folderUri: vscode.Uri) {
   const telemetry = TelemetryService.getInstance()
@@ -75,6 +77,30 @@ export async function addFolder(folderUri: vscode.Uri, recursive = true) {
 
 export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.ExtensionContext) {
   const telemetry = TelemetryService.getInstance()
+  let currentProvider = await getProviderConfig()
+
+  if (!currentProvider) {
+    vscode.window.showInformationMessage(
+      'No LLM provider configured for Smart Add. Please set one up.'
+    )
+    const providerSelected = await selectProvider()
+    if (!providerSelected) {
+      vscode.window.showWarningMessage(
+        'Provider setup cancelled or failed. Smart Add cannot proceed.'
+      )
+      return // Exit if provider setup failed or was cancelled
+    }
+    // Re-fetch the provider after selection
+    currentProvider = await getProviderConfig()
+
+    // Double-check if the provider is now set
+    if (!currentProvider) {
+      vscode.window.showErrorMessage(
+        'Failed to configure the provider after selection. Please try again or check settings.'
+      )
+      return
+    }
+  }
 
   try {
     // Prompt user for file selection criteria
@@ -101,7 +127,7 @@ export async function addFilesSmart(folderUris: vscode.Uri[], context: vscode.Ex
     }
 
     // Create LLM provider and ensure authenticated
-    const llm = createProvider()
+    const llm = createProvider(currentProvider)
 
     // Show progress notification
     return vscode.window.withProgress(

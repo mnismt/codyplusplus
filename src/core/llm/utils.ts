@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
-import { FEW_SHOT_EXAMPLES, SYSTEM_PROMPT } from '../../constants/llm'
 import { formatFileTree, getWorkspaceFileTree } from '../filesystem/operations'
+import { FEW_SHOT_EXAMPLES, SYSTEM_PROMPT } from './constants'
 import { CompletionRequestMessage } from './types'
 
 export async function createCompletionRequestMessages(
