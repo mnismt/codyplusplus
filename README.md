@@ -31,9 +31,27 @@ code --install-extension mnismt.cody-plus-plus
 ### Files control
 
 - **Add Files to Cody (Smart)**:
-  - Describe what files you want to add to Cody, and let's AI do the rest.
 
-![image](https://github.com/user-attachments/assets/025a69a1-51ba-4ce7-8529-b06f5ecd2e62)
+  - Describe what files you want to add to Cody, and let the AI do the rest.
+
+  ![image](https://github.com/user-attachments/assets/025a69a1-51ba-4ce7-8529-b06f5ecd2e62)
+
+  - Supported LLM Providers:
+    - OpenAI
+    - Gemini
+    - OpenAI-compatible
+
+  ![image](https://github.com/user-attachments/assets/2ac04927-db04-4280-8cba-04e409a1eb7e)
+
+  - Select and switch between available models for each provider using the "Select LLM (switch model)" command.
+
+  - Google Gemini Models
+
+    ![image](https://github.com/user-attachments/assets/03916253-210c-4aa6-85e9-cb7cab6f6289)
+
+  - OpenAI-compatible (Groq, Ollama, etc.) (example: Groq)
+
+    ![groq(openai-compatible)](https://github.com/user-attachments/assets/dd3d83f0-82e7-4730-b8cc-87ed01986b92)
 
 - **Add File to Cody**:
   - Adds a single file to Cody's context.
