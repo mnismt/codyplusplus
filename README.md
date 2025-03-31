@@ -12,15 +12,13 @@ Enhances [Cody AI](https://sourcegraph.com/cody) with additional files control a
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/CodyPlusPlus)](https://twitter.com/CodyPlusPlus)
 ![CI Tests](https://github.com/mnismt/CodyPlusPlus/actions/workflows/test.yml/badge.svg)
 
-## Requirements
-
-- You must have the [Cody](https://marketplace.visualstudio.com/items?itemName=sourcegraph.cody-ai) extension installed in VS Code.
-
 ## Installation
 
-You can install the Cody++ extension from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mnismt.cody-plus-plus)
+1. Install the [Sourcegraph Cody](https://marketplace.visualstudio.com/items?itemName=sourcegraph.cody-ai) extension in VS Code (if not already installed).
 
-You can also install the extension from the command line:
+2. Install the Cody++ extension from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=mnismt.cody-plus-plus)
+
+3. You can also install the extension from the command line:
 
 ```sh
 code --install-extension mnismt.cody-plus-plus
@@ -116,7 +114,7 @@ To configure this setting in two ways:
 
 ### Requirements
 
-- Node.js 18.x
+- Node.js 20.x
 - pnpm 9.11.0 (specified as the package manager)
 
 ### Testing
@@ -127,25 +125,9 @@ The extension comes with a comprehensive test suite. To run tests locally:
 # Install dependencies
 pnpm install
 
-# Run linting checks
-pnpm run lint
-
-# Compile the extension
-pnpm run compile
-
 # Run tests
 pnpm test
 ```
-
-### Continuous Integration
-
-The project uses GitHub Actions for automated testing and building:
-
-- Tests run on push to main branch and pull requests
-- Tests run on multiple platforms (Windows, macOS, Linux)
-- Tests run against multiple VS Code versions (stable and insiders)
-
-For details about the CI setup, see [docs/ci-setup.md](docs/ci-setup.md).
 
 ## Telemetry
 
