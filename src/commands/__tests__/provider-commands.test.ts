@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 import * as llmModule from '../../core/llm'
 import { CONFIG_KEYS, SUPPORTED_PROVIDERS } from '../../core/llm/constants'
 import * as workspaceConfigUtils from '../../utils/workspace-config'
-import { selectLLM, selectProvider } from '../providerCommands'
+import { selectLLM, selectProvider } from '../provider-commands'
 
 suite('Provider Commands Tests', () => {
   let sandbox: sinon.SinonSandbox

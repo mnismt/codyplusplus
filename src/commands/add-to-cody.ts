@@ -9,7 +9,9 @@ import { createCompletionRequestMessages, parseLLMResponse } from '../core/llm/u
 import { TelemetryService } from '../services/telemetry.service'
 import { getSuccessCount } from '../utils'
 import { getProviderConfig } from '../utils/workspace-config'
-import { selectProvider } from './providerCommands'
+import { selectProvider } from './provider-commands'
+
+let telemetryServiceInstance: TelemetryService | null = null
 
 export async function addFile(folderUri: vscode.Uri) {
   const telemetry = TelemetryService.getInstance()

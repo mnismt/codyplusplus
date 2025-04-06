@@ -3,7 +3,7 @@ import * as sinon from 'sinon'
 import * as vscode from 'vscode'
 import { CustomCommandService } from '../../services/customCommand.service'
 import { CustomCommandsWebview } from '../../views/CustomCommandsWebview'
-import { addCustomCommand, editCustomCommand } from '../addCustomCommand'
+import { addCustomCommand, editCustomCommand } from '../add-custom-command'
 
 suite('Add Custom Command Tests', () => {
   let sandbox: sinon.SinonSandbox

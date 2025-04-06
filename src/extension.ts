@@ -1,9 +1,9 @@
 // Import VS Code API and necessary modules
 import * as vscode from 'vscode'
 // Import custom command handlers
-import { addCustomCommand, editCustomCommand } from './commands/addCustomCommand'
-import { addFile, addFilesSmart, addFolder, addSelection } from './commands/addToCody'
-import { selectLLM, selectProvider } from './commands/providerCommands'
+import { addCustomCommand, editCustomCommand } from './commands/add-custom-command'
+import { addFile, addFilesSmart, addFolder, addSelection } from './commands/add-to-cody'
+import { selectLLM, selectProvider } from './commands/provider-commands'
 // Import services and views
 import { CustomCommandService } from './services/customCommand.service'
 import { TelemetryService } from './services/telemetry.service'

@@ -9,8 +9,8 @@ import * as llmModule from '../../core/llm'
 import * as llmUtils from '../../core/llm/utils'
 import { TelemetryService } from '../../services/telemetry.service'
 import * as workspaceConfigUtils from '../../utils/workspace-config'
-import { addFile, addFilesSmart, addFolder, addSelection } from '../addToCody'
-import * as providerCommands from '../providerCommands'
+import { addFile, addFilesSmart, addFolder, addSelection } from '../add-to-cody'
+import * as providerCommands from '../provider-commands'
 
 suite('Add to Cody Commands Tests', () => {
   let sandbox: sinon.SinonSandbox
